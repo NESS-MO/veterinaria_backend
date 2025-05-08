@@ -1,0 +1,472 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Citas - Veterinaria</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            background-image: url(Imagenes/gato.jpg);
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center center;
+            background-attachment: fixed;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            color: #2563eb;
+            font-family: 'Segoe UI', sans-serif;
+            text-align: center;
+            margin: 40px 0 20px;
+        }
+
+        .sidebar {
+            width: 290px;
+            height: 100vh;
+            background: linear-gradient(135deg, #22d3ee, #1e40af);
+            color: white;
+            padding: 20px;
+            position: fixed;
+            left: 0;
+            top: 0;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 20px 0;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            display: block;
+            padding: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #e4e7eb67;
+        }
+
+        .logo {
+            height: 100px;
+            display: block;
+            margin: 0 auto 20px;
+        }
+
+        section {
+            margin-left: 320px;
+            margin-top: 20px;
+            padding: 30px;
+            background-color: rgba(255, 255, 255, 0.9);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            max-width: 1550px;
+            margin-right: auto;
+            backdrop-filter: blur(10px);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        th, td {
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid #ddd;
+            text-align: center;
+        }
+
+        th {
+            background-color: #2563eb;
+            color: white;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        button {
+            padding: 8px 12px;
+            font-size: 0.95rem;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            font-weight: bold;
+            margin: 5px;
+        }
+
+        .guardar {
+            background-color: #27ae60;
+        }
+
+        .guardar:hover {
+            background-color: #2ecc71;
+        }
+
+        .eliminar {
+            background-color: #e74c3c;
+        }
+
+        .eliminar:hover {
+            background-color: #c0392b;
+        }
+
+        .actions {
+            display: flex;
+            justify-content: center;
+        }
+
+        #loading {
+            text-align: center;
+            padding: 20px;
+        }
+
+    
+    /* .. Todo el resto del CSS original ... */
+
+    #toggle-filtros {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        background: linear-gradient(135deg, #3b82f6, #06b6d4);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        cursor: pointer;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        transition: background 0.3s, transform 0.3s;
+        margin: 0 auto 20px;
+        max-width: 200px;
+        justify-content: center;
+    }
+
+    #toggle-filtros:hover {
+        background: linear-gradient(135deg, #2563eb, #0891b2);
+        transform: scale(1.03);
+    }
+
+    .filtro-campos {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        gap: 20px;
+        padding: 25px;
+        background: rgba(255, 255, 255, 0.95);
+        border-radius: 16px;
+        margin-bottom: 25px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        transition: all 0.4s ease;
+    }
+
+    .filtro-campos.mostrar {
+        max-height: 1000px;
+        opacity: 1;
+    }
+
+    .filtro-campos .campo {
+        position: relative;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .filtro-campos label {
+        font-weight: 600;
+        margin-bottom: 6px;
+        color: #1e40af;
+        font-size: 14px;
+    }
+
+    .filtro-campos input {
+        padding: 10px 14px 10px 40px;
+        border: 1px solid #ccc;
+        border-radius: 12px;
+        font-size: 15px;
+        background-color: #f9f9f9;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+        transition: border-color 0.3s;
+    }
+
+    .filtro-campos input:focus {
+        border-color: #1e40af;
+        outline: none;
+        background-color: #fff;
+    }
+
+    .filtro-campos .campo::before {
+        content: "🔍";
+        position: absolute;
+        top: 35px;
+        left: 12px;
+        font-size: 14px;
+        opacity: 0.6;
+    }
+
+    #filtro-fecha::before,
+    #filtro-hora::before {
+        content: none;
+    }
+
+    #btn-limpiar {
+        background: linear-gradient(135deg, #2563eb, #0891b2);
+        color: white;
+        padding: 10px 16px;
+        border-radius: 10px;
+        font-weight: bold;
+        margin-top: 24px;
+        cursor: pointer;
+        transition: background 0.3s ease;
+        align-self: flex-end;
+    }
+
+    #btn-limpiar:hover {
+        background-color: #d97706;
+    }
+
+
+    </style>
+</head>
+<body>
+
+    <div class="sidebar">
+        <img class="logo" src="Imagenes/logo2.png" alt="">
+        <h2>Menú</h2>
+        <ul>
+            <li><a>Citas Solicitadas</a></li>
+            <li><a href={% url "registroc" %} >Registro Citas</a></li>
+            <li><a href={% url "Tipdelasemana" %} >Modificar Información <br>¡TIP DE LA SEMANA!</a></li>
+            <li><a href={% url "Galeria" %} >Modificar fotos "Nuestro trabajo"</a></li>
+            <li><a href={% url "modificarservicio" %} >Modificar Servicios</a></li>
+            <li><a href={% url "index" %} >Cerrar sesión</a></li>
+        </ul>
+    </div>
+
+    <section>
+        <h1>Panel de Administración de Citas</h1>
+
+        <button id="toggle-filtros">
+            <i class="fas fa-sliders-h"></i>
+            <span>Filtros</span>
+        </button>
+
+        <div class="filtro-campos" id="contenedor-filtros">
+            <div class="campo">
+                <label for="filtro-nombre">Nombre</label>
+                <input type="text" id="filtro-nombre" placeholder="Nombre">
+            </div>
+            <div class="campo">
+                <label for="filtro-correo">Correo</label>
+                <input type="text" id="filtro-correo" placeholder="Correo">
+            </div>
+            <div class="campo">
+                <label for="filtro-telefono">Teléfono</label>
+                <input type="text" id="filtro-telefono" placeholder="Teléfono">
+            </div>
+            <div class="campo">
+                <label for="filtro-mascota">Mascota</label>
+                <input type="text" id="filtro-mascota" placeholder="Mascota">
+            </div>
+            <div class="campo">
+                <label for="filtro-fecha">Fecha</label>
+                <input type="date" id="filtro-fecha">
+            </div>
+            <div class="campo">
+                <label for="filtro-hora">Hora</label>
+                <input type="time" id="filtro-hora">
+            </div>
+            <div class="campo">
+                <label for="filtro-servicio">Servicios</label>
+                <input type="text" id="filtro-servicio" placeholder="Servicios">
+            </div>
+            <div class="campo">
+                <button id="btn-limpiar">Limpiar</button>
+            </div>
+        </div>
+
+        <div id="loading" style="display: none;">
+            <img src="Imagenes/loading.gif" alt="Cargando...">
+        </div>
+
+        <table id="tabla-citas">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Correo</th>
+                    <th>Teléfono</th>
+                    <th>Mascota</th>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Servicios</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </section>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loadingElement = document.getElementById('loading');
+            const tablaCitas = document.getElementById('tabla-citas').getElementsByTagName('tbody')[0];
+            const toggleBtn = document.getElementById('toggle-filtros');
+            const contenedorFiltros = document.getElementById('contenedor-filtros');
+
+            const filtroNombre = document.getElementById('filtro-nombre');
+            const filtroCorreo = document.getElementById('filtro-correo');
+            const filtroTelefono = document.getElementById('filtro-telefono');
+            const filtroMascota = document.getElementById('filtro-mascota');
+            const filtroFecha = document.getElementById('filtro-fecha');
+            const filtroHora = document.getElementById('filtro-hora');
+            const filtroServicio = document.getElementById('filtro-servicio');
+            const btnLimpiar = document.getElementById('btn-limpiar');
+
+            let citas = JSON.parse(localStorage.getItem('citas')) || [];
+
+            toggleBtn.addEventListener('click', () => {
+                contenedorFiltros.classList.toggle('mostrar');
+            });
+
+            function mostrarCitas() {
+                tablaCitas.innerHTML = '';
+                const nombre = filtroNombre.value.toLowerCase();
+                const correo = filtroCorreo.value.toLowerCase();
+                const telefono = filtroTelefono.value.toLowerCase();
+                const mascota = filtroMascota.value.toLowerCase();
+                const fecha = filtroFecha.value;
+                const hora = filtroHora.value;
+                const servicio = filtroServicio.value.toLowerCase();
+
+                citas.forEach((cita, index) => {
+                    const coincide =
+                        (!nombre || cita.nombre.toLowerCase().includes(nombre)) &&
+                        (!correo || cita.correo.toLowerCase().includes(correo)) &&
+                        (!telefono || cita.telefono.toLowerCase().includes(telefono)) &&
+                        (!mascota || cita.mascota.toLowerCase().includes(mascota)) &&
+                        (!fecha || cita.fecha === fecha) &&
+                        (!hora || cita.hora === hora) &&
+                        (!servicio || cita.servicios.join(',').toLowerCase().includes(servicio));
+
+                    if (coincide) {
+                        const row = tablaCitas.insertRow();
+                        row.innerHTML = `
+                            <td><input type="text" value="${cita.nombre}" data-index="${index}" data-campo="nombre"></td>
+                            <td><input type="email" value="${cita.correo}" data-index="${index}" data-campo="correo"></td>
+                            <td><input type="text" value="${cita.telefono}" data-index="${index}" data-campo="telefono"></td>
+                            <td><input type="text" value="${cita.mascota}" data-index="${index}" data-campo="mascota"></td>
+                            <td><input type="date" value="${cita.fecha}" data-index="${index}" data-campo="fecha"></td>
+                            <td><input type="time" value="${cita.hora}" data-index="${index}" data-campo="hora"></td>
+                            <td><input type="text" value="${cita.servicios.join(', ')}" data-index="${index}" data-campo="servicios"></td>
+                            <td class="actions">
+                                <button class="guardar" data-index="${index}">Guardar</button>
+                                <button class="eliminar" data-index="${index}">Eliminar</button>
+                            </td>
+                        `;
+                    }
+                });
+
+                loadingElement.style.display = 'none';
+            }
+
+            tablaCitas.addEventListener('click', function (e) {
+                const index = e.target.dataset.index;
+                if (e.target.classList.contains('eliminar')) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: '¿Seguro que deseas eliminar esta cita?',
+                        showConfirmButton: true,
+                        showCancelButton: true
+                    }).then(result => {
+                        if (result.isConfirmed) {
+                            citas.splice(index, 1);
+                            localStorage.setItem('citas', JSON.stringify(citas));
+                            mostrarCitas();
+                            Swal.fire({
+                                icon: 'warning',
+                                title: '¡Cita eliminada!',
+                                showConfirmButton: false,
+                                timer: 1500
+                            });
+                        }
+                    });
+                } else if (e.target.classList.contains('guardar')) {
+                    const inputs = tablaCitas.querySelectorAll(`input[data-index="${index}"]`);
+                    let citaActualizada = {};
+                    inputs.forEach(input => {
+                        if (input.dataset.campo === 'servicios') {
+                            citaActualizada[input.dataset.campo] = input.value.split(',').map(s => s.trim());
+                        } else {
+                            citaActualizada[input.dataset.campo] = input.value;
+                        }
+                    });
+                    citas[index] = citaActualizada;
+                    localStorage.setItem('citas', JSON.stringify(citas));
+                    Swal.fire({
+                        icon: 'success',
+                        title: '¡Cita actualizada correctamente!',
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                }
+            });
+
+            filtroNombre.addEventListener('input', mostrarCitas);
+            filtroCorreo.addEventListener('input', mostrarCitas);
+            filtroTelefono.addEventListener('input', mostrarCitas);
+            filtroMascota.addEventListener('input', mostrarCitas);
+            filtroFecha.addEventListener('change', mostrarCitas);
+            filtroHora.addEventListener('input', mostrarCitas);
+            filtroServicio.addEventListener('input', mostrarCitas);
+
+            btnLimpiar.addEventListener('click', () => {
+                filtroNombre.value = '';
+                filtroCorreo.value = '';
+                filtroTelefono.value = '';
+                filtroMascota.value = '';
+                filtroFecha.value = '';
+                filtroHora.value = '';
+                filtroServicio.value = '';
+                mostrarCitas();
+            });
+
+            mostrarCitas();
+        });
+    </script>
+</body>
+</html>
+
+</html>

@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <script>
+        const STATIC_URL = "{% static "" %}";
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inicio - DR.PUL</title>
+    <link rel="icon" href={% static "Images/Logo.png" %}/>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href={%static "css/1. Index.css"%}>
+    
+    <!-- Widget de Accesibilidad -->
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href={%static "css/custom.css"%}>
+</head>
+
+<body>
+    <header>
+        <!--Logo de encabezado-->
+        <div class="Logotipo">
+            <a href="1. Index.html">
+                <img src={%static "Images/logo2.png"%} alt="logo DR.PUL">
+            </a>
+            <h3 class="eslogan">COMPROMETIDOS CON LA SALUD ANIMAL</h3>
+        </div>
+
+        <!--Menú hamburguesa responsivo-->
+        <button class="abrir" id="abrir-menu">☰</button>
+        
+        <!--Opciones de encabezado-->
+        <nav class="opciones" id="menu">
+            <button class="cerrar" id="cerrar-menu">✕</button>
+            <a href="1. Index.html">INICIO</a>
+            <a href="#conocenos">CONÓCENOS</a>
+            <a href="2. Servicios.html">SERVICIOS</a>
+            <a href="3. Agendar.html">AGENDAR CITA</a>
+            <a href="4. Login.html"><img class="perfil" src={%static "Images/perfil.png"%} alt="logo DR.PUL"></a>
+        </nav>
+    </header>
+
+{% block content %}
+{% endblock %}
+
+    <!--Pie de pagina-->
+    <footer>
+        <div class="footer-container">
+            <!-- Información de contacto -->
+            <div class="footer-section">
+                <h3>DR.PUL - Clínica Veterinaria</h3>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="material-icons">location_on</i>
+                        <p>Cl. 16 #915, Sogamoso, Boyacá</p>
+                    </div>
+                    <div class="contact-item">
+                        <i class="material-icons">phone</i>
+                        <p>+57 310 6890146</p>
+                    </div>
+                    <div class="contact-item">
+                        <i class="material-icons">email</i>
+                        <p>veterinariadr.pul@gmail.com</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Horario de atención -->
+            <div class="footer-section">
+                <h3>Horario de atención</h3>
+                <div class="schedule">
+                    <p>Lunes a Viernes: 8:00 AM - 6:00 PM</p>
+                    <p>Sábados: 9:00 AM - 2:00 PM</p>
+                    <p>Domingos: Cerrado</p>
+                </div>
+            </div>
+            
+            <!-- Enlaces rápidos -->
+            <div class="footer-section">
+                <h3>Enlaces rápidos</h3>
+                <div class="quick-links">
+                    <a href="1. Index.html">Inicio</a>
+                    <a href="#conocenos">Conócenos</a>
+                    <a href="2. Servicios.html">Servicios</a>
+                    <a href="3. Agendar.html">Agendar cita</a>
+                    <a href="4. Login.html">Iniciar sesión</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Derechos de autor -->
+        <div class="copyright">
+            <p>&copy; 2025 DR.PUL Veterinaria. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+{%block content%}
+{%endblock%}

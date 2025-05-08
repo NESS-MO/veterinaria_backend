@@ -1,0 +1,296 @@
+{%load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <script>
+        const STATIC_URL = "{% static '' %}";
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendario y Agendar</title>
+    <link rel="icon" href={% static "Images/Logo.png" %}/>
+    <link href='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.css' rel='stylesheet' />
+    <link rel="stylesheet" href={% static "css/3. Agendar.css" %}>
+</head>
+<body>
+    <header>
+        <div class="Logotipo">
+            <a href={% url "index" %}>
+                <img src={% static "Images/logo2.png" %} alt="logo DR.PUL">
+            </a>
+            <h3 class="eslogan">COMPROMETIDOS CON LA SALUD ANIMAL</h3>
+        </div>
+    
+        <button class="abrir" id="abrir-menu">☰</button>
+    
+        <nav class="opciones" id="menu">
+            <button class="cerrar" id="cerrar-menu">✕</button>
+            <a href="{% url "index" %}">INICIO</a>
+            <a href="{% url "index" %}#conocenos">CONÓCENOS</a>
+            <a href="{% url "servicios" %}">SERVICIOS</a>
+            <a href="{% url "agendar" %}">AGENDAR CITA</a>
+            <a href="{% url "login" %}"><img class="perfil" src={% static "Images/perfil.png" %} alt="logo DR.PUL"></a>
+        </nav>
+    </header>
+
+    
+    <div class="container" id="calen">
+        <div class="calendario-section">
+            <h2>Calendario de disponibilidad</h2>
+            <div id="calendario"></div>
+        </div>
+        <a href="#formulario" class="agendar">Agendar</a>
+    </div>
+
+    <section class="formulario" id="formulario">
+        <div class="container">
+            <h2>Agendar Cita</h2>
+            <h4></h4>
+            <p>Complete el formulario para agendar una cita con nuestros veterinarios.</p>
+            <form action="#" method="POST" id="appointment-form">
+                <div class="form-group">
+                    <label for="nombre">Nombre Completo (Dueño) </label>
+                    <input type="text" id="nombre" name="nombre" required placeholder="Ingresa tu nombre completo">
+                </div>
+                <div class="form-group">
+                    <label for="correo">Correo Electrónico</label>
+                    <input type="email" id="correo" name="correo" required placeholder="Ingresa tu correo electrónico">
+                </div>
+                <div class="form-group">
+                    <label for="telefono">Número de Teléfono</label>
+                    <input type="tel" id="telefono" name="telefono" required placeholder="Ingresa tu número de teléfono">
+                </div>
+                <div class="form-group">
+                    <label for="mascota">Nombre de la Mascota</label>
+                    <input type="text" id="mascota" name="mascota" required placeholder="Ingresa el nombre de tu mascota">
+                </div>
+                <div class="form-group">
+                    <label for="clase-mascota">Clase de Mascota</label>
+                    <select id="clase-mascota" name="clase-mascota" required>
+                        <option value="">Selecciona la clase de tu mascota</option>
+                        <option value="Perro">Perro</option>
+                        <option value="Gato">Gato</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="fecha">Selecciona en el calendario de arriba la fecha que este disponible</label>
+                    <input type="date" id="fecha" name="fecha" required readonly>
+                </div>
+                <div class="form-group">
+                    <label for="hora">Hora de la Cita</label>
+                    <input type="time" id="hora" name="hora" required>
+                </div>
+                <div class="form-group">
+                    <label for="services">Motivo de la Cita:</label>
+                    <div class="checkbox-group">
+                        <label>Consulta <input type="checkbox" name="services" value="consulta"></label>
+                        <label>Esterilización <input type="checkbox" name="services" value="esterilizacion"></label>
+                        <label>Guardería <input type="checkbox" name="services" value="guarderia"></label>
+                        <label>Vacunación <input type="checkbox" name="services" value="vacunacion"></label>
+                        <label>Profilaxis <input type="checkbox" name="services" value="profilaxis"></label>
+                        <label>Cirugías <input type="checkbox" name="services" value="cirugias"></label>
+                    </div>
+                    </div
+                <button type="submit" class="agendar">Enviar</button>
+                <a class="dispo" href="#inicio"><h3>⬆️ Disponibilidad ⬆️</h3></a>
+            </form>
+        </div>
+    </section>
+
+    <footer>
+        <div class="footer-container">
+            <!-- Información de contacto -->
+            <div class="footer-section">
+                <h3>DR.PUL - Clínica Veterinaria</h3>
+                <div class="contact-info">
+                    <div class="contact-item">
+                        <i class="material-icons">location_on</i>
+                        <p>Cl. 16 #915, Sogamoso, Boyacá</p>
+                    </div>
+                    <div class="contact-item">
+                        <i class="material-icons">phone</i>
+                        <p>+57 310 6890146</p>
+                    </div>
+                    <div class="contact-item">
+                        <i class="material-icons">email</i>
+                        <p>veterinariadr.pul@gmail.com</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Horario de atención -->
+            <div class="footer-section">
+                <h3>Horario de atención</h3>
+                <div class="schedule">
+                    <p>Lunes a Viernes: 8:00 AM - 6:00 PM</p>
+                    <p>Sábados: 9:00 AM - 2:00 PM</p>
+                    <p>Domingos: Cerrado</p>
+                </div>
+            </div>
+            
+            <!-- Enlaces rápidos -->
+            <div class="footer-section">
+                <h3>Enlaces rápidos</h3>
+                <div class="quick-links">
+                    <a href={% url "index" %}>Inicio</a>
+                    <a href="{% url "index" %}#conocenos">Conócenos</a>
+                    <a href={% url "servicios" %}>Servicios</a>
+                    <a href={% url "agendar" %}>Agendar cita</a>
+                    <a href={% url "login" %}>Iniciar sesión</a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Derechos de autor -->
+        <div class="copyright">
+            <p>&copy; 2023 DR.PUL Veterinaria. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js'></script>
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/locales/es.min.js'></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+    var calendarEl = document.getElementById('calendario');
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'es',
+        events: function (fetchInfo, successCallback, failureCallback) {
+            var citas = JSON.parse(localStorage.getItem('citas')) || [];
+            var events = citas.map(function (cita, index) {
+                return {
+                    title: `Cita: ${cita.mascota}`,
+                    start: `${cita.fecha}T${cita.hora}`,
+                    description: `Servicios: ${cita.servicios.join(', ')}`,
+                    extendedProps: {
+                        citaIndex: index
+                    }
+                };
+            });
+            successCallback(events);
+        },
+        dateClick: function (info) {
+            var fechaSeleccionada = info.dateStr;
+            document.getElementById('fecha').value = fechaSeleccionada;
+
+            window.scrollTo({
+                top: document.getElementById('formulario').offsetTop,
+                behavior: 'smooth'
+            });
+        },
+        eventClick: function (info) {
+            if (confirm(`¿Deseas cancelar la cita para ${info.event.title}?`)) {
+                var citas = JSON.parse(localStorage.getItem('citas')) || [];
+                var citaIndex = info.event.extendedProps.citaIndex;
+                citas.splice(citaIndex, 1);
+                localStorage.setItem('citas', JSON.stringify(citas));
+                info.event.remove();
+            }
+
+        },
+        eventTimeFormat: {
+            hour: '2-digit',
+            minute: '2-digit',
+            meridiem: 'short'
+        }
+    });
+
+    calendar.render();
+
+    document.getElementById('appointment-form').addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        var nombre = document.getElementById('nombre').value;
+        var correo = document.getElementById('correo').value;
+        var telefono = document.getElementById('telefono').value;
+        var mascota = document.getElementById('mascota').value;
+        var fecha = document.getElementById('fecha').value;
+        var hora = document.getElementById('hora').value;
+        var services = [];
+        const serviceCheckboxes = document.querySelectorAll('input[name="services"]:checked');
+
+        serviceCheckboxes.forEach(function (checkbox) {
+            services.push(checkbox.value);
+        });
+
+        if (!fecha || !hora || services.length === 0) {
+            alert('Por favor llena los campos de la fecha, hora o un motivo de cita.');
+            return;
+        }
+
+        var citas = JSON.parse(localStorage.getItem('citas')) || [];
+        var existeCita = citas.some(function (cita) {
+            return cita.fecha === fecha && cita.hora === hora;
+        });
+
+        if (existeCita) {
+            alert('¡Esta hora ya está ocupada! Por favor, selecciona otra hora.');
+            return;
+        }
+
+        var nuevaCita = {
+            nombre: nombre,
+            correo: correo,
+            telefono: telefono,
+            mascota: mascota,
+            fecha: fecha,
+            hora: hora,
+            servicios: services
+        };
+
+        citas.push(nuevaCita);
+        localStorage.setItem('citas', JSON.stringify(citas));
+
+        calendar.addEvent({
+            title: `Cita: ${mascota}`,
+            start: `${fecha}T${hora}`,
+            description: `Servicios: ${services.join(', ')}`
+        });
+
+        document.getElementById('appointment-form').reset();
+        alert('✅ ¡Tu cita ha sido guardada exitosamente!');
+    });
+});
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Obtener el parámetro "servicio" de la URL
+    const params = new URLSearchParams(window.location.search);
+    const servicio = params.get('servicio');
+
+    if (servicio) {
+        const checkbox = document.querySelector(`input[name="services"][value="${servicio}"]`);
+        if (checkbox) {
+            checkbox.checked = true;
+        }
+    }
+});
+
+    </script>
+
+    <script src={% static "JavaScript/MenuHamburguesa.js" %}></script>
+
+    <script>
+        window.siennaOptions = {
+            buttonColor: '#3a6ead',
+            buttonIconColor: '#ffffff',
+            highlightColor: '#3a6ead',
+            menuBackgroundColor: '#ffffff',
+            menuTextColor: '#333333'
+        };
+    </script>
+
+
+    <script src="BotonesFlotantes.js"></script>
+    <script src={% static "JavaScript/sienna.js" %}></script>
+    <script src={% static "JavaScript/custom.js" %}></script>
+
+<!--Boton Tip de la semana-->
+<script src={% static "JavaScript/js-BotonTipSemana.js" %}></script>
+<!--Boton Whatsapp-->
+<script src={% static "JavaScript/js-BotonWhatsapp.js" %}></script>
+<!--Boton Ayuda-->
+<script src={% static "JavaScript/js-BotonAyuda.js" %}></script>
+
+<script src={% static "JavaScript/From.js" %}></script>
+
+</body>
+</html>

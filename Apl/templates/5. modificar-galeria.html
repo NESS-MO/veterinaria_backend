@@ -1,0 +1,197 @@
+{%load static%}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modificar Galería</title>
+</head>
+<body>
+    <div class="sidebar">
+        <img class="logo" src={% static "Images/logo2.png" %} alt="">
+        <h2>Menú</h2>
+        <ul>
+            <li><a href={% url "gestioncitas" %} >Citas Solicitadas</a></li>
+            <li><a href={% url "registroc" %} >Registro Citas</a></li>
+            <li><a href={% url "Tipdelasemana" %} >Modificar Información <br>¡TIP DE LA SEMANA!</a></li>
+            <li><a href={% url "Galeria" %} >Modificar fotos "Nuestro trabajo"</a></li>
+            <li><a href={% url "modificarservicio" %} >Modificar Servicios</a></li>
+            <li><a href={% url "index" %} >Cerrar sesión</a></li>
+        </ul>
+    </div>
+    
+    <div class="content">
+        <div class="container">
+            <h1>Modificar Imágenes de la Galería</h1>
+            
+            <!-- Inputs para cada imagen con preview -->
+            <div class="imagen-input">
+                <label for="img1">Imagen 1:</label>
+                <input type="file" id="img1" accept="image/*" onchange="mostrarPreview(this, 'preview1')">
+                <div id="preview1" class="preview"></div>
+            </div>
+            <div class="imagen-input">
+                <label for="img2">Imagen 2:</label>
+                <input type="file" id="img2" accept="image/*" onchange="mostrarPreview(this, 'preview2')">
+                <div id="preview2" class="preview"></div>
+            </div>
+            <div class="imagen-input">
+                <label for="img3">Imagen 3:</label>
+                <input type="file" id="img3" accept="image/*" onchange="mostrarPreview(this, 'preview3')">
+                <div id="preview3" class="preview"></div>
+            </div>
+            <div class="imagen-input">
+                <label for="img4">Imagen 4:</label>
+                <input type="file" id="img4" accept="image/*" onchange="mostrarPreview(this, 'preview4')">
+                <div id="preview4" class="preview"></div>
+            </div>
+            <div class="imagen-input">
+                <label for="img5">Imagen 5:</label>
+                <input type="file" id="img5" accept="image/*" onchange="mostrarPreview(this, 'preview5')">
+                <div id="preview5" class="preview"></div>
+            </div>
+    
+            <button onclick="actualizarGaleria()">Actualizar Galería</button>
+        </div>
+    </div>
+    <style>/* Estilo general del cuerpo */
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+        }
+        
+        .logo{
+            height: 100px;
+            margin-bottom: 20px;
+        }
+          
+          /* Estilos para la barra lateral */
+          .sidebar {
+            width: 250px;
+            height: 100vh;
+            background: linear-gradient(135deg, #22d3ee,#1e40af); 
+            color: white;
+            padding: 20px;
+            position: fixed;
+            left: 0;
+            top: 0;
+          }
+          
+          .sidebar h2 {
+            text-align: center;
+            margin-top: 0;
+          }
+          
+          .sidebar ul {
+            list-style-type: none;
+            padding: 0;
+          }
+          
+          .sidebar ul li {
+            margin: 20px 0;
+          }
+          
+          .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            display: block;
+            padding: 10px;
+            transition: background-color 0.3s ease;
+          }
+          
+          .sidebar ul li a:hover {
+            background-color: #e4e7eb67;
+          }
+          
+          /* Estilos para el contenido principal */
+          .content {
+            margin-left: 270px;
+            padding: 20px;
+            flex: 1;
+          }
+          
+          .content h1 {
+            color: #333;
+          }
+          
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .imagen-input {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="file"] {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #1e40af;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            cursor: pointer;
+        }
+        .preview {
+            max-width: 200px;
+            margin-top: 10px;
+            border: 1px solid #ddd;
+            padding: 5px;
+        }</style>
+
+    <script>
+        // Función para mostrar la preview de la imagen seleccionada
+        function mostrarPreview(input, previewId) {
+            const preview = document.getElementById(previewId);
+            preview.innerHTML = '';
+            
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    const img = document.createElement('img');
+                    img.src = e.target.result;
+                    img.style.maxWidth = '100%';
+                    preview.appendChild(img);
+                }
+                
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        // Función para actualizar las imágenes
+        function actualizarGaleria() {
+            const imagenes = [];
+            for(let i = 1; i <= 5; i++) {
+                const input = document.getElementById(`img${i}`);
+                if (input.files && input.files[0]) {
+                    imagenes.push(input.files[0]);
+                }
+            }
+
+            if (imagenes.length === 0) {
+                alert('Por favor, seleccione al menos una imagen');
+                return;
+            }
+
+            // Convertir los archivos a URLs
+            const urls = imagenes.map(file => URL.createObjectURL(file));
+            
+            // Guardar en localStorage
+            localStorage.setItem('galeriaUrls', JSON.stringify(urls));
+            
+            alert('Las imágenes se han guardado correctamente');
+        }
+
+    </script>
+</body>
+</html>
