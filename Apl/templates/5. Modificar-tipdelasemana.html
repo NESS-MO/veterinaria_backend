@@ -6,244 +6,75 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Edición Tip de la Semana</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href=" {% static 'css/ModTip.css' %}">
+  <script src="https://cdn.tailwindcss.com"></script>
+
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-image: url(Imagenes/GATO\ FONDO.jpg);
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
-      display: flex;
-    }
     
-
-    .fade-in {
-            animation: fadeIn 0.6s ease-out forwards;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-            }
-            .sidebar ul {
-                display: flex;
-                flex-direction: column;
-            }
-            .sidebar ul li {
-                margin: 10px 0;
-            }
-            body {
-                margin-left: 0;
-            }
-            .main-content {
-                margin-left: 0;
-            }
-        }
-
-    .logo {
-      height: 80px;
-      margin: 20px auto 10px;
-      display: block;
-    }
-
-    .sidebar {
-            width: 290px;
-            height: 100vh;
-            background: linear-gradient(135deg, #22d3ee,#1e40af);
-            color: white;
-            padding: 20px;
-            position: fixed;
-            left: 0;
-            top: 0;
-        }
-
-        .sidebar h2 {
-            text-align: center;
-        }
-
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .sidebar ul li {
-            margin: 20px 0;
-        }
-
-        .sidebar ul li a {
-            color: white;
-            text-decoration: none;
-            font-size: 18px;
-            display: block;
-            padding: 10px;
-            transition: background-color 0.3s ease;
-        }
-
-        .sidebar ul li a:hover {
-            background-color: #e4e7eb67;
-        }
-
-    .main-content {
-      margin-left: 280px;
-      padding: 40px 60px;
-      width: calc(100% - 280px);
-    }
-
-    h2 {
-      font-family: 'Segoe UI', sans-serif;
-      font-size: 2.5rem;
-      color: #2c3e50;
-      text-align: center;
-      position: relative;
-    }
-
-    h2::after {
-      content: '';
-      display: block;
-      margin: 12px auto 0;
-      width: 60px;
-      height: 4px;
-      background-color: #3498db;
-      border-radius: 4px;
-    }
-
-    .sects {
-      display: flex;
-      justify-content: center;
-      margin-top: 40px;
-    }
-
-    .sects div {
-      background: #ffffff;
-      padding: 30px;
-      border-radius: 16px;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.08);
-      width: 100%;
-      max-width: 500px;
-      transition: transform 0.3s ease;
-    }
-
-    .sects div:hover {
-      transform: translateY(-5px);
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 20px;
-    }
-
-    label {
-      font-weight: 500;
-      color: #34495e;
-      font-size: 15px;
-    }
-
-    input[type="text"],
-    input[type="file"],
-    textarea {
-      padding: 12px 14px;
-      border: 1px solid #ccc;
-      border-radius: 10px;
-      font-size: 15px;
-      transition: all 0.3s ease;
-    }
-
-    input[type="text"]:focus,
-    textarea:focus {
-      outline: none;
-      border-color: #3498db;
-      box-shadow: 0 0 0 4px rgba(52, 152, 219, 0.2);
-    }
-
-    textarea {
-      resize: vertical;
-      min-height: 100px;
-    }
-
-    #previewImage {
-      display: none;
-      max-width: 100%;
-      max-height: 200px;
-      margin-top: 15px;
-      border-radius: 10px;
-      object-fit: contain;
-      border: 1px solid #ddd;
-    }
-
-    .guardar,
-    .eliminar {
-      padding: 14px 28px;
-      margin: 30px auto 0;
-      display: block;
-      font-size: 16px;
-      border-radius: 10px;
-      font-weight: 600;
-      border: none;
-      cursor: pointer;
-      transition: all 0.3s ease;
-    }
-
-    .guardar {
-      background-color: #3498db;
-      color: white;
-    }
-
-    .guardar:hover {
-      background-color: #2980b9;
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-      transform: translateY(-2px);
-    }
-
-    .eliminar {
-      background-color: #e74c3c;
-      color: white;
-    }
-
-    .eliminar:hover {
-      background-color: #c0392b;
-      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-      transform: translateY(-2px);
-    }
   </style>
 </head>
 <body>
-  <div class="sidebar">
-    <img class="logo" src={% static "Images/logo2.png" %} alt="Logo">
-    <h2>Menú</h2>
-    <ul>
-      <li><a href={% url "gestioncitas" %} >Citas Solicitadas</a></li>
-      <li><a href={% url "registroc" %} >Registro Citas</a></li>
-      <li><a href={% url "Tipdelasemana" %} >Modificar Información <br>¡TIP DE LA SEMANA!</a></li>
-      <li><a href={% url "Galeria" %} >Modificar fotos "Nuestro trabajo"</a></li>
-      <li><a href={% url "modificarservicio" %} >Modificar Servicios</a></li>
-      <li><a href={% url "index" %} >Cerrar sesión</a></li>
-    </ul>
-  </div>
+  <!-- Sidebar -->
+    <div class="w-full md:w-72 bg-gradient-to-br from-[#33C0F1] to-[#1E2D93] text-white p-7 md:fixed md:h-full top-0 left-0 z-10">
+        <img class="h-24 mx-auto mb-4" src="{% static 'Images/logo2.png' %}" alt="Logo" />
+        <ul class="space-y-3">
+          <li><a href="{% url 'gestioncitas' %}" class="block hover:bg-white/20 p-2 rounded">Citas Solicitadas</a></li>
+          <li><a href="{% url 'registroc' %}" class="block hover:bg-white/20 p-2 rounded">Registro Citas</a></li>
+          <li><a href="{% url 'Tipdelasemana' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Tip de la Semana</a></li>
+          <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded">Modificar fotos "Nuestro trabajo"</a></li>
+          <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Servicios</a></li>
+          <li><a href="{% url 'index' %}" class="block hover:bg-white/20 p-2 rounded">Cerrar sesión</a></li>
+        </ul>
+    </div>
 
-  <div class="main-content">
-    <h2>Configurar Tip de la Semana</h2>
-    <div class="sects">
-      <div class="form-group">
-        <label for="tipTitle">Título:</label>
-        <input type="text" id="tipTitle" placeholder="Ingrese el título del tip">
-        <label for="imageInput">Seleccionar Imagen:</label>
-        <input type="file" id="imageInput" accept="image/*">
-        <img id="previewImage" alt="Vista previa de la imagen">
-        <label for="tipText">Contenido:</label>
-        <textarea id="tipText" placeholder="Escribe aquí el contenido del tip"></textarea>
+ <div class="main-content fade-in">
+    <div class="content-container">
+      <h2>Configurar Tip de la Semana</h2>
+      
+      <div class="form-container">
+        <div class="form-group">
+          <div>
+            <label for="tipTitle" class="form-label">Título del Tip</label>
+            <input type="text" id="tipTitle" class="form-input" placeholder="Ingrese un título llamativo">
+          </div>
+
+          <div>
+            <label class="form-label">Imagen del Tip</label>
+            <div class="image-upload-container" onclick="document.getElementById('imageInput').click()">
+              <input type="file" id="imageInput" accept="image/*" style="display: none;">
+              <label for="imageInput" class="image-upload-label">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                Haz clic para subir una imagen
+                <span class="text-xs mt-1">Formatos recomendados: JPG, PNG (Max. 2MB)</span>
+              </label>
+              <img id="previewImage" alt="Vista previa de la imagen">
+            </div>
+          </div>
+
+          <div>
+            <label for="tipText" class="form-label">Contenido del Tip</label>
+            <textarea id="tipText" class="form-input form-textarea" placeholder="Escribe aquí el contenido detallado del tip..."></textarea>
+          </div>
+        </div>
+
+        <div class="button-container">
+          <button class="btn btn-save" onclick="saveTip()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+            </svg>
+            Guardar Tip
+          </button>
+          <button class="btn btn-delete" onclick="deleteTip()">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
+            Eliminar Tip
+          </button>
+        </div>
       </div>
     </div>
-    <button class="guardar" onclick="saveTip()">Guardar Tip</button>
-    <button class="eliminar" onclick="deleteTip()">Eliminar Tip</button>
   </div>
 
   <script>
@@ -255,12 +86,22 @@
     document.getElementById("imageInput").addEventListener("change", function(event) {
       const file = event.target.files[0];
       if (file) {
+        // Validar tamaño de archivo (max 2MB)
+        if (file.size > 2 * 1024 * 1024) {
+          alert("El archivo es demasiado grande. Por favor, selecciona una imagen menor a 2MB.");
+          return;
+        }
+        
         const reader = new FileReader();
         reader.onload = function(e) {
           const preview = document.getElementById("previewImage");
           preview.src = e.target.result;
           preview.style.display = "block";
           hasChanges = true;
+          
+          // Animación al cargar imagen
+          preview.classList.add('pulse-once');
+          setTimeout(() => preview.classList.remove('pulse-once'), 500);
         };
         reader.readAsDataURL(file);
       }
@@ -292,6 +133,9 @@
         document.getElementById("tipText").value = savedText;
         initialText = savedText;
       }
+      
+      // Animación al cargar la página
+      document.querySelector('.form-container').classList.add('fade-in');
     });
 
     function saveTip() {
@@ -304,15 +148,16 @@
         return;
       }
 
-      if (tipTitle) {
-        localStorage.setItem("tipTitle", tipTitle);
-        initialTitle = tipTitle;
+      if (!tipTitle || !tipText) {
+        alert("Por favor, completa tanto el título como el contenido del tip.");
+        return;
       }
 
-      if (tipText) {
-        localStorage.setItem("tipText", tipText);
-        initialText = tipText;
-      }
+      localStorage.setItem("tipTitle", tipTitle);
+      initialTitle = tipTitle;
+
+      localStorage.setItem("tipText", tipText);
+      initialText = tipText;
 
       if (imageInput.files[0]) {
         const reader = new FileReader();
@@ -324,11 +169,20 @@
       }
 
       hasChanges = false;
-      alert("Tip guardado correctamente. Los cambios se verán reflejados en la página principal.");
+      
+      // Animación de confirmación
+      const saveBtn = document.querySelector('.btn-save');
+      saveBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> ¡Guardado!';
+      saveBtn.style.backgroundColor = '#10B981';
+      
+      setTimeout(() => {
+        saveBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> Guardar Tip';
+        saveBtn.style.background = 'linear-gradient(135deg, #1E2D93, #33C0F1)';
+      }, 2000);
     }
 
     function deleteTip() {
-      if (confirm("¿Estás seguro de que deseas eliminar el Tip de la Semana?")) {
+      if (confirm("¿Estás seguro de que deseas eliminar el Tip de la Semana? Esta acción no se puede deshacer.")) {
         localStorage.removeItem("tipTitle");
         localStorage.removeItem("tipText");
         localStorage.removeItem("tipImage");
@@ -336,11 +190,17 @@
         document.getElementById("tipTitle").value = '';
         document.getElementById("tipText").value = '';
         document.getElementById("previewImage").style.display = "none";
+        document.getElementById("imageInput").value = '';
 
-        alert("Tip eliminado correctamente.");
+        // Animación de confirmación
+        const deleteBtn = document.querySelector('.btn-delete');
+        deleteBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> ¡Eliminado!';
+        
+        setTimeout(() => {
+          deleteBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg> Eliminar Tip';
+        }, 2000);
       }
     }
   </script>
 </body>
 </html>
-

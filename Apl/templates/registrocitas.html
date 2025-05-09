@@ -7,109 +7,22 @@
   <title>Registro de Citas</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <style>
-    .fade-in {
-      animation: fadeIn 0.6s ease-out forwards;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
     
-    .sidebar {
-            width: 290px;
-            height: 100vh;
-            background: linear-gradient(135deg, #22d3ee,#1e40af);
-            color: white;
-            padding: 20px;
-            position: fixed;
-            left: 0;
-            top: 0;
-        }
-
-        .sidebar h2 {
-            text-align: center;
-        }
-
-        .sidebar ul {
-            list-style: none;
-            padding: 0;
-        }
-
-        .sidebar ul li {
-            margin: 20px 0;
-        }
-
-        .sidebar ul li a {
-            color: white;
-            text-decoration: none;
-            font-size: 18px;
-            display: block;
-            padding: 10px;
-            transition: background-color 0.3s ease;
-        }
-
-        .sidebar ul li a:hover {
-            background-color: #e4e7eb67;
-        }
-
-        .logo {
-            height: 100px;
-            display: block;
-            margin: 0 auto 20px;
-        }
-
-        body {
-            font-family: 'Segoe UI', sans-serif;
-        }
-
-        .fade-in {
-            animation: fadeIn 0.6s ease-out forwards;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @media (max-width: 768px) {
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-            }
-            .sidebar ul {
-                display: flex;
-                flex-direction: column;
-            }
-            .sidebar ul li {
-                margin: 10px 0;
-            }
-            body {
-                margin-left: 0;
-            }
-            .main-content {
-                margin-left: 0;
-            }
-        }
   </style>
 </head>
 <body class="bg-gray-100 font-sans">
-
   <!-- Contenedor general en flex -->
-  <div class="flex flex-col md:flex-row min-h-screen">
-
-    <!-- Sidebar -->
-    <div class="w-full md:w-72 bg-gradient-to-br from-cyan-400 to-blue-800 text-white p-4 md:fixed md:h-full top-0 left-0 z-10">
-      <img class="h-24 mx-auto mb-4" src={% static "Images/logo2.png" %} alt="Logo" />
-      <h2 class="text-center text-xl font-bold mb-4">Menú</h2>
-      <ul class="space-y-3">
-        <li><a href={% url "gestioncitas"%} class="block hover:bg-white/20 p-2 rounded">Citas Solicitadas</a></li>
-        <li><a href="#" class="block hover:bg-white/20 p-2 rounded">Registro Citas</a></li>
-        <li><a href={% url "Tipdelasemana"%} class="block hover:bg-white/20 p-2 rounded">Modificar Tip de la Semana</a></li>
-        <li><a href={% url "Galeria"%} class="block hover:bg-white/20 p-2 rounded">Modificar fotos "Nuestro trabajo"</a></li>
-        <li><a href={% url "modificarservicio" %} class="block hover:bg-white/20 p-2 rounded">Modificar Servicios</a></li>
-        <li><a href={% url "index" %} class="block hover:bg-white/20 p-2 rounded">Cerrar sesión</a></li>
-      </ul>
+  <!-- Sidebar -->
+    <div class="w-full md:w-72 bg-gradient-to-br from-[#33C0F1] to-[#1E2D93] text-white p-7 md:fixed md:h-full top-0 left-0 z-10">
+        <img class="h-24 mx-auto mb-4" src="{% static 'Images/logo2.png' %}" alt="Logo" />
+        <ul class="space-y-3">
+          <li><a href="{% url 'gestioncitas' %}" class="block hover:bg-white/20 p-2 rounded">Citas Solicitadas</a></li>
+          <li><a href="{% url 'registroc' %}" class="block hover:bg-white/20 p-2 rounded">Registro Citas</a></li>
+          <li><a href="{% url 'Tipdelasemana' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Tip de la Semana</a></li>
+          <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded">Modificar fotos "Nuestro trabajo"</a></li>
+          <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Servicios</a></li>
+          <li><a href="{% url 'index' %}" class="block hover:bg-white/20 p-2 rounded">Cerrar sesión</a></li>
+        </ul>
     </div>
 
     <!-- Main Content -->
