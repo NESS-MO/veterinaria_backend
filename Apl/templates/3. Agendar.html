@@ -49,8 +49,24 @@
             <p>Complete el formulario para agendar una cita con nuestros veterinarios.</p>
             <form action="#" method="POST" id="appointment-form">
                 <div class="form-group">
-                    <label for="nombre">Nombre Completo (Dueño) </label>
-                    <input type="text" id="nombre" name="nombre" required placeholder="Ingresa tu nombre completo">
+                    <label for="nombre">Nombre (Dueño) </label>
+                    <input type="text" id="nombre" name="nombre" required placeholder="Ingresa tu nombre">
+                </div>
+                <div class="form-group">
+                    <label for="apellido">Apellido</label>
+                    <input type="text" id="apellido" name="apellido" required placeholder="Ingresa tu Apellido">
+                </div>
+                <div class="form-group">
+                    <label for="tipo_documento">Tipo de Documento</label>
+                    <select id="tipo_documento" name="tipo_documento" required>
+                        <option value="">Selecciona Documento</option>
+                        <option value="cedula">Cedula de Ciudadania</option>
+                        <option value="extranjeria">Cedula de Extranjeria</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="num_domumento">Número de documento </label>
+                    <input type="text" id="documento" name="documento" required placeholder="Ingresa tu número de documento">
                 </div>
                 <div class="form-group">
                     <label for="correo">Correo Electrónico</label>

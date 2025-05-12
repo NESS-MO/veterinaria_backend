@@ -1,5 +1,5 @@
 from django.urls import path
-from Apl import views 
+from . import views 
 
 urlpatterns = [
     path('', views.index, name='index' ),
@@ -12,5 +12,10 @@ urlpatterns = [
     path('Tipdelasemana/',views.Tip, name='Tipdelasemana' ),
     path('Gestioncitas/', views.gestion, name='gestioncitas'),
     path('modificaservicio/', views.ModificarS, name='modificarservicio'),
-    path('registroCita/', views.RegistroC, name='registroc')
-]
+    path('registroCita/', views.RegistroC, name='registroc'),
+    path('tip-semana/',views.gestion_tip , name='Tipdelasemana'),
+    path('eliminar-tip/<int:tip_id>/', views.eliminar_tip, name='eliminar_tip'),
+    path('obtener-tip-actual/', views.obtener_tip_actual, name='obtener_tip_actual'),
+    path('obtener-tip-actual/', views.obtener_tip_actual, name='obtener_tip_actual'),
+    path('galeria/', views.gestion_galeria, name='Galeria'),
+] 

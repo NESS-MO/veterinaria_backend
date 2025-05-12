@@ -22,7 +22,7 @@
         <!--Logo de encabezado-->
         <div class="Logotipo">
             <a href={% url "index" %}>
-                <img src={%static "Images/logo2.png"%} alt="logo DR.PUL">
+                <img src={% static "Images/logo2.png" %} alt="logo DR.PUL">
             </a>
             <h3 class="eslogan">COMPROMETIDOS CON LA SALUD ANIMAL</h3>
         </div>
@@ -112,22 +112,19 @@
     <section class="nuestro-trabajo">
         <h2>Nuestro Trabajo</h2>
         <p>Aquí puedes ver algunas imágenes de nuestro día a día y los servicios que ofrecemos en la clínica.</p>
-        <div class="galeria">
+        <div class="galeria grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" id="galeria-trabajo">
+            {% for imagen in imagenes_galeria %}
             <div class="imagen">
-                <img src={% static "Images/w1.jpeg" %} >
+                <img src="{{ imagen.imagen.url }}" 
+                    alt="{{ imagen.titulo|default:'Nuestro trabajo en DR.PUL' }}"
+                    class="w-full h-64 object-cover rounded-lg shadow-md">
+                {% if imagen.titulo %}
+                <p class="mt-2 text-center font-medium">{{ imagen.titulo }}</p>
+                {% endif %}
             </div>
-            <div class="imagen">
-                <img src={% static "Images/w2.jpeg" %} >
-            </div>
-            <div class="imagen">
-                <img src={% static "Images/w3.jpeg" %} >
-            </div>
-            <div class="imagen">
-                <img src={% static "Images/w4.jpeg" %}>
-            </div>
-            <div class="imagen">
-                <img src={% static "Images/w5.jpeg" %} >
-            </div>
+            {% empty %}
+            <p class="col-span-3 text-center py-8">No hay imágenes disponibles en la galería.</p>
+            {% endfor %}
         </div>
     </section>
 
@@ -200,7 +197,8 @@
     </script>
 
     <!--Boton Tip de la semana-->
-    <script src={% static "JavaScript/js-BotonTipSemana.js" %}></script>
+    <script src="{% static 'JavaScript/js-BotonTipSemana.js' %}"></script>
+     
     <!--Boton Whatsapp-->
     <script src={% static "JavaScript/js-BotonWhatsapp.js" %}></script>
     <!--Boton Ayuda-->
@@ -209,51 +207,4 @@
     <script src={% static "JavaScript/sienna.js" %}></script>
     <script src={% static "JavaScript/custom.js" %}></script>
 </body>
-<script>
-    // Función para cargar las imágenes de la galería en el orden correcto
-    function cargarGaleria() {
-        const galeria = document.getElementById('galeria-trabajo');
-        galeria.innerHTML = ''; // Limpiar galería antes de cargar
-        
-        const imagenesGuardadas = JSON.parse(localStorage.getItem('galeriaImagenes')) || [];
-        
-        // Si no hay imágenes guardadas, mostrar las predeterminadas
-        if (imagenesGuardadas.length === 0) {
-            const imagenesPredeterminadas = [
-                'Imagenes/w1.jpeg',
-                'Imagenes/w2.jpeg',
-                'Imagenes/w3.jpeg',
-                'Imagenes/w4.jpeg',
-                'Imagenes/w5.jpeg',
-                'Imagenes/w6.jpeg'
-            ];
-            
-            imagenesPredeterminadas.forEach(src => {
-                const div = document.createElement('div');
-                div.className = 'imagen';
-                const img = document.createElement('img');
-                img.src = src;
-                img.alt = 'Nuestro trabajo';
-                div.appendChild(img);
-                galeria.appendChild(div);
-            });
-        } else {
-            // Mostrar las imágenes guardadas en el orden exacto
-            imagenesGuardadas.forEach(imagen => {
-                if (imagen && imagen.data) {
-                    const div = document.createElement('div');
-                    div.className = 'imagen';
-                    const img = document.createElement('img');
-                    img.src = imagen.data;
-                    img.alt = 'Nuestro trabajo';
-                    div.appendChild(img);
-                    galeria.appendChild(div);
-                }
-            });
-        }
-    }
-
-    // Cargar la galería cuando la página esté lista
-    document.addEventListener('DOMContentLoaded', cargarGaleria);
-</script>
 </html>

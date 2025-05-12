@@ -8,199 +8,249 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href=" {% static 'css/ModTip.css' %}">
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <style>
-    
-  </style>
 </head>
 <body>
   <!-- Sidebar -->
-    <div class="w-full md:w-72 bg-gradient-to-br from-[#33C0F1] to-[#1E2D93] text-white p-7 md:fixed md:h-full top-0 left-0 z-10">
-        <img class="h-24 mx-auto mb-4" src="{% static 'Images/logo2.png' %}" alt="Logo" />
-        <ul class="space-y-3">
-          <li><a href="{% url 'gestioncitas' %}" class="block hover:bg-white/20 p-2 rounded">Citas Solicitadas</a></li>
-          <li><a href="{% url 'registroc' %}" class="block hover:bg-white/20 p-2 rounded">Registro Citas</a></li>
-          <li><a href="{% url 'Tipdelasemana' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Tip de la Semana</a></li>
-          <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded">Modificar fotos "Nuestro trabajo"</a></li>
-          <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Servicios</a></li>
-          <li><a href="{% url 'index' %}" class="block hover:bg-white/20 p-2 rounded">Cerrar sesión</a></li>
-        </ul>
-    </div>
+  <div class="w-full md:w-72 bg-gradient-to-br from-[#33C0F1] to-[#1E2D93] text-white p-7 md:fixed md:h-full top-0 left-0 z-10">
+      <img class="h-24 mx-auto mb-4" src="{% static 'Images/logo2.png' %}" alt="Logo" />
+      <ul class="space-y-3">
+        <li><a href="{% url 'gestioncitas' %}" class="block hover:bg-white/20 p-2 rounded">Citas Solicitadas</a></li>
+        <li><a href="{% url 'registroc' %}" class="block hover:bg-white/20 p-2 rounded">Registro Citas</a></li>
+        <li><a href="{% url 'Tipdelasemana' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Tip de la Semana</a></li>
+        <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded">Modificar fotos "Nuestro trabajo"</a></li>
+        <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Servicios</a></li>
+        <li><a href="{% url 'index' %}" class="block hover:bg-white/20 p-2 rounded">Cerrar sesión</a></li>
+      </ul>
+  </div>
 
- <div class="main-content fade-in">
+  <div class="main-content fade-in">
     <div class="content-container">
-      <h2>Configurar Tip de la Semana</h2>
-      
-      <div class="form-container">
-        <div class="form-group">
-          <div>
-            <label for="tipTitle" class="form-label">Título del Tip</label>
-            <input type="text" id="tipTitle" class="form-input" placeholder="Ingrese un título llamativo">
-          </div>
+      <form id="tipForm" method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        <h2>Configurar Tip de la Semana</h2>
+        
+        <div class="form-container">
+          <div class="form-group">
+            <div>
+              <label for="tipTitle" class="form-label">Título del Tip</label>
+              <input type="text" id="tipTitle" name="titulo" class="form-input" placeholder="Ingrese un título llamativo" value="{{ tip.titulo|default:'' }}">
+            </div>
 
-          <div>
-            <label class="form-label">Imagen del Tip</label>
-            <div class="image-upload-container" onclick="document.getElementById('imageInput').click()">
-              <input type="file" id="imageInput" accept="image/*" style="display: none;">
-              <label for="imageInput" class="image-upload-label">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-                Haz clic para subir una imagen
-                <span class="text-xs mt-1">Formatos recomendados: JPG, PNG (Max. 2MB)</span>
-              </label>
-              <img id="previewImage" alt="Vista previa de la imagen">
+            <div>
+              <label class="form-label">Imagen del Tip</label>
+              <div class="image-upload-container" onclick="document.getElementById('imageInput').click()">
+                <input type="file" id="imageInput" name="imagen" accept="image/*" style="display: none;">
+                <label for="imageInput" class="image-upload-label">
+                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  Haz clic para subir una imagen
+                  <span class="text-xs mt-1">Formatos recomendados: JPG, PNG (Max. 2MB)</span>
+                </label>
+                {% if tip and tip.imagen %}
+                  <img id="previewImage" src="{{ tip.imagen.url }}" alt="Vista previa de la imagen" style="display: block;">
+                {% else %}
+                  <img id="previewImage" alt="Vista previa de la imagen" style="display: none;">
+                {% endif %}
+              </div>
+            </div>
+
+            <div>
+              <label for="tipText" class="form-label">Contenido del Tip</label>
+              <textarea id="tipText" name="contenido" class="form-input form-textarea" placeholder="Escribe aquí el contenido detallado del tip...">{{ tip.contenido|default:'' }}</textarea>
             </div>
           </div>
 
-          <div>
-            <label for="tipText" class="form-label">Contenido del Tip</label>
-            <textarea id="tipText" class="form-input form-textarea" placeholder="Escribe aquí el contenido detallado del tip..."></textarea>
+          <div class="button-container">
+              <button type="submit" class="btn btn-save">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                {% if tip %}Actualizar Tip{% else %}Guardar Tip{% endif %}
+              </button>
+            {% if tip %}
+            <button type="button" class="btn btn-delete" onclick="deleteTip()">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+              </svg>
+              Eliminar Tip
+            </button>
+            {% endif %}
           </div>
         </div>
-
-        <div class="button-container">
-          <button class="btn btn-save" onclick="saveTip()">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-            </svg>
-            Guardar Tip
-          </button>
-          <button class="btn btn-delete" onclick="deleteTip()">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-            </svg>
-            Eliminar Tip
-          </button>
-        </div>
-      </div>
+      </form>
     </div>
   </div>
 
-  <script>
-    let hasChanges = false;
-    let initialTitle = '';
-    let initialText = '';
-    let initialImage = localStorage.getItem("tipImage") || '';
+<script>
+// ===== Variables globales =====
+let hasChanges = false;
 
-    document.getElementById("imageInput").addEventListener("change", function(event) {
-      const file = event.target.files[0];
-      if (file) {
-        // Validar tamaño de archivo (max 2MB)
-        if (file.size > 2 * 1024 * 1024) {
-          alert("El archivo es demasiado grande. Por favor, selecciona una imagen menor a 2MB.");
-          return;
-        }
-        
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const preview = document.getElementById("previewImage");
-          preview.src = e.target.result;
-          preview.style.display = "block";
-          hasChanges = true;
-          
-          // Animación al cargar imagen
-          preview.classList.add('pulse-once');
-          setTimeout(() => preview.classList.remove('pulse-once'), 500);
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-
-    document.getElementById("tipTitle").addEventListener("input", function() {
-      hasChanges = this.value !== initialTitle;
-    });
-
-    document.getElementById("tipText").addEventListener("input", function() {
-      hasChanges = this.value !== initialText;
-    });
-
-    window.addEventListener('DOMContentLoaded', () => {
-      const savedImage = localStorage.getItem("tipImage");
-      const savedTitle = localStorage.getItem("tipTitle");
-      const savedText = localStorage.getItem("tipText");
-
-      if (savedImage) {
-        const preview = document.getElementById("previewImage");
-        preview.src = savedImage;
-        preview.style.display = "block";
-      }
-      if (savedTitle) {
-        document.getElementById("tipTitle").value = savedTitle;
-        initialTitle = savedTitle;
-      }
-      if (savedText) {
-        document.getElementById("tipText").value = savedText;
-        initialText = savedText;
-      }
+// ===== Previsualización de la imagen =====
+document.getElementById("imageInput").addEventListener("change", function(event) {
+  const file = event.target.files[0];
+  if (file) {
+    // Validar tamaño (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      alert("La imagen debe ser menor a 2MB");
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const preview = document.getElementById("previewImage");
+      preview.src = e.target.result;
+      preview.style.display = "block";
+      hasChanges = true;
       
-      // Animación al cargar la página
-      document.querySelector('.form-container').classList.add('fade-in');
+      // Animación
+      preview.classList.add('pulse-once');
+      setTimeout(() => preview.classList.remove('pulse-once'), 500);
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+// ===== Guardar Tip =====
+document.getElementById("tipForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+  
+  const formData = new FormData(this);
+  
+  // Validación básica
+  if (!formData.get('titulo') || !formData.get('contenido')) {
+    alert("Título y contenido son obligatorios");
+    return;
+  }
+
+  fetch("{% url 'Tipdelasemana' %}", {
+    method: 'POST',
+    body: formData,
+    headers: {
+      'X-Requested-With': 'XMLHttpRequest'
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.error) {
+      alert(data.error);
+      return;
+    }
+    
+    // Animación de confirmación
+    const saveBtn = document.querySelector('.btn-save');
+    saveBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> ¡Guardado!';
+    saveBtn.style.backgroundColor = '#10B981';
+    
+    setTimeout(() => {
+      saveBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> Guardar Tip';
+      saveBtn.style.background = 'linear-gradient(135deg, #1E2D93, #33C0F1)';
+    }, 2000);
+    
+    // Actualizar localStorage y botón flotante
+    if (data.imagen_url) {
+      localStorage.setItem('tipImage', data.imagen_url);
+    }
+    localStorage.setItem('tipTitle', data.titulo);
+    localStorage.setItem('tipText', data.contenido);
+    
+    // Notificar a otras pestañas
+    const event = new CustomEvent('tipUpdated', { 
+      detail: data 
     });
+    document.dispatchEvent(event);
+    
+    hasChanges = false;
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Error al guardar');
+  });
+});
 
-    function saveTip() {
-      const tipTitle = document.getElementById("tipTitle").value;
-      const tipText = document.getElementById("tipText").value;
-      const imageInput = document.getElementById("imageInput");
+// ===== Eliminar Tip =====
+function deleteTip() {
+  if (!confirm("¿Eliminar el Tip actual?")) return;
 
-      if (!hasChanges && !imageInput.files[0]) {
-        alert("No se han realizado cambios para guardar.");
-        return;
-      }
-
-      if (!tipTitle || !tipText) {
-        alert("Por favor, completa tanto el título como el contenido del tip.");
-        return;
-      }
-
-      localStorage.setItem("tipTitle", tipTitle);
-      initialTitle = tipTitle;
-
-      localStorage.setItem("tipText", tipText);
-      initialText = tipText;
-
-      if (imageInput.files[0]) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          localStorage.setItem("tipImage", e.target.result);
-          initialImage = e.target.result;
-        };
-        reader.readAsDataURL(imageInput.files[0]);
-      }
-
-      hasChanges = false;
+  fetch("{% url 'eliminar_tip' tip.id %}", {
+    method: 'POST',
+    headers: {
+      'X-CSRFToken': '{{ csrf_token }}',
+      'X-Requested-With': 'XMLHttpRequest'
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    if (data.success) {
+      // Limpiar formulario
+      document.getElementById("tipTitle").value = '';
+      document.getElementById("tipText").value = '';
+      document.getElementById("previewImage").style.display = "none";
+      document.getElementById("imageInput").value = '';
+      
+      // Limpiar localStorage
+      localStorage.removeItem('tipTitle');
+      localStorage.removeItem('tipText');
+      localStorage.removeItem('tipImage');
+      
+      // Notificar al botón flotante
+      document.dispatchEvent(new CustomEvent('tipUpdated', { 
+        detail: { titulo: '', contenido: '', imagen_url: '' } 
+      }));
       
       // Animación de confirmación
-      const saveBtn = document.querySelector('.btn-save');
-      saveBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> ¡Guardado!';
-      saveBtn.style.backgroundColor = '#10B981';
-      
+      const deleteBtn = document.querySelector('.btn-delete');
+      deleteBtn.innerHTML = '✓ ¡Eliminado!';
       setTimeout(() => {
-        saveBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> Guardar Tip';
-        saveBtn.style.background = 'linear-gradient(135deg, #1E2D93, #33C0F1)';
+        deleteBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg> Eliminar Tip';
       }, 2000);
     }
+  })
+  .catch(error => {
+    console.error('Error:', error);
+    alert('Error al eliminar');
+  });
+}
 
-    function deleteTip() {
-      if (confirm("¿Estás seguro de que deseas eliminar el Tip de la Semana? Esta acción no se puede deshacer.")) {
-        localStorage.removeItem("tipTitle");
-        localStorage.removeItem("tipText");
-        localStorage.removeItem("tipImage");
+// ===== Cargar datos al iniciar =====
+document.addEventListener('DOMContentLoaded', () => {
+  // Cargar datos guardados
+  const savedImage = localStorage.getItem('tipImage');
+  const savedTitle = localStorage.getItem('tipTitle');
+  const savedText = localStorage.getItem('tipText');
 
-        document.getElementById("tipTitle").value = '';
-        document.getElementById("tipText").value = '';
-        document.getElementById("previewImage").style.display = "none";
-        document.getElementById("imageInput").value = '';
+  if (savedImage) {
+    const preview = document.getElementById("previewImage");
+    preview.src = savedImage;
+    preview.style.display = "block";
+  }
+  if (savedTitle) {
+    document.getElementById("tipTitle").value = savedTitle;
+  }
+  if (savedText) {
+    document.getElementById("tipText").value = savedText;
+  }
+  
+  // Animación inicial
+  document.querySelector('.form-container').classList.add('fade-in');
+});
 
-        // Animación de confirmación
-        const deleteBtn = document.querySelector('.btn-delete');
-        deleteBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> ¡Eliminado!';
-        
-        setTimeout(() => {
-          deleteBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg> Eliminar Tip';
-        }, 2000);
-      }
-    }
-  </script>
+// ===== Detectar cambios =====
+document.getElementById("tipTitle").addEventListener("input", function() {
+  hasChanges = true;
+});
+
+document.getElementById("tipText").addEventListener("input", function() {
+  hasChanges = true;
+});
+
+// ===== Advertencia al salir con cambios no guardados =====
+window.addEventListener('beforeunload', (e) => {
+  if (hasChanges) {
+    e.preventDefault();
+    e.returnValue = 'Tienes cambios sin guardar. ¿Seguro que quieres salir?';
+  }
+});
+</script>
 </body>
-</html>
+</html>  

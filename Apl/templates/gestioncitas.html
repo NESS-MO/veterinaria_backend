@@ -87,131 +87,155 @@
     </section>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const loadingElement = document.getElementById('loading');
-            const tablaCitas = document.getElementById('tabla-citas').getElementsByTagName('tbody')[0];
-            const toggleBtn = document.getElementById('toggle-filtros');
-            const contenedorFiltros = document.getElementById('contenedor-filtros');
+       document.addEventListener('DOMContentLoaded', () => {
+    const loadingElement = document.getElementById('loading');
+    const tablaCitas = document.getElementById('tabla-citas').getElementsByTagName('tbody')[0];
+    const toggleBtn = document.getElementById('toggle-filtros');
+    const contenedorFiltros = document.getElementById('contenedor-filtros');
 
-            const filtroNombre = document.getElementById('filtro-nombre');
-            const filtroCorreo = document.getElementById('filtro-correo');
-            const filtroTelefono = document.getElementById('filtro-telefono');
-            const filtroMascota = document.getElementById('filtro-mascota');
-            const filtroFecha = document.getElementById('filtro-fecha');
-            const filtroHora = document.getElementById('filtro-hora');
-            const filtroServicio = document.getElementById('filtro-servicio');
-            const btnLimpiar = document.getElementById('btn-limpiar');
+    const filtroNombre = document.getElementById('filtro-nombre');
+    const filtroCorreo = document.getElementById('filtro-correo');
+    const filtroTelefono = document.getElementById('filtro-telefono');
+    const filtroMascota = document.getElementById('filtro-mascota');
+    const filtroFecha = document.getElementById('filtro-fecha');
+    const filtroHora = document.getElementById('filtro-hora');
+    const filtroServicio = document.getElementById('filtro-servicio');
+    const btnLimpiar = document.getElementById('btn-limpiar');
 
-            let citas = JSON.parse(localStorage.getItem('citas')) || [];
+    let citas = JSON.parse(localStorage.getItem('citas')) || [];
 
-            toggleBtn.addEventListener('click', () => {
-                contenedorFiltros.classList.toggle('mostrar');
-            });
+    toggleBtn.addEventListener('click', () => {
+        contenedorFiltros.classList.toggle('mostrar');
+    });
 
-            function mostrarCitas() {
-                tablaCitas.innerHTML = '';
-                const nombre = filtroNombre.value.toLowerCase();
-                const correo = filtroCorreo.value.toLowerCase();
-                const telefono = filtroTelefono.value.toLowerCase();
-                const mascota = filtroMascota.value.toLowerCase();
-                const fecha = filtroFecha.value;
-                const hora = filtroHora.value;
-                const servicio = filtroServicio.value.toLowerCase();
+    function mostrarCitas() {
+        tablaCitas.innerHTML = '';
+        const nombre = filtroNombre.value.toLowerCase();
+        const correo = filtroCorreo.value.toLowerCase();
+        const telefono = filtroTelefono.value.toLowerCase();
+        const mascota = filtroMascota.value.toLowerCase();
+        const fecha = filtroFecha.value;
+        const hora = filtroHora.value;
+        const servicio = filtroServicio.value.toLowerCase();
 
-                citas.forEach((cita, index) => {
-                    const coincide =
-                        (!nombre || cita.nombre.toLowerCase().includes(nombre)) &&
-                        (!correo || cita.correo.toLowerCase().includes(correo)) &&
-                        (!telefono || cita.telefono.toLowerCase().includes(telefono)) &&
-                        (!mascota || cita.mascota.toLowerCase().includes(mascota)) &&
-                        (!fecha || cita.fecha === fecha) &&
-                        (!hora || cita.hora === hora) &&
-                        (!servicio || cita.servicios.join(',').toLowerCase().includes(servicio));
+        // Ordenar citas por fecha descendente (más recientes primero)
+        const citasOrdenadas = [...citas].sort((a, b) => {
+            // Convertir fechas a formato comparable (asumiendo formato dd/mm/aaaa)
+            const fechaA = new Date(a.fecha.split('/').reverse().join('-'));
+            const fechaB = new Date(b.fecha.split('/').reverse().join('-'));
+            return fechaB - fechaA;
+        });
 
-                    if (coincide) {
-                        const row = tablaCitas.insertRow();
-                        row.innerHTML = `
-                            <td><input type="text" value="${cita.nombre}" data-index="${index}" data-campo="nombre"></td>
-                            <td><input type="email" value="${cita.correo}" data-index="${index}" data-campo="correo"></td>
-                            <td><input type="text" value="${cita.telefono}" data-index="${index}" data-campo="telefono"></td>
-                            <td><input type="text" value="${cita.mascota}" data-index="${index}" data-campo="mascota"></td>
-                            <td><input type="date" value="${cita.fecha}" data-index="${index}" data-campo="fecha"></td>
-                            <td><input type="time" value="${cita.hora}" data-index="${index}" data-campo="hora"></td>
-                            <td><input type="text" value="${cita.servicios.join(', ')}" data-index="${index}" data-campo="servicios"></td>
-                            <td class="actions">
-                                <button class="guardar" data-index="${index}">Guardar</button>
-                                <button class="eliminar" data-index="${index}">Eliminar</button>
-                            </td>
-                        `;
-                    }
-                });
+        citasOrdenadas.forEach((cita) => {
+            const coincide =
+                (!nombre || cita.nombre.toLowerCase().includes(nombre)) &&
+                (!correo || cita.correo.toLowerCase().includes(correo)) &&
+                (!telefono || cita.telefono.toLowerCase().includes(telefono)) &&
+                (!mascota || cita.mascota.toLowerCase().includes(mascota)) &&
+                (!fecha || cita.fecha === fecha) &&
+                (!hora || cita.hora === hora) &&
+                (!servicio || cita.servicios.join(',').toLowerCase().includes(servicio));
 
-                loadingElement.style.display = 'none';
+            if (coincide) {
+                const row = tablaCitas.insertRow();
+                // Usamos citas.indexOf(cita) para mantener el índice original
+                const originalIndex = citas.indexOf(cita);
+                row.innerHTML = `
+                    <td>${cita.nombre}</td>
+                    <td>${cita.correo}</td>
+                    <td>${cita.telefono}</td>
+                    <td>${cita.mascota}</td>
+                    <td><input type="date" value="${cita.fecha}" data-index="${originalIndex}" data-campo="fecha" class="editable-field"></td>
+                    <td><input type="time" value="${cita.hora}" data-index="${originalIndex}" data-campo="hora" class="editable-field"></td>
+                    <td>${cita.servicios.join(', ')}</td>
+                    <td class="actions">
+                        <button class="btn-aceptar" data-index="${originalIndex}">
+                            <i class="fas fa-check-circle"></i> Aceptar
+                        </button>
+                        <button class="btn-rechazar" data-index="${originalIndex}">
+                            <i class="fas fa-times-circle"></i> Rechazar
+                        </button>
+                    </td>
+                `;
             }
+        });
 
-            tablaCitas.addEventListener('click', function (e) {
-                const index = e.target.dataset.index;
-                if (e.target.classList.contains('eliminar')) {
-                    Swal.fire({
-                        icon: 'warning',
-                        title: '¿Seguro que deseas eliminar esta cita?',
-                        showConfirmButton: true,
-                        showCancelButton: true
-                    }).then(result => {
-                        if (result.isConfirmed) {
-                            citas.splice(index, 1);
-                            localStorage.setItem('citas', JSON.stringify(citas));
-                            mostrarCitas();
-                            Swal.fire({
-                                icon: 'warning',
-                                title: '¡Cita eliminada!',
-                                showConfirmButton: false,
-                                timer: 1500
-                            });
-                        }
-                    });
-                } else if (e.target.classList.contains('guardar')) {
-                    const inputs = tablaCitas.querySelectorAll(`input[data-index="${index}"]`);
-                    let citaActualizada = {};
-                    inputs.forEach(input => {
-                        if (input.dataset.campo === 'servicios') {
-                            citaActualizada[input.dataset.campo] = input.value.split(',').map(s => s.trim());
-                        } else {
-                            citaActualizada[input.dataset.campo] = input.value;
-                        }
-                    });
-                    citas[index] = citaActualizada;
+        loadingElement.style.display = 'none';
+    }
+
+    tablaCitas.addEventListener('click', function (e) {
+        const index = e.target.dataset.index;
+        if (e.target.classList.contains('btn-rechazar')) {
+            Swal.fire({
+                icon: 'warning',
+                title: '¿Seguro que deseas rechazar esta cita?',
+                text: 'Esta acción no se puede deshacer',
+                showConfirmButton: true,
+                showCancelButton: true,
+                confirmButtonText: 'Sí, rechazar',
+                cancelButtonText: 'Cancelar',
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d'
+            }).then(result => {
+                if (result.isConfirmed) {
+                    citas.splice(index, 1);
                     localStorage.setItem('citas', JSON.stringify(citas));
+                    mostrarCitas();
                     Swal.fire({
                         icon: 'success',
-                        title: '¡Cita actualizada correctamente!',
+                        title: '¡Cita rechazada!',
                         showConfirmButton: false,
                         timer: 1500
                     });
                 }
             });
-
-            filtroNombre.addEventListener('input', mostrarCitas);
-            filtroCorreo.addEventListener('input', mostrarCitas);
-            filtroTelefono.addEventListener('input', mostrarCitas);
-            filtroMascota.addEventListener('input', mostrarCitas);
-            filtroFecha.addEventListener('change', mostrarCitas);
-            filtroHora.addEventListener('input', mostrarCitas);
-            filtroServicio.addEventListener('input', mostrarCitas);
-
-            btnLimpiar.addEventListener('click', () => {
-                filtroNombre.value = '';
-                filtroCorreo.value = '';
-                filtroTelefono.value = '';
-                filtroMascota.value = '';
-                filtroFecha.value = '';
-                filtroHora.value = '';
-                filtroServicio.value = '';
-                mostrarCitas();
+        } else if (e.target.classList.contains('btn-aceptar')) {
+            const inputs = tablaCitas.querySelectorAll(`input[data-index="${index}"]`);
+            let citaActualizada = {};
+            inputs.forEach(input => {
+                citaActualizada[input.dataset.campo] = input.value;
             });
+            
+            // Actualizar solo fecha y hora, mantener el resto de datos originales
+            citas[index] = {
+                ...citas[index],
+                fecha: citaActualizada.fecha,
+                hora: citaActualizada.hora
+            };
+            
+            localStorage.setItem('citas', JSON.stringify(citas));
+            Swal.fire({
+                icon: 'success',
+                title: '¡Cita actualizada correctamente!',
+                showConfirmButton: false,
+                timer: 1500
+            });
+        }
+    });
 
-            mostrarCitas();
-        });
+    // Event listeners para los filtros
+    filtroNombre.addEventListener('input', mostrarCitas);
+    filtroCorreo.addEventListener('input', mostrarCitas);
+    filtroTelefono.addEventListener('input', mostrarCitas);
+    filtroMascota.addEventListener('input', mostrarCitas);
+    filtroFecha.addEventListener('change', mostrarCitas);
+    filtroHora.addEventListener('input', mostrarCitas);
+    filtroServicio.addEventListener('input', mostrarCitas);
+
+    btnLimpiar.addEventListener('click', () => {
+        filtroNombre.value = '';
+        filtroCorreo.value = '';
+        filtroTelefono.value = '';
+        filtroMascota.value = '';
+        filtroFecha.value = '';
+        filtroHora.value = '';
+        filtroServicio.value = '';
+        mostrarCitas();
+    });
+
+    // Cargar citas al iniciar
+    mostrarCitas();
+});
     </script>
 </body>
 </html>

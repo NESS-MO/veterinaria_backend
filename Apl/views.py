@@ -38,3 +38,124 @@ def ModificarS(request):
 
 def RegistroC(request):
     return render(request, "registrocitas.html")
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from .models import TipSemana 
+
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+
+def gestion_tip(request):
+    try:
+        tip = TipSemana.objects.latest('fecha_actualizacion')
+    except TipSemana.DoesNotExist:
+        tip = None
+
+    if request.method == 'POST':
+        titulo = request.POST.get('titulo')
+        contenido = request.POST.get('contenido')
+        imagen = request.FILES.get('imagen')
+
+        if not titulo or not contenido:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'error': 'El título y el contenido son obligatorios'}, status=400)
+            messages.error(request, 'El título y el contenido son obligatorios')
+            return redirect('Tipdelasemana')
+
+        if tip:
+            tip.titulo = titulo
+            tip.contenido = contenido
+            if imagen:
+                tip.imagen = imagen
+            tip.save()
+            message = 'Tip actualizado correctamente'
+        else:
+            tip = TipSemana.objects.create(
+                titulo=titulo,
+                contenido=contenido,
+                imagen=imagen
+            )
+            message = 'Nuevo tip creado con éxito'
+
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({
+                'success': True,
+                'message': message,
+                'titulo': tip.titulo,
+                'contenido': tip.contenido,
+                'imagen_url': tip.imagen.url if tip.imagen else ''
+            })
+
+        messages.success(request, message)
+        return redirect('Tipdelasemana')
+
+    return render(request, '5. Modificar-tipdelasemana.html', {'tip': tip})
+from django.shortcuts import get_object_or_404
+
+def eliminar_tip(request, tip_id):
+    tip = get_object_or_404(TipSemana, id=tip_id)
+    if request.method == 'POST':
+        tip.delete()
+        messages.success(request, 'Tip eliminado correctamente')
+        return redirect('Tipdelasemana')
+    # Redirigir si no es POST
+    return redirect('Tipdelasemana')
+
+from django.http import JsonResponse
+
+def obtener_tip_actual(request):
+    try:
+        tip = TipSemana.objects.latest('fecha_actualizacion')
+        data = {
+            'titulo': tip.titulo,
+            'contenido': tip.contenido,
+            'imagen': tip.imagen.url if tip.imagen else ''
+        }
+        return JsonResponse(data)
+    except TipSemana.DoesNotExist:
+        return JsonResponse({
+            'titulo': '¡Tip de la Semana!',
+            'contenido': 'No hay tips disponibles actualmente.',
+            'imagen': ''
+        })
+    
+from django.contrib import messages
+from .models import ImagenGaleria
+from .forms import ImagenGaleriaForm
+
+def gestion_galeria(request):
+    imagenes = ImagenGaleria.objects.all().order_by('orden')
+    
+    if request.method == 'POST':
+        # Procesar eliminación de imágenes
+        if 'eliminar' in request.POST:
+            imagen_id = request.POST.get('eliminar')
+            imagen = ImagenGaleria.objects.get(id=imagen_id)
+            imagen.delete()
+            messages.success(request, 'Imagen eliminada correctamente')
+            return redirect('Galeria')
+        
+        # Procesar nueva imagen
+        form = ImagenGaleriaForm(request.POST, request.FILES)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'Imagen agregada correctamente')
+            return redirect('Galeria')
+    else:
+        form = ImagenGaleriaForm()
+
+    return render(request, '5. modificar-galeria.html', {
+        'imagenes': imagenes,
+        'form': form
+    })
+
+from .models import ImagenGaleria 
+
+def index(request):
+    imagenes_galeria = ImagenGaleria.objects.filter(activa=True).order_by('orden')[:9]
+    context = {
+        'imagenes_galeria': imagenes_galeria,
+        # otros contextos...
+    }
+    return render(request, '1. Index.html', context)
