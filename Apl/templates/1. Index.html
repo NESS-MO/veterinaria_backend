@@ -8,13 +8,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio - DR.PUL</title>
-    <link rel="icon" href={% static "Images/Logo.png" %}/>
+    <link rel="icon" href={% static "Images/logo.png" %}/>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href={%static "css/1. Index.css"%}>
+    <link rel="stylesheet" href={% static "css/1. Index.css" %}>
     
     <!-- Widget de Accesibilidad -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
-    <link rel="stylesheet" href={%static "css/custom.css"%}>
+    <link rel="stylesheet" href={% static "css/custom.css" %}>
 </head>
 
 <body>
@@ -33,13 +33,14 @@
         <!--Opciones de encabezado-->
         <nav class="opciones" id="menu">
             <button class="cerrar" id="cerrar-menu">✕</button>
-            <a href="{%  url "index"%}">INICIO</a>
+            <a href={% url "index"%}>INICIO</a>
             <a href="#conocenos">CONÓCENOS</a>
-            <a href="{% url "servicios" %}">SERVICIOS</a>
-            <a href="{% url "agendar" %}">AGENDAR CITA</a>
-            <a href="{% url "login"%}"><img class="perfil" src={%static "Images/perfil.png"%} alt="logo DR.PUL"></a>
+            <a href={% url "servicios" %}>SERVICIOS</a>
+            <a href={% url "agendar" %}>AGENDAR CITA</a>
+            <a href={% url "login"%}><img class="perfil" src={% static "Images/perfil.png" %} alt="logo DR.PUL"></a>
         </nav>
     </header>
+    
     <!--Fondo inicial-->
     <section class="bienvenida">
         <h1></h1>
@@ -47,17 +48,17 @@
         <!--Logo boton-->
         <img class="logo1" src={% static "Images/logop1.png" %}>
         <img class="logo2" src={% static "Images/logop2.png" %}>
-        <a href={% url 'agendar' %}><img class="logo3" src={% static "Images/logop3.png" %}></a>
+        <a href={% url "agendar" %}><img class="logo3" src={% static "Images/logop3.png" %}></a>
     </section>
 
 
     
-    <!--Seccion informativa; Bienvenidos y experiencia-->
-    <section id="conocenos" class="conocenos">
-        <h1 >Conócenos</h1>
-        <div class="conocenos2">
-            
-            <div class="c1">
+<!--Seccion informativa; Bienvenidos y experiencia-->
+<section id="conocenos" class="conocenos">
+    <h1>Conócenos</h1>
+    <div class="conocenos2">
+        <div class="c1">
+            <div class="text-content">
                 <h2>Bienvenidos a nuestra veterinaria</h2>
                 <p>En Veterinaria Dr Pul, nuestro equipo de veterinarios está altamente capacitado para brindar el mejor cuidado a tu mascota. Contamos con formación especializada en:</p>
                 <ul>
@@ -68,45 +69,60 @@
                     <li>Comportamiento Animal</li>
                 </ul>
             </div>
-            <div class="c1">
+            <img src={% static "Images/bienvenidos.jpg" %} alt="Veterinaria" class="section-img">
+        </div>
+        <div class="c1">
+            <div class="text-content">
                 <h2>Experiencia</h2>
                 <p>Con más de 15 años de experiencia, en Veterinaria Animal. Hemos brindado atención a miles de mascotas, siempre con el compromiso de ofrecer un servicio profesional y amoroso.</p>
                 <p>Durante estos años, hemos trabajado con todo tipo de animales, desde perros y gatos, siempre buscando soluciones innovadoras y adaptadas a las necesidades de cada paciente.</p>
             </div>
+            <img src={% static "Images/experiencia.jpg" %} alt="Experiencia" class="section-img">
         </div>
-    </section>
+    </div>
+</section>
 
-    <section class="conocenos">
-        <div class="conocenos2">
-            <div class="c1">
+
+<!--Conocenos-->
+<section class="conocenos">
+    <div class="conocenos2">
+        <div class="c1">
+            <div class="text-content">
                 <h2>Visión</h2>
                 <p>Ser reconocidos como líderes en el cuidado y bienestar animal, brindando servicios veterinarios de alta calidad y estableciendo estándares excepcionales en la industria. Nos comprometemos a innovar constantemente en el campo de la salud animal, ofreciendo a nuestros pacientes tratamientos de vanguardia y utilizando tecnología de última generación. Buscamos ser una clínica referente en la comunidad, no solo por la calidad de nuestros servicios, sino también por el compromiso con el bienestar de las mascotas y la satisfacción de sus dueños.</p>
             </div>
-            <div class="c1">
+            <img src={% static "Images/vision.jpg" %} alt="Visión" class="section-img">
+        </div>
+        <div class="c1">
+            <div class="text-content">
                 <h2>Misión</h2>
                 <p>En Veterinaria Dr. Pul, nos comprometemos a proporcionar atención veterinaria compasiva, ética y profesional para mejorar la salud y la calidad de vida de las mascotas. Nuestro equipo altamente capacitado se esfuerza por ofrecer servicios personalizados y de la más alta calidad, con un enfoque en la prevención, el diagnóstico y el tratamiento de enfermedades. Nos preocupamos por crear un ambiente acogedor para nuestros pacientes y sus dueños, en el cual la confianza, la educación continua y el cuidado del bienestar animal sean nuestra prioridad. Estamos dedicados a promover la salud preventiva, el bienestar animal y la satisfacción de nuestros clientes, a través de una atención profesional y personalizada en cada interacción.</p>
             </div>
+            <img src={% static "Images/mision.jpg" %} alt="Misión" class="section-img">
         </div>
-    </section>
+    </div>
+</section>
 
-        <!--Seccion conocenos-->
-        <section class="equipo">
-            
-            <h2>Nuestro Equipo</h2>
-            <div class="miembros">
-                <div class="miembro">
-                    <h3>Cristian Arias</h3>
-                    <p>Especializado en</p>
-                    <img src={% static "Images/ava1.jpg" %} alt="Cristian Arias">
-                </div>
-                <div class="miembro">
-                    <h3>Cesilia Pinzón</h3>
-                    <p>Especializado en</p>
-                    <img src={% static "Images/ava2.jpg" %} alt="Cesilia Pinzón">
-                </div>
-            </div>
-        </section>
-        <section>
+<!--Nuestro equipo-->
+<section class="equipo-nuevo">
+    <h2>Nuestro Equipo</h2>
+    <div class="tarjetas-equipo">
+        <div class="tarjeta">
+            <img src={% static "Images/ava1.jpg" %} alt="Dr. Juan Pérez">
+            <h3>Dr. Juan Pérez</h3>
+            <div class="especialidad">Medicina Interna y Diagnóstico</div>
+            <p>Con más de 10 años de experiencia, el Dr. Pérez ha sido fundamental en el diagnóstico de enfermedades complejas en mascotas.</p>
+        </div>
+        <div class="tarjeta">
+            <img src={% static "Images/ava2.jpg" %} alt="Dra. Laura Gómez">
+            <h3>Dra. Laura Gómez</h3>
+            <div class="especialidad">Cirugía Veterinaria</div>
+            <p>Especialista en cirugía de tejidos blandos y ortopedia, comprometida con la recuperación integral de cada paciente.</p>
+        </div>
+    </div>
+</section>
+
+
 
     <!--Galeria de imagenes-->
     <section class="nuestro-trabajo">
@@ -131,8 +147,9 @@
     <!--Mapa-->
     <section class="f-mapa">
         <h2>¿Dónde nos ubicamos?</h2>
-        <iframe class="mapa" src="https://www.google.com/maps/embed?pb=!1m14!1m8!1m3!1d640.3375443897645!2d-72.92414385152054!3d5.7183907445867135!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x8e6a45de4792562d%3A0x60e3e042f656854b!2sCl.%2016%20%23915%2C%20Sogamoso%2C%20Boyac%C3%A1%2C%20Colombia!5e1!3m2!1ses-419!2sus!4v1740753140218!5m2!1ses-419!2sus" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        <iframe class="mapa" src="https://maps.google.com/maps?q=5%C2%B043%2706.1%22N+72%C2%B055%2726.7%22W&t=&z=13&ie=UTF8&iwloc=&output=embed" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
     </section>
+
     <!--Pie de pagina-->
     <footer>
         <div class="footer-container">
@@ -170,7 +187,7 @@
                 <h3>Enlaces rápidos</h3>
                 <div class="quick-links">
                     <a href={% url "index" %}>Inicio</a>
-                    <a href="{% url "index" %}#conocenos">Conócenos</a>
+                    <a href="#conocenos">Conócenos</a>
                     <a href={% url "servicios" %}>Servicios</a>
                     <a href={% url "agendar" %}>Agendar cita</a>
                     <a href={% url "login" %}>Iniciar sesión</a>
@@ -183,6 +200,7 @@
             <p>&copy; 2025 DR.PUL Veterinaria. Todos los derechos reservados.</p>
         </div>
     </footer>
+
     <script src={% static "JavaScript/MenuHamburguesa.js" %}></script>
     
     <!-- Widget de Accesibilidad -->
@@ -202,7 +220,7 @@
     <!--Boton Whatsapp-->
     <script src={% static "JavaScript/js-BotonWhatsapp.js" %}></script>
     <!--Boton Ayuda-->
-    <script src={% static "JavaScript/js-botonAyuda.js"%}></script>
+    <script src={% static "JavaScript/js-botonAyuda.js" %}></script>
 
     <script src={% static "JavaScript/sienna.js" %}></script>
     <script src={% static "JavaScript/custom.js" %}></script>
