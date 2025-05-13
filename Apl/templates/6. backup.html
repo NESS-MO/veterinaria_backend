@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Copia de Seguridad - Clínica Veterinaria</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <link rel="stylesheet" href="{% static 'css/copia_de_seguridad.css' %}">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+</head>
+<body>
+
+  <!-- Encabezado móvil -->
+  <div class="mobile-header">
+    <h1>Copia de Seguridad</h1>
+    <button class="hamburger" id="menu-toggle"><i class="fas fa-bars"></i></button>
+  </div>
+
+  <!-- Sidebar -->
+  <div id="sidebar">
+    <img src="{% static 'Images/logo2.png' %}" alt="Logo" />
+    <nav>
+      <a href="{% url 'gestioncitas' %}">Citas Solicitadas</a>
+      <a href="{% url 'registroc' %}">Registro Citas</a>
+      <a href="{% url 'Tipdelasemana' %}">Modificar Tip de la Semana</a>
+      <a href="{% url 'Galeria' %}">Modificar fotos "Nuestro trabajo"</a>
+      <a href="{% url 'modificarservicio' %}">Modificar Servicios</a>
+      <a href="{% url 'backup' %}">Copia de seguridad</a>
+      <a href="{% url 'index' %}">Cerrar sesión</a>
+    </nav>
+  </div>
+
+  <!-- Contenido -->
+  <main>
+    <div class="container">
+      <h1>Copia de Seguridad</h1>
+
+      <div class="card">
+        <p>Gestiona y descarga las copias de seguridad de la base de datos de la clínica.</p>
+
+        <div class="buttons">
+          <button class="generate">Generar Backup</button>
+          <button class="download">Descargar Último Backup</button>
+        </div>
+
+        <h2>Historial de Copias</h2>
+        <div class="history">
+          <div class="backup-card">
+            <div class="name">backup-2025-05-01.sql</div>
+            <div class="meta">1.2 MB · 01/05/2025</div>
+            <a href="#">Descargar</a>
+          </div>
+          <div class="backup-card">
+            <div class="name">backup-2025-04-20.sql</div>
+            <div class="meta">1.1 MB · 20/04/2025</div>
+            <a href="#">Descargar</a>
+          </div>
+          <div class="backup-card">
+            <div class="name">backup-2025-04-05.sql</div>
+            <div class="meta">1.0 MB · 05/04/2025</div>
+            <a href="#">Descargar</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const toggleBtn = document.getElementById('menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('open');
+    });
+  </script>
+
+</body>
+</html>

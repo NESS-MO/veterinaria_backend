@@ -18,4 +18,5 @@ urlpatterns = [
     path('obtener-tip-actual/', views.obtener_tip_actual, name='obtener_tip_actual'),
     path('obtener-tip-actual/', views.obtener_tip_actual, name='obtener_tip_actual'),
     path('galeria/', views.gestion_galeria, name='Galeria'),
+    path('backup/', views.backup, name='backup'),
 ] 
