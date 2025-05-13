@@ -13,14 +13,22 @@ class ImagenGaleria(models.Model):
         verbose_name="Imagen",
         help_text="Formatos recomendados: JPG, PNG (Max. 2MB)"
     )
-    titulo = models.CharField(max_length=100, blank=True, verbose_name="Título (opcional)")
+    titulo = models.CharField(
+        max_length=100, 
+        blank=True, 
+        null=True,
+        verbose_name="Título (opcional)"
+    )
     orden = models.PositiveIntegerField(
         default=0,
         verbose_name="Orden de visualización",
         help_text="Las imágenes se ordenarán de menor a mayor número"
     )
     fecha_creacion = models.DateTimeField(auto_now_add=True)
-    activa = models.BooleanField(default=True, verbose_name="Mostrar en galería")
+    activa = models.BooleanField(
+        default=True,
+        verbose_name="Mostrar en galería"
+    )
 
     class Meta:
         verbose_name = "Imagen de galería"
@@ -28,4 +36,4 @@ class ImagenGaleria(models.Model):
         ordering = ['orden']
 
     def __str__(self):
-        return f"Imagen {self.id} - Orden {self.orden}"
+        return f"Imagen {self.id} - {self.titulo if self.titulo else 'Sin título'}"

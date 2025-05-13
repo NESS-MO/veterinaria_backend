@@ -158,6 +158,54 @@ nav a:hover {
     text-align: center;
 }
 
+<<<<<<< HEAD
+=======
+
+
+.equipo h2 {
+    font-size: 28px;
+    margin-bottom: 40px;
+    color: #1e40af;
+}
+
+.miembros {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.miembro {
+    width: 100%;
+    max-width: 300px;
+    margin-bottom: 20px;
+}
+
+.miembro img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.miembro h3 {
+    font-size: 20px;
+    margin: 15px 0;
+    color: #1e40af;
+}
+
+.miembro p {
+    font-size: 16px;
+    color: #555;
+}
+
+.conocenos {    
+    padding: 40px 20px;
+    background-color: #f4f4f4;
+    text-align: center;
+}
+
+>>>>>>> 04612bcfc68805d080873e7b5029c4a47a4cb650
 .conocenos h1 {
     font-size: 36px;
     margin-bottom: 40px;
@@ -237,6 +285,7 @@ nav a:hover {
     color: #555;
 }
 
+<<<<<<< HEAD
 .c1 ul li::before {
     content: '✓';
     position: absolute;
@@ -382,17 +431,141 @@ nav a:hover {
 .imagen:hover {
     transform: translateY(-5px);
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+=======
+/* Sección Nuestro Trabajo */
+.seccion-trabajo {
+    padding: 60px 20px;
+    background-color: #f4f4f4; /* Mismo color que la sección Conócenos */
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-.imagen img {
+.encabezado-trabajo {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.titulo-trabajo {
+    font-size: 36px;
+    color: #1E2D93;
+    margin-bottom: 15px;
+    position: relative;
+    display: inline-block;
+}
+
+.titulo-trabajo::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background-color: #33C0F1;
+>>>>>>> 04612bcfc68805d080873e7b5029c4a47a4cb650
+}
+
+.descripcion-trabajo {
+    font-size: 16px;
+    color: #555;
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* Galería */
+.galeria-trabajo {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.item-trabajo {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    aspect-ratio: 1/1;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    background-color: white; /* Fondo blanco para los items */
+}
+
+.item-trabajo:hover {
+    transform: translateY(-5px);
+}
+
+.imagen-trabajo {
     width: 100%;
     height: 100%;
     object-fit: cover;
+<<<<<<< HEAD
     transition: transform 0.5s ease;
 }
 
 .imagen:hover img {
     transform: scale(1.1);
+=======
+}
+
+/* Mensaje cuando no hay imágenes */
+.mensaje-vacio {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px 0;
+    color: #666;
+}
+
+/* Estilos para los títulos de las imágenes */
+.titulo-imagen {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+    color: white;
+    padding: 15px 10px 10px;
+    text-align: center;
+    opacity: 1;
+    transition: all 0.3s ease;
+}
+
+.titulo-imagen p {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+}
+
+/* Ajustes para el contenedor de cada imagen */
+.item-trabajo {
+    position: relative; /* Añade esto si no está presente */
+    overflow: hidden;
+    border-radius: 8px;
+    aspect-ratio: 1/1;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .galeria-trabajo {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .galeria-trabajo {
+        grid-template-columns: 1fr;
+    }
+    
+    .titulo-trabajo {
+        font-size: 28px;
+    }
+    
+    .descripcion-trabajo {
+        font-size: 15px;
+    }
+>>>>>>> 04612bcfc68805d080873e7b5029c4a47a4cb650
 }
 
 .f-mapa {
