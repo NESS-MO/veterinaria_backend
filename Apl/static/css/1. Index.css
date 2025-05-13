@@ -199,7 +199,7 @@ nav a:hover {
 
 .conocenos {    
     padding: 40px 20px;
-    background-color: #f9f9f9;
+    background-color: #f4f4f4;
     text-align: center;
 }
 
@@ -243,57 +243,131 @@ nav a:hover {
     margin: 10px 0;
 }
 
-.nuestro-trabajo {
+/* Sección Nuestro Trabajo */
+.seccion-trabajo {
+    padding: 60px 20px;
+    background-color: #f4f4f4; /* Mismo color que la sección Conócenos */
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.encabezado-trabajo {
     text-align: center;
-    padding: 50px 20px;
-    background-color: #f9f9f9; 
+    margin-bottom: 40px;
 }
 
-.nuestro-trabajo h2 {
-    font-size: 32px;
-    margin-bottom: 20px;
-    color: #1e40af;
-    font-weight: bold;
-}
-
-.galeria {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); 
-    gap: 20px;
-    margin-top: 20px;
-    padding: 0 20px;
-}
-
-.imagen {
+.titulo-trabajo {
+    font-size: 36px;
+    color: #1E2D93;
+    margin-bottom: 15px;
     position: relative;
-    border-radius: 10px;
-    overflow: hidden; 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
-    transition: transform 0.3s, box-shadow 0.3s; 
+    display: inline-block;
 }
 
-.imagen:hover {
-    transform: scale(1.05); 
-    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);  
+.titulo-trabajo::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80px;
+    height: 3px;
+    background-color: #33C0F1;
 }
 
-.imagen img {
+.descripcion-trabajo {
+    font-size: 16px;
+    color: #555;
+    max-width: 700px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+/* Galería */
+.galeria-trabajo {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+}
+
+.item-trabajo {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    aspect-ratio: 1/1;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+    background-color: white; /* Fondo blanco para los items */
+}
+
+.item-trabajo:hover {
+    transform: translateY(-5px);
+}
+
+.imagen-trabajo {
     width: 100%;
     height: 100%;
-    object-fit: cover; 
-    border-radius: 10px;
+    object-fit: cover;
 }
 
-.imagen p {
+/* Mensaje cuando no hay imágenes */
+.mensaje-vacio {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 40px 0;
+    color: #666;
+}
+
+/* Estilos para los títulos de las imágenes */
+.titulo-imagen {
     position: absolute;
-    bottom: 15px;
-    left: 15px;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+    color: white;
+    padding: 15px 10px 10px;
+    text-align: center;
+    opacity: 1;
+    transition: all 0.3s ease;
+}
+
+.titulo-imagen p {
+    margin: 0;
     font-size: 16px;
-    color: #fff;
-    background-color: rgba(0, 0, 0, 0.6); 
-    padding: 8px 15px;
-    border-radius: 5px;
-    font-weight: bold;
+    font-weight: 600;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+}
+
+/* Ajustes para el contenedor de cada imagen */
+.item-trabajo {
+    position: relative; /* Añade esto si no está presente */
+    overflow: hidden;
+    border-radius: 8px;
+    aspect-ratio: 1/1;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+    .galeria-trabajo {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media (max-width: 600px) {
+    .galeria-trabajo {
+        grid-template-columns: 1fr;
+    }
+    
+    .titulo-trabajo {
+        font-size: 28px;
+    }
+    
+    .descripcion-trabajo {
+        font-size: 15px;
+    }
 }
 
 .f-mapa {
