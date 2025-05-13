@@ -25,7 +25,7 @@ def RContrasenaDos(requets):
     return render(requets, "4.2 RecuperarContrasena.html")
 
 def modificar(request):
-    return render(request, "5. modificar-galeria.html")
+    return gestion_galeria(request)
 
 def Tip(request):
     return render(request, "5. Modificar-tipdelasemana.html")
@@ -124,6 +124,10 @@ from django.contrib import messages
 from .models import ImagenGaleria
 from .forms import ImagenGaleriaForm
 
+from django.shortcuts import render, redirect
+from .models import ImagenGaleria
+from .forms import ImagenGaleriaForm
+
 def gestion_galeria(request):
     imagenes = ImagenGaleria.objects.all().order_by('orden')
     
@@ -136,26 +140,34 @@ def gestion_galeria(request):
             messages.success(request, 'Imagen eliminada correctamente')
             return redirect('Galeria')
         
+        # Procesar cambio de estado
+        if 'toggle_activa' in request.POST:
+            imagen_id = request.POST.get('toggle_activa')
+            imagen = ImagenGaleria.objects.get(id=imagen_id)
+            imagen.activa = not imagen.activa
+            imagen.save()
+            messages.success(request, f'Imagen {"activada" if imagen.activa else "ocultada"} correctamente')
+            return redirect('Galeria')
+        
         # Procesar nueva imagen
         form = ImagenGaleriaForm(request.POST, request.FILES)
         if form.is_valid():
-            form.save()
-            messages.success(request, 'Imagen agregada correctamente')
+            # Limitar a 9 imágenes máximo
+            if ImagenGaleria.objects.count() >= 9:
+                messages.error(request, 'Solo se permiten 9 imágenes en la galería')
+            else:
+                form.save()
+                messages.success(request, 'Imagen agregada correctamente')
             return redirect('Galeria')
     else:
         form = ImagenGaleriaForm()
 
     return render(request, '5. modificar-galeria.html', {
         'imagenes': imagenes,
-        'form': form
+        'form': form,
+        'total_imagenes': ImagenGaleria.objects.count()
     })
-
-from .models import ImagenGaleria 
 
 def index(request):
     imagenes_galeria = ImagenGaleria.objects.filter(activa=True).order_by('orden')[:9]
-    context = {
-        'imagenes_galeria': imagenes_galeria,
-        # otros contextos...
-    }
-    return render(request, '1. Index.html', context)
+    return render(request, "1. Index.html", {'imagenes_galeria': imagenes_galeria})
