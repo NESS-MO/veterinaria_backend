@@ -14,7 +14,8 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: linear-gradient(135deg, #5fbac8, #3f6ead);
+    background: linear-gradient(135deg, #22d3ee, #1e40af);
+    ;
     padding: 10px 20px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     flex-wrap: wrap;
@@ -73,7 +74,7 @@ nav a:hover {
 
 .bienvenida {
     position: relative;
-    background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.5)), url(../Images/fondo.jpg);
+    background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.5)), url('../Images/fondo.jpg');
     background-size: cover;
     background-position: center;
     padding: 21.5% 20px;
@@ -151,198 +152,119 @@ nav a:hover {
     background-color: #1e40af;
 }
 
-
-.conocenos {
-    padding: 60px 20px;
+.equipo {
+    padding: 40px 20px;
     background-color: #ffffff;
     text-align: center;
 }
 
-.conocenos h1 {
-    font-size: 36px;
+
+
+.equipo h2 {
+    font-size: 28px;
     margin-bottom: 40px;
-    color: #3f6ead;
-    position: relative;
-    display: inline-block;
+    color: #1e40af;
 }
 
-.conocenos h1::after {
-    content: '';
-    position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80px;
-    height: 3px;
-    background-color: #5fbac8;
+.miembros {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+}
+
+.miembro {
+    width: 100%;
+    max-width: 300px;
+    margin-bottom: 20px;
+}
+
+.miembro img {
+    width: 100%;
+    height: 300px;
+    object-fit: cover;
+    border-radius: 10px;
+}
+
+.miembro h3 {
+    font-size: 20px;
+    margin: 15px 0;
+    color: #1e40af;
+}
+
+.miembro p {
+    font-size: 16px;
+    color: #555;
+}
+
+.conocenos {    
+    padding: 40px 20px;
+    background-color: #f4f4f4;
+    text-align: center;
+}
+
+.conocenos h1 {
+    font-size: 32px;
+    margin-bottom: 50px;
+    color: #1e40af;
+    text-shadow: 0 4px 8px rgba(0, 0, 0, 0.281);
+}
+
+.conocenos h2 {
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: #1e40af;
 }
 
 .conocenos2 {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 40px;
-    max-width: 1400px;
-    margin: 0 auto;
+    gap: 20px;
 }
 
 .c1 {
-    flex: 1;
-    min-width: 300px;
-    max-width: 800px; /* Aumentado para acomodar la imagen */
-    text-align: left;
-    padding: 0;
-    border-radius: 15px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s, box-shadow 0.3s;
-    background-color: #fff;
-    display: flex;
-    overflow: hidden;
-}
-
-.c1:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-}
-
-.text-content {
-    padding: 30px;
-    flex: 1;
-}
-
-.c1 h2 {
-    font-size: 24px;
-    margin-bottom: 20px;
-    color: #3f6ead;
-}
-
-.c1 p {
-    font-size: 16px;
-    line-height: 1.6;
-    color: #555;
-    margin-bottom: 15px;
+    align-items: center;
+    max-width: 600px;
+    text-align: center;
+    margin-right: 80px;
+    margin-left: 80px;
+    padding: 20px 40px;
+    border-radius: 40px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .c1 ul {
     list-style-type: none;
     padding: 0;
-    text-align: left;
-    display: inline-block;
 }
 
 .c1 ul li {
     margin: 10px 0;
-    padding-left: 25px;
-    position: relative;
-    color: #555;
 }
 
-.c1 ul li::before {
-    content: '✓';
-    position: absolute;
-    left: 0;
-    color: #5fbac8;
-    font-weight: bold;
-}
-
-.section-img {
-    width: 200px;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
-
-.equipo-nuevo {
+/* Sección Nuestro Trabajo */
+.seccion-trabajo {
     padding: 60px 20px;
-    background-color: #f9f9f9;
-    text-align: center;
-}
-
-.equipo-nuevo h2 {
-    font-size: 36px;
-    color: #3f6ead;
-    margin-bottom: 40px;
-    position: relative;
-}
-
-.equipo-nuevo h2::after {
-    content: '';
-    width: 80px;
-    height: 3px;
-    background-color: #5fbac8;
-    position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-}
-
-.tarjetas-equipo {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 40px;
-    max-width: 1100px;
+    background-color: #f4f4f4; /* Mismo color que la sección Conócenos */
+    max-width: 1200px;
     margin: 0 auto;
 }
 
-.tarjeta {
-    background-color: #fff;
-    border-radius: 15px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-    width: 280px;
-    padding: 20px;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
+.encabezado-trabajo {
     text-align: center;
+    margin-bottom: 40px;
 }
 
-.tarjeta:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
-}
-
-.tarjeta img {
-    width: 100%;
-    height: 260px;
-    object-fit: cover;
-    border-radius: 12px;
-    margin-bottom: 15px;
-}
-
-.tarjeta h3 {
-    font-size: 20px;
-    color: #1e40af;
-    margin-bottom: 5px;
-}
-
-.especialidad {
-    font-size: 14px;
-    color: #5fbac8;
-    margin-bottom: 10px;
-    font-weight: 600;
-}
-
-.tarjeta p {
-    font-size: 15px;
-    color: #555;
-    line-height: 1.5;
-}
-    
-
-.nuestro-trabajo {
-    padding: 60px 20px;
-    background-color: #ffffff;
-    text-align: center;
-}
-
-.nuestro-trabajo h2 {
+.titulo-trabajo {
     font-size: 36px;
-    margin-bottom: 20px;
-    color: #3f6ead;
+    color: #1E2D93;
+    margin-bottom: 15px;
     position: relative;
     display: inline-block;
 }
 
-.nuestro-trabajo h2::after {
+.titulo-trabajo::after {
     content: '';
     position: absolute;
     bottom: -10px;
@@ -350,38 +272,7 @@ nav a:hover {
     transform: translateX(-50%);
     width: 80px;
     height: 3px;
-    background-color: #5fbac8;
-}
-
-.nuestro-trabajo p {
-    font-size: 16px;
-    color: #555;
-    max-width: 700px;
-    margin: 0 auto 30px;
-    line-height: 1.6;
-}
-
-.galeria {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-.imagen {
-    position: relative;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    aspect-ratio: 1/1;
-}
-
-.imagen:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    background-color: #33C0F1;
 }
 
 .descripcion-trabajo {
@@ -492,15 +383,16 @@ nav a:hover {
 }
 
 .mapa {
+    text-align: center;
     width: 80%;
-    height: 500px;
+    height: 700px;
     border: 0;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 footer {
-    background: linear-gradient(135deg, #5fbac8, #3f6ead);
+    background: linear-gradient(135deg, #22d3ee, #1e40af);
     color: #fff;
     padding: 40px 20px 20px;
     font-family: 'Open Sans', sans-serif;
@@ -724,110 +616,3 @@ footer {
         bottom: 50px;
     }
 }
-
-/* Galería */
-.galeria-trabajo {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-}
-
-.item-trabajo {
-    position: relative;
-    overflow: hidden;
-    border-radius: 8px;
-    aspect-ratio: 1/1;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-    background-color: white; /* Fondo blanco para los items */
-}
-
-.item-trabajo:hover {
-    transform: translateY(-5px);
-}
-
-.imagen-trabajo {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-/* Mensaje cuando no hay imágenes */
-.mensaje-vacio {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 40px 0;
-    color: #666;
-}
-
-/* Estilos para los títulos de las imágenes */
-.titulo-imagen {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
-    color: white;
-    padding: 15px 10px 10px;
-    text-align: center;
-    opacity: 1;
-    transition: all 0.3s ease;
-}
-
-.titulo-imagen p {
-    margin: 0;
-    font-size: 16px;
-    font-weight: 600;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-}
-
-/* Ajustes para el contenedor de cada imagen */
-.item-trabajo {
-    position: relative; /* Añade esto si no está presente */
-    overflow: hidden;
-    border-radius: 8px;
-    aspect-ratio: 1/1;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-}
-
-/* Sección Nuestro Trabajo */
-.seccion-trabajo {
-    padding: 60px 20px;
-    background-color: #f4f4f4; /* Mismo color que la sección Conócenos */
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.encabezado-trabajo {
-    text-align: center;
-    margin-bottom: 40px;
-}
-
-.titulo-trabajo {
-    font-size: 36px;
-    color: #1E2D93;
-    margin-bottom: 15px;
-    position: relative;
-    display: inline-block;
-}
-
-.titulo-trabajo::after {
-    content: '';
-    position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80px;
-    height: 3px;
-    background-color: #33C0F1;
-}
-
-.descripcion-trabajo {
-    font-size: 16px;
-    color: #555;
-    max-width: 700px;
-    margin: 0 auto;
-    line-height: 1.6;
-}
-
