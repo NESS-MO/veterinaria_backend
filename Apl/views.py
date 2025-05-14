@@ -3,6 +3,7 @@ from django.http import HttpResponse, JsonResponse
 from .models import Administrador, Cliente 
 from django.shortcuts import get_object_or_404
 from .forms import craeteNewTask
+from datetime import date, timedelta
 
 # Create your views here.
 
@@ -13,7 +14,12 @@ def servicios(request):
     return render(request, "2. Servicios.html" )
 
 def Agendar(request):
-    return render(request, "3. Agendar.html")
+    min_date = date.today().strftime('%Y-%m-%d')
+    max_date = (date.today() + timedelta(days=60)).strftime('%Y-%m-%d')
+    return render(request, "3. Agendar.html", {
+        'min_date': min_date,
+        'max_date': max_date
+    })
 
 def login(request):
     return render(request, "4. login.html")
@@ -26,6 +32,9 @@ def RContrasenaDos(requets):
 
 def modificar(request):
     return gestion_galeria(request)
+
+def backup(request):
+    return render(request, "6. backup.html")
 
 def Tip(request):
     return render(request, "5. Modificar-tipdelasemana.html")

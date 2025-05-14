@@ -1,0 +1,81 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Copia de Seguridad - Clínica Veterinaria</title>
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="font-sans bg-gradient-to-tr from-[#e0f7ff] to-white text-[#333] min-h-screen">
+
+  <!-- Encabezado móvil -->
+  <div class="mobile-header md:hidden flex items-center justify-between bg-[#1E2D93] text-white p-4">
+    <h1 class="text-lg font-bold">Copia de Seguridad</h1>
+    <button class="hamburger" id="menu-toggle"><i class="fas fa-bars"></i></button>
+  </div>
+
+  <!-- Sidebar -->
+  <div id="sidebar" class="w-72 md:w-72 bg-gradient-to-br from-[#33C0F1] to-[#1E2D93] text-white p-7 md:fixed md:h-full top-0 left-0 z-10 transform md:translate-x-0 -translate-x-full transition-transform duration-300 ease-in-out">
+    <img class="h-24 mx-auto mb-4" src="{% static 'Images/logo2.png' %}" alt="Logo" />
+    <ul class="space-y-3">
+      <li><a href="{% url 'gestioncitas' %}" class="block hover:bg-white/20 p-2 rounded">Citas Solicitadas</a></li>
+      <li><a href="{% url 'registroc' %}" class="block hover:bg-white/20 p-2 rounded">Registro Citas</a></li>
+      <li><a href="{% url 'Tipdelasemana' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Tip de la Semana</a></li>
+      <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded">Modificar fotos "Nuestro trabajo"</a></li>
+      <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Servicios</a></li>
+      <li><a href="{% url 'backup' %}" class="block hover:bg-white/20 p-2 rounded">Copia de seguridad</a></li>
+      <li><a href="{% url 'index' %}" class="block hover:bg-white/20 p-2 rounded">Cerrar sesión</a></li>
+    </ul>
+  </div>
+
+  <!-- Contenido principal -->
+  <section class="md:ml-72 p-6">
+    <div class="container mx-auto max-w-4xl">
+      <h1 class="text-3xl font-bold text-[#1E2D93] mb-6">Copia de Seguridad</h1>
+
+      <div class="card bg-white rounded-xl shadow-lg p-6 mb-8">
+        <p class="text-lg text-gray-700 mb-4">Gestiona y descarga las copias de seguridad de la base de datos de la clínica.</p>
+
+        <div class="buttons flex flex-wrap gap-4 mb-6">
+          <button class="generate bg-blue-600 hover:bg-blue-800 text-white px-5 py-3 rounded-lg font-semibold">Generar Backup</button>
+          <button class="download bg-green-600 hover:bg-green-800 text-white px-5 py-3 rounded-lg font-semibold">Descargar Último Backup</button>
+        </div>
+
+        <h2 class="text-xl font-semibold mb-4">Historial de Copias</h2>
+        <div class="history grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div class="backup-card bg-slate-100 rounded-lg p-4 hover:shadow-md transition-shadow">
+            <div class="name font-bold mb-1">backup-2025-05-01.sql</div>
+            <div class="meta text-sm text-gray-600">1.2 MB · 01/05/2025</div>
+            <a href="#" class="text-blue-600 hover:underline text-sm mt-2 inline-block">Descargar</a>
+          </div>
+          <div class="backup-card bg-slate-100 rounded-lg p-4 hover:shadow-md transition-shadow">
+            <div class="name font-bold mb-1">backup-2025-04-20.sql</div>
+            <div class="meta text-sm text-gray-600">1.1 MB · 20/04/2025</div>
+            <a href="#" class="text-blue-600 hover:underline text-sm mt-2 inline-block">Descargar</a>
+          </div>
+          <div class="backup-card bg-slate-100 rounded-lg p-4 hover:shadow-md transition-shadow">
+            <div class="name font-bold mb-1">backup-2025-04-05.sql</div>
+            <div class="meta text-sm text-gray-600">1.0 MB · 05/04/2025</div>
+            <a href="#" class="text-blue-600 hover:underline text-sm mt-2 inline-block">Descargar</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Script para abrir/cerrar sidebar en móvil -->
+  <script>
+    const toggleBtn = document.getElementById('menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+
+    toggleBtn.addEventListener('click', () => {
+      sidebar.classList.toggle('translate-x-0');
+      sidebar.classList.toggle('-translate-x-full');
+    });
+  </script>
+
+</body>
+</html>
