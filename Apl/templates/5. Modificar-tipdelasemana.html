@@ -11,15 +11,15 @@
 </head>
 <body>
   <!-- Sidebar -->
-  <div class="w-full md:w-72 bg-gradient-to-br from-[#33C0F1] to-[#1E2D93] text-white p-7 md:fixed md:h-full top-0 left-0 z-10">
+  <div class="w-full md:w-72 bg-gradient-to-br from-[#33C0F1] to-[#1E2D93] text-white p-7 md:fixed md:h-full top-0 left-0 z-10 font-sans"> 
       <img class="h-24 mx-auto mb-4" src="{% static 'Images/logo2.png' %}" alt="Logo" />
-      <ul class="space-y-3">
+      <ul class="space-y-4">
         <li><a href="{% url 'gestioncitas' %}" class="block hover:bg-white/20 p-2 rounded">Citas Solicitadas</a></li>
         <li><a href="{% url 'registroc' %}" class="block hover:bg-white/20 p-2 rounded">Registro Citas</a></li>
-        <li><a href="{% url 'Tipdelasemana' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Tip de la Semana</a></li>
-        <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded">Modificar fotos "Nuestro trabajo"</a></li>
+        <li><a href="{% url 'Galeria' %}" class="block bg-white/30 hover:bg-white/40 p-2 rounded text-gray-900">Modificar Tip de la Semana</a></li>
+        <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Galería</a></li>
         <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Servicios</a></li>
-        <li><a href="{% url 'index' %}" class="block hover:bg-white/20 p-2 rounded">Cerrar sesión</a></li>
+        <li><a href="{% url 'index' %}" class="block hover:bg-red-500/80 p-2 rounded">Cerrar sesión</a></li>
       </ul>
   </div>
 
