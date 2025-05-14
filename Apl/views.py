@@ -33,6 +33,9 @@ def RContrasenaDos(requets):
 def modificar(request):
     return gestion_galeria(request)
 
+def backup(request):
+    return render(request, "6. backup.html")
+
 def Tip(request):
     return render(request, "5. Modificar-tipdelasemana.html")
 
