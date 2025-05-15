@@ -17,7 +17,12 @@ urlpatterns = [
     path('registroCita/', views.RegistroC, name='registroc'),
     path('eliminar-tip/<int:tip_id>/', views.eliminar_tip, name='eliminar_tip'),
     path('obtener-tip-actual/', views.obtener_tip_actual, name='obtener_tip_actual'),
+<<<<<<< HEAD
     path('obtener-tip-actual/', views.obtener_tip_actual, name='obtener_tip_actual'),
     path('galeria/', views.gestion_galeria, name='Galeria'),
     path('backup/', views.backup, name='backup'),
 ] 
+=======
+    path('backup/', views.backup, name='backup'),
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+>>>>>>> 2a4f29e80819de76ba358fbe72d2f93bb17d6f35

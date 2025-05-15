@@ -5,7 +5,6 @@
         }
 
         body {
-            font-family: Arial, sans-serif;
             background-color: #f5f5f5;
             background-repeat: no-repeat;
             background-size: cover;
@@ -21,6 +20,7 @@
             margin: 40px 0 20px;
         }
 
+<<<<<<< HEAD
         .sidebar {
             width: 290px;
             height: 100vh;
@@ -65,6 +65,8 @@
             margin: 0 auto 20px;
         }
 
+=======
+>>>>>>> 2a4f29e80819de76ba358fbe72d2f93bb17d6f35
         section {
             margin-left: 320px;
             margin-top: 20px;
@@ -285,13 +287,6 @@
                 margin-top: 20px;
                 padding: 20px;
             }
-
-            .sidebar {
-                width: 100%;
-                height: auto;
-                position: relative;
-            }
-
             .actions {
                 flex-direction: column;
             }
