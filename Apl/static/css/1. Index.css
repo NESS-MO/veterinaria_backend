@@ -14,7 +14,7 @@ header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: linear-gradient(135deg, #5fbac8, #3f6ead);
+    background: linear-gradient(135deg, #22d3ee, #1e40af);
     padding: 10px 20px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     flex-wrap: wrap;
@@ -161,7 +161,7 @@ nav a:hover {
 .conocenos h1 {
     font-size: 36px;
     margin-bottom: 40px;
-    color: #3f6ead;
+    color: #1e40af;
     position: relative;
     display: inline-block;
 }
@@ -174,7 +174,7 @@ nav a:hover {
     transform: translateX(-50%);
     width: 80px;
     height: 3px;
-    background-color: #5fbac8;
+    background-color: #22d3ee;
 }
 
 .conocenos2 {
@@ -213,7 +213,7 @@ nav a:hover {
 .c1 h2 {
     font-size: 24px;
     margin-bottom: 20px;
-    color: #3f6ead;
+    color: #1e40af;
 }
 
 .c1 p {
@@ -241,7 +241,7 @@ nav a:hover {
     content: '✓';
     position: absolute;
     left: 0;
-    color: #5fbac8;
+    color: #22d3ee;
     font-weight: bold;
 }
 
@@ -260,7 +260,7 @@ nav a:hover {
 
 .equipo-nuevo h2 {
     font-size: 36px;
-    color: #3f6ead;
+    color: #1e40af;
     margin-bottom: 40px;
     position: relative;
 }
@@ -269,7 +269,7 @@ nav a:hover {
     content: '';
     width: 80px;
     height: 3px;
-    background-color: #5fbac8;
+    background-color: #22d3ee;
     position: absolute;
     bottom: -10px;
     left: 50%;
@@ -316,7 +316,7 @@ nav a:hover {
 
 .especialidad {
     font-size: 14px;
-    color: #5fbac8;
+    color: #22d3ee;
     margin-bottom: 10px;
     font-weight: 600;
 }
@@ -337,7 +337,7 @@ nav a:hover {
 .nuestro-trabajo h2 {
     font-size: 36px;
     margin-bottom: 20px;
-    color: #3f6ead;
+    color: #1e40af;
     position: relative;
     display: inline-block;
 }
@@ -350,7 +350,7 @@ nav a:hover {
     transform: translateX(-50%);
     width: 80px;
     height: 3px;
-    background-color: #5fbac8;
+    background-color: #22d3ee;
 }
 
 .nuestro-trabajo p {
@@ -493,14 +493,14 @@ nav a:hover {
 
 .mapa {
     width: 80%;
-    height: 500px;
+    height: 750px;
     border: 0;
     border-radius: 10px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 footer {
-    background: linear-gradient(135deg, #5fbac8, #3f6ead);
+    background: linear-gradient(135deg, #22d3ee, #1e40af);
     color: #fff;
     padding: 40px 20px 20px;
     font-family: 'Open Sans', sans-serif;
@@ -830,4 +830,3 @@ footer {
     margin: 0 auto;
     line-height: 1.6;
 }
-

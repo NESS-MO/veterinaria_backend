@@ -235,13 +235,11 @@ function createFloatingTipElements() {
   tipWindow.style.display = 'none';
   tipWindow.innerHTML = `
     <div class="contenedor-tip">
-      <!-- Encabezado con botón de cerrar -->
       <div class="cabecera-tip">
         <h2 class="titulo-tip">¡TIP DE LA SEMANA!</h2>
         <img src="${STATIC_URL}Images/salida.png" class="salir" alt="Cerrar">
       </div>
     
-      <!-- Contenido principal -->
       <div class="cuerpo-tip">
         <div class="imagen-tip">
           <img src="${STATIC_URL}Images/gato.gif" alt="Consejo sobre gatos" class="gif-tip">
@@ -254,7 +252,6 @@ function createFloatingTipElements() {
         </div>
       </div>
       
-      <!-- Pie con branding -->
       <div class="pie-tip">
         <img src="${STATIC_URL}Images/logo2.png" alt="DR.PUL" class="logo-tip">
         <span>Comprometidos con la salud animal</span>
@@ -268,29 +265,46 @@ function createFloatingTipElements() {
   document.body.appendChild(tipWindow);
 
   // Event listeners
-  tipButton.addEventListener('click', tipb);
-  fondoOscuro.addEventListener('click', salirfo);
+  tipButton.addEventListener('click', function() {
+    console.log("Botón tip clickeado");
+    tipb();
+  });
+
+  fondoOscuro.addEventListener('click', function() {
+    console.log("Fondo oscuro clickeado");
+    salirfo();
+  });
   
   // Event listener para el botón de salir
   tipWindow.querySelector('.salir').addEventListener('click', function(e) {
+    console.log("Botón 'salir' dentro de la ventana clickeado");
     e.stopPropagation();
     salir();
   });
 }
 
 function tipb() {
+  console.log("Función tipb() llamada");
   document.getElementById("fondo-oscuro").style.display = "block";
   document.getElementById("tipv").style.display = "block";
+  console.log("Ventana tip mostrada");
+  console.log("Fondo oscuro mostrado");
 }
 
 function salir() {
+  console.log("Función salir() llamada");
   document.getElementById("tipv").style.display = "none";
   document.getElementById("fondo-oscuro").style.display = "none";
+  console.log("Ventana tip oculta");
+  console.log("Fondo oscuro oculto");
 }
 
 function salirfo() {
+  console.log("Función salirfo() llamada");
   document.getElementById("tipv").style.display = "none";
   document.getElementById("fondo-oscuro").style.display = "none";
+  console.log("Ventana tip oculta");
+  console.log("Fondo oscuro oculto");
 }
 
 // Inicialización cuando el DOM esté listo
