@@ -20,6 +20,50 @@
             margin: 40px 0 20px;
         }
 
+        .sidebar {
+            width: 290px;
+            height: 100vh;
+            background: linear-gradient(135deg,  #33C0F1,#1E2D93); 
+            color: white;
+            padding: 20px;
+            position: fixed;
+            left: 0;
+            top: 0;
+            overflow-y: auto;
+        }
+
+        .sidebar h2 {
+            text-align: center;
+        }
+
+        .sidebar ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sidebar ul li {
+            margin: 20px 0;
+        }
+
+        .sidebar ul li a {
+            color: white;
+            text-decoration: none;
+            font-size: 18px;
+            display: block;
+            padding: 10px;
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar ul li a:hover {
+            background-color: #e4e7eb67;
+        }
+
+        .logo {
+            height: 100px;
+            display: block;
+            margin: 0 auto 20px;
+        }
+
         section {
             margin-left: 320px;
             margin-top: 20px;
