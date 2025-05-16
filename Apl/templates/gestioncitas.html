@@ -5,240 +5,255 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Citas - Veterinaria</title>
+    <link rel="icon" href="{% static 'Images/logo.png' %}"/>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href=" {% static 'css/GestionCitas.css' %}">
     <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
+<body class="bg-gray-100 font-sans">
+
     <!-- Sidebar -->
     <div class="w-full md:w-72 bg-gradient-to-br from-[#33C0F1] to-[#1E2D93] text-white p-7 md:fixed md:h-full top-0 left-0 z-10">
         <img class="h-24 mx-auto mb-4" src="{% static 'Images/logo2.png' %}" alt="Logo" />
-        <ul class="space-y-3">
-          <li><a href="{% url 'gestioncitas' %}" class="block hover:bg-white/20 p-2 rounded">Citas Solicitadas</a></li>
-          <li><a href="{% url 'registroc' %}" class="block hover:bg-white/20 p-2 rounded">Registro Citas</a></li>
-          <li><a href="{% url 'Tipdelasemana' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Tip de la Semana</a></li>
-          <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded">Modificar fotos "Nuestro trabajo"</a></li>
-          <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Servicios</a></li>
-          <li><a href="{% url 'backup' %}">Copia de seguridad</a><li>
-          <li><a href="{% url 'index' %}" class="block hover:bg-white/20 p-2 rounded">Cerrar sesión</a></li>
+        <ul class="space-y-4 text-lg">
+            <li><a href="{% url 'gestioncitas' %}" class="block bg-white/30 hover:bg-white/40 p-2 rounded text-gray-900">Citas Solicitadas</a></li>
+            <li><a href="{% url 'registroc' %}" class="block hover:bg-white/20 p-2 rounded">Registro Citas</a></li>
+            <li><a href="{% url 'Tipdelasemana' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Tip de la Semana</a></li>
+            <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Galería</a></li>
+            <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Servicios</a></li>
+            <li><a href="{% url 'backup' %}" class="block hover:bg-white/20 p-2 rounded">Copia de seguridad</a></li>
+            <li><a href="{% url 'index' %}" class="block hover:bg-red-500/80 p-2 rounded">Cerrar sesión</a></li>
         </ul>
     </div>
-    <section>
-        <h1>Panel de Administración de Citas</h1>
 
-        <button id="toggle-filtros">
+    <!-- Main Section -->
+    <section class="md:ml-80 mt-6 px-4 md:px-6 pb-10">
+        <h1 class="text-3xl font-semibold text-[#1E2D93] text-center mb-8">PANEL ADMINISTRACIÓN DE CITAS</h1>
+
+        <button id="toggle-filtros" class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#33C0F1] to-[#1E2D93] text-white rounded-lg mx-auto mb-6 hover:scale-105 transition">
             <i class="fas fa-sliders-h"></i>
             <span>Filtros</span>
         </button>
 
-        <div class="filtro-campos" id="contenedor-filtros">
-            <div class="campo">
-                <label for="filtro-nombre">Nombre</label>
-                <input type="text" id="filtro-nombre" placeholder="Nombre">
+        <div id="contenedor-filtros" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 bg-white p-6 rounded-xl shadow transition-all max-h-0 overflow-hidden opacity-0">
+            <div class="flex flex-col">
+                <label class="font-medium text-[#1E2D93] mb-1">Nombre</label>
+                <input type="text" id="filtro-nombre" placeholder="Nombre" class="input-filter">
             </div>
-            <div class="campo">
-                <label for="filtro-correo">Correo</label>
-                <input type="text" id="filtro-correo" placeholder="Correo">
+            <div class="flex flex-col">
+                <label class="font-medium text-[#1E2D93] mb-1">Correo</label>
+                <input type="text" id="filtro-correo" placeholder="Correo" class="input-filter">
             </div>
-            <div class="campo">
-                <label for="filtro-telefono">Teléfono</label>
-                <input type="text" id="filtro-telefono" placeholder="Teléfono">
+            <div class="flex flex-col">
+                <label class="font-medium text-[#1E2D93] mb-1">Teléfono</label>
+                <input type="text" id="filtro-telefono" placeholder="Teléfono" class="input-filter">
             </div>
-            <div class="campo">
-                <label for="filtro-mascota">Mascota</label>
-                <input type="text" id="filtro-mascota" placeholder="Mascota">
+            <div class="flex flex-col">
+                <label class="font-medium text-[#1E2D93] mb-1">Mascota</label>
+                <input type="text" id="filtro-mascota" placeholder="Mascota" class="input-filter">
             </div>
-            <div class="campo">
-                <label for="filtro-fecha">Fecha</label>
-                <input type="date" id="filtro-fecha">
+            <div class="flex flex-col">
+                <label class="font-medium text-[#1E2D93] mb-1">Fecha</label>
+                <input type="date" id="filtro-fecha" class="input-filter">
             </div>
-            <div class="campo">
-                <label for="filtro-hora">Hora</label>
-                <input type="time" id="filtro-hora">
+            <div class="flex flex-col">
+                <label class="font-medium text-[#1E2D93] mb-1">Hora</label>
+                <input type="time" id="filtro-hora" class="input-filter">
             </div>
-            <div class="campo">
-                <label for="filtro-servicio">Servicios</label>
-                <input type="text" id="filtro-servicio" placeholder="Servicios">
+            <div class="flex flex-col">
+                <label class="font-medium text-[#1E2D93] mb-1">Servicios</label>
+                <input type="text" id="filtro-servicio" placeholder="Servicios" class="input-filter">
             </div>
-            <div class="campo">
-                <button id="btn-limpiar">Limpiar</button>
+            <div class="flex items-end">
+                <button id="btn-limpiar" class="bg-gradient-to-r from-[#33C0F1] to-[#1E2D93] text-white px-4 py-2 rounded-lg font-bold">Limpiar</button>
             </div>
         </div>
 
-        <div id="loading" style="display: none;">
-            <img src="Imagenes/loading.gif" alt="Cargando...">
+        <div id="loading" class="text-center py-6 hidden">
+            <img src="{% static 'Imagenes/loading.gif' %}" alt="Cargando..." class="mx-auto">
         </div>
 
-        <table id="tabla-citas">
-            <thead>
-                <tr>
-                    <th>Nombre</th>
-                    <th>Correo</th>
-                    <th>Teléfono</th>
-                    <th>Mascota</th>
-                    <th>Fecha</th>
-                    <th>Hora</th>
-                    <th>Servicios</th>
-                    <th>Acciones</th>
-                </tr>
-            </thead>
-            <tbody></tbody>
-        </table>
+        <div class="overflow-x-auto bg-white shadow-md rounded-xl">
+            <table class="min-w-full divide-y divide-gray-200" id="tabla-citas">
+                <thead class="bg-[#1E2D93] text-white">
+                    <tr>
+                        <th class="px-6 py-3 text-xs font-bold uppercase text-center">Nombre</th>
+                        <th class="px-6 py-3 text-xs font-bold uppercase text-center">Correo</th>
+                        <th class="px-6 py-3 text-xs font-bold uppercase text-center">Teléfono</th>
+                        <th class="px-6 py-3 text-xs font-bold uppercase text-center">Mascota</th>
+                        <th class="px-6 py-3 text-xs font-bold uppercase text-center">Fecha</th>
+                        <th class="px-6 py-3 text-xs font-bold uppercase text-center">Hora</th>
+                        <th class="px-6 py-3 text-xs font-bold uppercase text-center">Servicios</th>
+                        <th class="px-6 py-3 text-xs font-bold uppercase text-center">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-200 text-center">
+                    <!-- Contenido generado dinámicamente -->
+                </tbody>
+            </table>
+        </div>
     </section>
 
+    <style>
+        .input-filter {
+            padding: 0.5rem 0.75rem;
+            border: 1px solid #ccc;
+            border-radius: 0.75rem;
+            font-size: 1rem;
+            background-color: #f9f9f9;
+        }
+        .mostrar {
+            max-height: 1000px !important;
+            opacity: 1 !important;
+        }
+    </style>
+
     <script>
-       document.addEventListener('DOMContentLoaded', () => {
-    const loadingElement = document.getElementById('loading');
-    const tablaCitas = document.getElementById('tabla-citas').getElementsByTagName('tbody')[0];
-    const toggleBtn = document.getElementById('toggle-filtros');
-    const contenedorFiltros = document.getElementById('contenedor-filtros');
+    document.addEventListener('DOMContentLoaded', () => {
+        const loadingElement = document.getElementById('loading');
+        const tablaCitas = document.getElementById('tabla-citas').getElementsByTagName('tbody')[0];
+        const toggleBtn = document.getElementById('toggle-filtros');
+        const contenedorFiltros = document.getElementById('contenedor-filtros');
 
-    const filtroNombre = document.getElementById('filtro-nombre');
-    const filtroCorreo = document.getElementById('filtro-correo');
-    const filtroTelefono = document.getElementById('filtro-telefono');
-    const filtroMascota = document.getElementById('filtro-mascota');
-    const filtroFecha = document.getElementById('filtro-fecha');
-    const filtroHora = document.getElementById('filtro-hora');
-    const filtroServicio = document.getElementById('filtro-servicio');
-    const btnLimpiar = document.getElementById('btn-limpiar');
+        const filtroNombre = document.getElementById('filtro-nombre');
+        const filtroCorreo = document.getElementById('filtro-correo');
+        const filtroTelefono = document.getElementById('filtro-telefono');
+        const filtroMascota = document.getElementById('filtro-mascota');
+        const filtroFecha = document.getElementById('filtro-fecha');
+        const filtroHora = document.getElementById('filtro-hora');
+        const filtroServicio = document.getElementById('filtro-servicio');
+        const btnLimpiar = document.getElementById('btn-limpiar');
 
-    let citas = JSON.parse(localStorage.getItem('citas')) || [];
+        let citas = JSON.parse(localStorage.getItem('citas')) || [];
 
-    toggleBtn.addEventListener('click', () => {
-        contenedorFiltros.classList.toggle('mostrar');
-    });
-
-    function mostrarCitas() {
-        tablaCitas.innerHTML = '';
-        const nombre = filtroNombre.value.toLowerCase();
-        const correo = filtroCorreo.value.toLowerCase();
-        const telefono = filtroTelefono.value.toLowerCase();
-        const mascota = filtroMascota.value.toLowerCase();
-        const fecha = filtroFecha.value;
-        const hora = filtroHora.value;
-        const servicio = filtroServicio.value.toLowerCase();
-
-        // Ordenar citas por fecha descendente (más recientes primero)
-        const citasOrdenadas = [...citas].sort((a, b) => {
-            // Convertir fechas a formato comparable (asumiendo formato dd/mm/aaaa)
-            const fechaA = new Date(a.fecha.split('/').reverse().join('-'));
-            const fechaB = new Date(b.fecha.split('/').reverse().join('-'));
-            return fechaB - fechaA;
+        toggleBtn.addEventListener('click', () => {
+            contenedorFiltros.classList.toggle('mostrar');
+            contenedorFiltros.classList.toggle('max-h-0');
+            contenedorFiltros.classList.toggle('opacity-0');
+            contenedorFiltros.classList.toggle('max-h-[1000px]');
+            contenedorFiltros.classList.toggle('opacity-100');
         });
 
-        citasOrdenadas.forEach((cita) => {
-            const coincide =
-                (!nombre || cita.nombre.toLowerCase().includes(nombre)) &&
-                (!correo || cita.correo.toLowerCase().includes(correo)) &&
-                (!telefono || cita.telefono.toLowerCase().includes(telefono)) &&
-                (!mascota || cita.mascota.toLowerCase().includes(mascota)) &&
-                (!fecha || cita.fecha === fecha) &&
-                (!hora || cita.hora === hora) &&
-                (!servicio || cita.servicios.join(',').toLowerCase().includes(servicio));
+        function mostrarCitas() {
+            tablaCitas.innerHTML = '';
+            const nombre = filtroNombre.value.toLowerCase();
+            const correo = filtroCorreo.value.toLowerCase();
+            const telefono = filtroTelefono.value.toLowerCase();
+            const mascota = filtroMascota.value.toLowerCase();
+            const fecha = filtroFecha.value;
+            const hora = filtroHora.value;
+            const servicio = filtroServicio.value.toLowerCase();
 
-            if (coincide) {
-                const row = tablaCitas.insertRow();
-                // Usamos citas.indexOf(cita) para mantener el índice original
-                const originalIndex = citas.indexOf(cita);
-                row.innerHTML = `
-                    <td>${cita.nombre}</td>
-                    <td>${cita.correo}</td>
-                    <td>${cita.telefono}</td>
-                    <td>${cita.mascota}</td>
-                    <td><input type="date" value="${cita.fecha}" data-index="${originalIndex}" data-campo="fecha" class="editable-field"></td>
-                    <td><input type="time" value="${cita.hora}" data-index="${originalIndex}" data-campo="hora" class="editable-field"></td>
-                    <td>${cita.servicios.join(', ')}</td>
-                    <td class="actions">
-                        <button class="btn-aceptar" data-index="${originalIndex}">
-                            <i class="fas fa-check-circle"></i> Aceptar
-                        </button>
-                        <button class="btn-rechazar" data-index="${originalIndex}">
-                            <i class="fas fa-times-circle"></i> Rechazar
-                        </button>
-                    </td>
-                `;
+            const citasOrdenadas = [...citas].sort((a, b) => {
+                const fechaA = new Date(a.fecha.split('/').reverse().join('-'));
+                const fechaB = new Date(b.fecha.split('/').reverse().join('-'));
+                return fechaB - fechaA;
+            });
+
+            citasOrdenadas.forEach((cita) => {
+                const coincide =
+                    (!nombre || cita.nombre.toLowerCase().includes(nombre)) &&
+                    (!correo || cita.correo.toLowerCase().includes(correo)) &&
+                    (!telefono || cita.telefono.toLowerCase().includes(telefono)) &&
+                    (!mascota || cita.mascota.toLowerCase().includes(mascota)) &&
+                    (!fecha || cita.fecha === fecha) &&
+                    (!hora || cita.hora === hora) &&
+                    (!servicio || cita.servicios.join(',').toLowerCase().includes(servicio));
+
+                if (coincide) {
+                    const row = tablaCitas.insertRow();
+                    const originalIndex = citas.indexOf(cita);
+                    row.innerHTML = `
+                        <td>${cita.nombre}</td>
+                        <td>${cita.correo}</td>
+                        <td>${cita.telefono}</td>
+                        <td>${cita.mascota}</td>
+                        <td><input type="date" value="${cita.fecha}" data-index="${originalIndex}" data-campo="fecha" class="editable-field"></td>
+                        <td><input type="time" value="${cita.hora}" data-index="${originalIndex}" data-campo="hora" class="editable-field"></td>
+                        <td>${cita.servicios.join(', ')}</td>
+                        <td>
+                            <button class="btn-aceptar" data-index="${originalIndex}">
+                                <i class="fas fa-check-circle"></i> Aceptar
+                            </button>
+                            <button class="btn-rechazar" data-index="${originalIndex}">
+                                <i class="fas fa-times-circle"></i> Rechazar
+                            </button>
+                        </td>
+                    `;
+                }
+            });
+
+            loadingElement.style.display = 'none';
+        }
+
+        tablaCitas.addEventListener('click', function (e) {
+            const index = e.target.dataset.index;
+            if (e.target.classList.contains('btn-rechazar')) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: '¿Seguro que deseas rechazar esta cita?',
+                    text: 'Esta acción no se puede deshacer',
+                    showConfirmButton: true,
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, rechazar',
+                    cancelButtonText: 'Cancelar',
+                    confirmButtonColor: '#dc3545',
+                    cancelButtonColor: '#6c757d'
+                }).then(result => {
+                    if (result.isConfirmed) {
+                        citas.splice(index, 1);
+                        localStorage.setItem('citas', JSON.stringify(citas));
+                        mostrarCitas();
+                        Swal.fire({
+                            icon: 'success',
+                            title: '¡Cita rechazada!',
+                            showConfirmButton: false,
+                            timer: 1500
+                        });
+                    }
+                });
+            } else if (e.target.classList.contains('btn-aceptar')) {
+                const inputs = tablaCitas.querySelectorAll(`input[data-index="${index}"]`);
+                let citaActualizada = {};
+                inputs.forEach(input => {
+                    citaActualizada[input.dataset.campo] = input.value;
+                });
+
+                citas[index] = {
+                    ...citas[index],
+                    fecha: citaActualizada.fecha,
+                    hora: citaActualizada.hora
+                };
+
+                localStorage.setItem('citas', JSON.stringify(citas));
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Cita actualizada correctamente!',
+                    showConfirmButton: false,
+                    timer: 1500
+                });
             }
         });
 
-        loadingElement.style.display = 'none';
-    }
+        [filtroNombre, filtroCorreo, filtroTelefono, filtroMascota, filtroFecha, filtroHora, filtroServicio].forEach(input => {
+            input.addEventListener('input', mostrarCitas);
+        });
 
-    tablaCitas.addEventListener('click', function (e) {
-        const index = e.target.dataset.index;
-        if (e.target.classList.contains('btn-rechazar')) {
-            Swal.fire({
-                icon: 'warning',
-                title: '¿Seguro que deseas rechazar esta cita?',
-                text: 'Esta acción no se puede deshacer',
-                showConfirmButton: true,
-                showCancelButton: true,
-                confirmButtonText: 'Sí, rechazar',
-                cancelButtonText: 'Cancelar',
-                confirmButtonColor: '#dc3545',
-                cancelButtonColor: '#6c757d'
-            }).then(result => {
-                if (result.isConfirmed) {
-                    citas.splice(index, 1);
-                    localStorage.setItem('citas', JSON.stringify(citas));
-                    mostrarCitas();
-                    Swal.fire({
-                        icon: 'success',
-                        title: '¡Cita rechazada!',
-                        showConfirmButton: false,
-                        timer: 1500
-                    });
-                }
-            });
-        } else if (e.target.classList.contains('btn-aceptar')) {
-            const inputs = tablaCitas.querySelectorAll(`input[data-index="${index}"]`);
-            let citaActualizada = {};
-            inputs.forEach(input => {
-                citaActualizada[input.dataset.campo] = input.value;
-            });
-            
-            // Actualizar solo fecha y hora, mantener el resto de datos originales
-            citas[index] = {
-                ...citas[index],
-                fecha: citaActualizada.fecha,
-                hora: citaActualizada.hora
-            };
-            
-            localStorage.setItem('citas', JSON.stringify(citas));
-            Swal.fire({
-                icon: 'success',
-                title: '¡Cita actualizada correctamente!',
-                showConfirmButton: false,
-                timer: 1500
-            });
-        }
-    });
+        filtroFecha.addEventListener('change', mostrarCitas);
 
-    // Event listeners para los filtros
-    filtroNombre.addEventListener('input', mostrarCitas);
-    filtroCorreo.addEventListener('input', mostrarCitas);
-    filtroTelefono.addEventListener('input', mostrarCitas);
-    filtroMascota.addEventListener('input', mostrarCitas);
-    filtroFecha.addEventListener('change', mostrarCitas);
-    filtroHora.addEventListener('input', mostrarCitas);
-    filtroServicio.addEventListener('input', mostrarCitas);
+        btnLimpiar.addEventListener('click', () => {
+            filtroNombre.value = '';
+            filtroCorreo.value = '';
+            filtroTelefono.value = '';
+            filtroMascota.value = '';
+            filtroFecha.value = '';
+            filtroHora.value = '';
+            filtroServicio.value = '';
+            mostrarCitas();
+        });
 
-    btnLimpiar.addEventListener('click', () => {
-        filtroNombre.value = '';
-        filtroCorreo.value = '';
-        filtroTelefono.value = '';
-        filtroMascota.value = '';
-        filtroFecha.value = '';
-        filtroHora.value = '';
-        filtroServicio.value = '';
         mostrarCitas();
     });
-
-    // Cargar citas al iniciar
-    mostrarCitas();
-});
     </script>
 </body>
-</html>
-
 </html>
