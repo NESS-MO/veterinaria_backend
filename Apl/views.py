@@ -180,3 +180,95 @@ def gestion_galeria(request):
 def index(request):
     imagenes_galeria = ImagenGaleria.objects.filter(activa=True).order_by('orden')[:9]
     return render(request, "1. Index.html", {'imagenes_galeria': imagenes_galeria})
+
+from django.shortcuts import render 
+from django.http import HttpResponseForbidden
+from .models import Servicio
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
+def servicios(request):
+    servicios = Servicio.objects.filter(activo=True).order_by('orden')
+    return render(request, "2. Servicios.html", {'servicios': servicios})
+
+def modificar_servicio(request):
+    
+    servicios = Servicio.objects.all().order_by('orden')
+    return render(request, 'modificarservicios.html', {'servicios': servicios})
+
+@csrf_exempt
+def api_servicios(request, servicio_id=None):
+    if request.method == 'GET':
+        if servicio_id:
+            servicio = get_object_or_404(Servicio, id=servicio_id)
+            data = {
+                'id': servicio.id,
+                'nombre': servicio.nombre,
+                'imagen_cuadro': servicio.imagen_cuadro.url if servicio.imagen_cuadro else '',
+                'mostrar_boton_consulta': servicio.mostrar_boton_consulta,
+                'titulo_ventana': servicio.titulo_ventana,
+                'subtitulo_ventana': servicio.subtitulo_ventana,
+                'imagen_ventana': servicio.imagen_ventana.url if servicio.imagen_ventana else '',
+                'contenido_ventana': servicio.contenido_ventana,
+                'mostrar_boton_agendar': servicio.mostrar_boton_agendar,
+            }
+            return JsonResponse(data)
+        else:
+            servicios = Servicio.objects.all().order_by('orden')
+            data = [{
+                'id': s.id,
+                'nombre': s.nombre,
+                'imagen_cuadro': s.imagen_cuadro.url if s.imagen_cuadro else '',
+                'mostrar_boton_consulta': s.mostrar_boton_consulta,
+            } for s in servicios]
+            return JsonResponse(data, safe=False)
+    
+    elif request.method == 'POST':
+        try:
+            data = request.POST
+            files = request.FILES
+            
+            if 'servicio_id' in data and data['servicio_id']:
+                # Actualizar servicio existente
+                servicio = Servicio.objects.get(id=data['servicio_id'])
+                servicio.nombre = data.get('nombre', servicio.nombre)
+                servicio.mostrar_boton_consulta = data.get('mostrar_boton_consulta', 'off') == 'on'
+                
+                servicio.titulo_ventana = data.get('titulo_ventana', servicio.titulo_ventana)
+                servicio.subtitulo_ventana = data.get('subtitulo_ventana', servicio.subtitulo_ventana)
+                servicio.contenido_ventana = data.get('contenido_ventana', servicio.contenido_ventana)
+                servicio.mostrar_boton_agendar = data.get('mostrar_boton_agendar', 'off') == 'on'
+                
+                if 'imagen_cuadro' in files:
+                    servicio.imagen_cuadro = files['imagen_cuadro']
+                if 'imagen_ventana' in files:
+                    servicio.imagen_ventana = files['imagen_ventana']
+                
+                servicio.save()
+            else:
+                # Crear nuevo servicio
+                servicio = Servicio.objects.create(
+                    nombre=data['nombre'],
+                    imagen_cuadro=files['imagen_cuadro'],
+                    mostrar_boton_consulta=data.get('mostrar_boton_consulta', 'off') == 'on',
+                    titulo_ventana=data['titulo_ventana'],
+                    subtitulo_ventana=data['subtitulo_ventana'],
+                    imagen_ventana=files['imagen_ventana'],
+                    contenido_ventana=data['contenido_ventana'],
+                    mostrar_boton_agendar=data.get('mostrar_boton_agendar', 'off') == 'on',
+                    orden=Servicio.objects.count() + 1
+                )
+            
+            return JsonResponse({'success': True, 'id': servicio.id})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    
+    elif request.method == 'DELETE':
+        try:
+            servicio = Servicio.objects.get(id=servicio_id)
+            servicio.delete()
+            return JsonResponse({'success': True})
+        except Servicio.DoesNotExist:
+            return JsonResponse({'error': 'Servicio no encontrado'}, status=404)
+    
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
