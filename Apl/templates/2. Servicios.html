@@ -37,21 +37,22 @@
         </nav>
     </header>
 
-    <div class="sect">
+    <div class="servicios-grid">
         {% for servicio in servicios %}
-        <!--Servicio/Botón {{ servicio.nombre }}-->
-        <div class="servicio">
-            <div id="{{ servicio.nombre|slugify }}">
-                <img class="img2" src="{{ servicio.imagen_cuadro.url }}" alt="{{ servicio.nombre }}">
-                <p><strong>{{ servicio.nombre }}</strong></p>
+        <div class="servicio-card">
+            <div class="servicio-imagen-container">
+                <img src="{{ servicio.imagen_cuadro.url }}" alt="{{ servicio.nombre }}" class="servicio-imagen">
+            </div>
+            <h3 class="servicio-titulo">{{ servicio.nombre }}</h3>
+            <div class="servicio-botones">
                 {% if servicio.mostrar_boton_consulta %}
-                <a href="javascript:mostrarDetalleServicio('{{ servicio.nombre|slugify }}')">
-                    <button class="agendar">Consultar</button>
-                </a>
+                <button onclick="mostrarDetalleServicio('{{ servicio.nombre|slugify }}')" class="btn-consulta">
+                    <i class="fas fa-info-circle"></i> Consultar
+                </button>
                 {% endif %}
                 {% if servicio.mostrar_boton_agendar %}
-                <a href="{% url "agendar" %}#formulario">
-                    <button class="agendar">Agendar</button>
+                <a href="{% url 'agendar' %}#formulario" class="btn-agendar">
+                    <i class="fas fa-calendar-alt"></i> Agendar
                 </a>
                 {% endif %}
             </div>
