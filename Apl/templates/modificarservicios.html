@@ -9,7 +9,176 @@
   <link rel="icon" href="{% static 'Images/logo.png' %}"/>
   <link rel="stylesheet" href=" {% static 'css/ModServicio.css' %}">
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
+<style>
+  /* Selector de imágenes */
+.preview-container {
+    width: 200px;
+    height: 150px;
+    border: 2px dashed #cbd5e1;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+}
+
+.preview-container:hover {
+    border-color: #1e40af;
+    transform: translateY(-2px);
+}
+
+.preview-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+}
+
+.upload-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.preview-container:hover .upload-overlay {
+    opacity: 1;
+}
+
+/* Toggle switches */
+.toggle-group {
+    background: #f8fafc;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    transition: background 0.3s;
+}
+
+.toggle-group:hover {
+    background: #f1f5f9;
+}
+
+.toggle-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.toggle-container {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #cbd5e1;
+    border-radius: 34px;
+    transition: .4s;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    border-radius: 50%;
+    transition: .4s;
+}
+
+.toggle-input:checked + .toggle-slider {
+    background-color: #1e40af;
+}
+
+.toggle-input:checked + .toggle-slider:before {
+    transform: translateX(24px);
+}
+
+.toggle-description {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 5px;
+}
+
+/* Contenedor de imagen */
+.preview-container {
+    width: 200px;
+    height: 150px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+/* Imagen dentro del contenedor */
+.preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;  /* Cambia a "contain" si prefieres ver la imagen completa */
+}
+
+/* Overlay al pasar el mouse */
+.upload-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.preview-container:hover .upload-overlay {
+    opacity: 1;
+}
+
+/* Estilo del toggle switch (igual que el anterior) */
+.toggle-container {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.toggle-input:checked + .toggle-slider {
+    background-color: #1e40af;  /* Azul de tu paleta */
+}
+</style>
 <body>
 
   <!-- Sidebar -->
@@ -46,15 +215,31 @@
               <input type="text" id="nombreServicio" name="nombre" class="w-full p-2 border rounded" required>
             </div>
             
-            <div>
-              <label for="imagenCuadro" class="block mb-2">Imagen del Cuadro</label>
-              <input type="file" id="imagenCuadro" name="imagen_cuadro" accept="image/*" class="w-full">
-              <img id="previewImagenCuadro" src="" class="mt-2 max-h-32 hidden">
+            <div class="image-uploader">
+                <label class="block mb-2">Imagen Principal</label>
+                <div class="flex items-center gap-4">
+                    <label for="imagenCuadro" class="cursor-pointer">
+                        <div class="preview-container">
+                            <img id="previewImagenCuadro" src="{{ servicio.imagen_cuadro.url|default:'/static/images/placeholder.jpg' }}" class="preview-image">
+                            <div class="upload-overlay">
+                                <i class="fas fa-camera text-2xl"></i>
+                                <span>Haz clic para cambiar</span>
+                            </div>
+                        </div>
+                    </label>
+                    <input type="file" id="imagenCuadro" name="imagen_cuadro" accept="image/*" class="hidden">
+                </div>
             </div>
             
-            <div class="flex items-center">
-              <input type="checkbox" id="mostrarBotonConsulta" name="mostrar_boton_consulta" class="mr-2" checked>
-              <label for="mostrarBotonConsulta">Mostrar botón de consulta</label>
+            <div class="toggle-group">
+                <label class="toggle-label">
+                    <span class="toggle-text">Mostrar botón "Detalles"</span>
+                    <div class="toggle-container">
+                        <input type="checkbox" id="mostrarBotonConsulta" name="mostrar_boton_consulta" {% if servicio.mostrar_boton_consulta %}checked{% endif %} class="toggle-input">
+                        <span class="toggle-slider"></span>
+                    </div>
+                </label>
+                <p class="toggle-description">Activa para mostrar el botón de detalles en la página principal</p>
             </div>
           </div>
           
@@ -72,10 +257,22 @@
               <input type="text" id="subtituloVentana" name="subtitulo_ventana" class="w-full p-2 border rounded" required>
             </div>
             
-            <div>
-              <label for="imagenVentana" class="block mb-2">Imagen</label>
-              <input type="file" id="imagenVentana" name="imagen_ventana" accept="image/*" class="w-full">
-              <img id="previewImagenVentana" src="" class="mt-2 max-h-32 hidden">
+            <div class="image-uploader mt-8">
+                <label class="block mb-3 text-sm font-medium text-gray-700">Imagen para Ventana de Detalles</label>
+                <div class="flex items-center gap-4">
+                    <label for="imagenVentana" class="cursor-pointer">
+                        <div class="preview-container bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-500 transition-all">
+                            <img id="previewImagenVentana" 
+                                src="{% if servicio.imagen_ventana %}{{ servicio.imagen_ventana.url }}{% else %}{% static 'images/placeholder.jpg' %}{% endif %}" 
+                                class="preview-image object-contain">
+                            <div class="upload-overlay flex flex-col items-center justify-center">
+                                <i class="fas fa-camera text-2xl mb-2"></i>
+                                <span class="text-sm">Haz clic para subir</span>
+                            </div>
+                        </div>
+                    </label>
+                    <input type="file" id="imagenVentana" name="imagen_ventana" accept="image/*" class="hidden">
+                </div>
             </div>
             
             <div>
@@ -83,9 +280,18 @@
               <textarea id="contenidoVentana" name="contenido_ventana" class="w-full p-2 border rounded" rows="3" required></textarea>
             </div>
             
-            <div class="flex items-center">
-              <input type="checkbox" id="mostrarBotonAgendar" name="mostrar_boton_agendar" class="mr-2" checked>
-              <label for="mostrarBotonAgendar">Mostrar botón de agendar</label>
+            <div class="toggle-group mt-6">
+                <label class="toggle-label flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                    <div>
+                        <span class="toggle-text font-medium text-gray-700">Mostrar botón "Agendar"</span>
+                        <p class="toggle-description text-xs text-gray-500 mt-1">Activa esta opción para mostrar el botón de agendar cita en la ventana flotante.</p>
+                    </div>
+                    <div class="toggle-container">
+                        <input type="checkbox" id="mostrarBotonAgendar" name="mostrar_boton_agendar" 
+                              {% if servicio.mostrar_boton_agendar %}checked{% endif %} class="toggle-input">
+                        <span class="toggle-slider"></span>
+                    </div>
+                </label>
             </div>
           </div>
         </div>
@@ -105,33 +311,76 @@
       <div class="overflow-x-auto">
         <table class="min-w-full bg-white">
           <thead>
-            <tr class="bg-gray-100">
-              <th class="py-2 px-4 border">Servicio</th>
-              <th class="py-2 px-4 border">Imagen Cuadro</th>
-              <th class="py-2 px-4 border">Botón Consulta</th>
-              <th class="py-2 px-4 border">Acciones</th>
-            </tr>
+              <tr class="bg-gray-100">
+                  <th class="py-2 px-4 border">Servicio</th>
+                  <th class="py-2 px-4 border">Imagen Principal</th>
+                  <th class="py-2 px-4 border">Título Ventana</th>
+                  <th class="py-2 px-4 border">Subtítulo Ventana</th>
+                  <th class="py-2 px-4 border">Imagen Ventana</th>
+                  <th class="py-2 px-4 border">Botón Agendar</th>
+                  <th class="py-2 px-4 border">Acciones</th>
+              </tr>
           </thead>
           <tbody id="tablaServicios">
-            {% for servicio in servicios %}
-            <tr>
-              <td class="py-2 px-4 border">{{ servicio.nombre }}</td>
-              <td class="py-2 px-4 border">
-                <img src="{{ servicio.imagen_cuadro.url }}" alt="{{ servicio.nombre }}" class="h-16">
-              </td>
-              <td class="py-2 px-4 border text-center">
-                {% if servicio.mostrar_boton_consulta %}
-                <span class="text-green-500">✓</span>
-                {% else %}
-                <span class="text-red-500">✗</span>
-                {% endif %}
-              </td>
-              <td class="py-2 px-4 border">
-                <button onclick="editarServicio({{ servicio.id }})" class="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 mr-2">Editar</button>
-                <button onclick="eliminarServicio({{ servicio.id }})" class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600">Eliminar</button>
-              </td>
-            </tr>
-            {% endfor %}
+              {% for servicio in servicios %}
+              <tr>
+                  <!-- Columna Nombre -->
+                  <td class="py-2 px-4 border">{{ servicio.nombre }}</td>
+                  
+                  <!-- Columna Imagen Principal -->
+                  <td class="py-2 px-4 border">
+                      <div class="flex justify-center">
+                          <div class="w-16 h-16 flex items-center justify-center overflow-hidden rounded-md bg-gray-50">
+                              <img src="{{ servicio.imagen_cuadro.url }}" 
+                                  alt="{{ servicio.nombre }}" 
+                                  class="max-w-full max-h-full object-contain p-1">
+                          </div>
+                      </div>
+                  </td>
+                  
+                  <!-- Columna Título Ventana -->
+                  <td class="py-2 px-4 border">{{ servicio.titulo_ventana|truncatechars:20 }}</td>
+                  
+                  <!-- Columna Subtítulo Ventana -->
+                  <td class="py-2 px-4 border">{{ servicio.subtitulo_ventana|truncatechars:20 }}</td>
+                  
+                  <!-- Columna Imagen Ventana -->
+                  <td class="py-2 px-4 border">
+                      <div class="flex justify-center">
+                          <div class="w-16 h-16 flex items-center justify-center overflow-hidden rounded-md bg-gray-50">
+                              <img src="{{ servicio.imagen_ventana.url }}" 
+                                  alt="{{ servicio.titulo_ventana }}" 
+                                  class="max-w-full max-h-full object-contain p-1">
+                          </div>
+                      </div>
+                  </td>
+                  
+                  <!-- Columna Botón Agendar -->
+                  <td class="py-2 px-4 border text-center">
+                      {% if servicio.mostrar_boton_agendar %}
+                      <span class="text-green-500">✓</span>
+                      {% else %}
+                      <span class="text-red-500">✗</span>
+                      {% endif %}
+                  </td>
+                  
+                  <!-- Columna Acciones -->
+                  <td class="py-2 px-4 border">
+                      <div class="flex justify-center space-x-3">
+                          <button onclick="editarServicio({{ servicio.id }})" 
+                                  class="p-2 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-full transition-colors"
+                                  title="Editar">
+                              <i class="fas fa-edit fa-sm"></i>
+                          </button>
+                          <button onclick="eliminarServicio({{ servicio.id }})" 
+                                  class="p-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-full transition-colors"
+                                  title="Eliminar">
+                              <i class="fas fa-trash fa-sm"></i>
+                          </button>
+                      </div>
+                  </td>
+              </tr>
+              {% endfor %}
           </tbody>
         </table>
       </div>
@@ -257,6 +506,33 @@
             alert('Error al guardar el servicio');
         });
     });
+
+    document.querySelectorAll('input[type="file"]').forEach(input => {
+    input.addEventListener('change', function(e) {
+        const previewId = this.id.replace('imagen', 'previewImagen');
+        const preview = document.getElementById(previewId);
+        
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+            }
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+});
+
+// Efecto para toggles
+document.querySelectorAll('.toggle-input').forEach(toggle => {
+    toggle.addEventListener('change', function() {
+        const slider = this.nextElementSibling;
+        if (this.checked) {
+            slider.style.backgroundColor = '#1e40af';
+        } else {
+            slider.style.backgroundColor = '#cbd5e1';
+        }
+    });
+});
 </script>
 </body>
 </html>
