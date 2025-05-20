@@ -13,6 +13,161 @@
     <!-- Sidebar -->
     <div class="w-full md:w-72 bg-gradient-to-br from-[#33C0F1] to-[#1E2D93] text-white p-7 md:fixed md:h-full top-0 left-0 z-10">
         <img class="h-24 mx-auto mb-4" src="{% static 'Images/logo2.png' %}" alt="Logo" />
+        <ul class="space-y-4 text-lg">
+            <li><a href="{% url 'gestioncitas' %}" class="block hover:bg-white/20 p-2 rounded">Citas Solicitadas</a></li>
+            <li><a href="{% url 'registroc' %}" class="block hover:bg-white/20 p-2 rounded">Registro Citas</a></li>
+            <li><a href="{% url 'Tipdelasemana' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Tip de la Semana</a></li>
+            <li><a href="{% url 'Galeria' %}" class="block bg-white/30 hover:bg-white/40 p-2 rounded text-gray-900">Modificar Galería</a></li>
+            <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Servicios</a></li>
+             <li><a href="{% url 'backup' %}" class="block hover:bg-white/20 p-2 rounded">Copia de seguridad</a></li>
+            <li><a href="{% url 'index' %}" class="block hover:bg-red-500/80 p-2 rounded">Cerrar sesión</a></li>
+        </ul>
+    </div>
+    
+    <div class="content md:ml-72 p-8 bg-gray-50 min-h-screen mt-16 md:mt-0">
+        <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6">
+            <!-- Encabezado -->
+            <div class="mb-8 text-center">
+                <h1 class="text-3xl font-bold text-[#1E2D93] mb-2">Galería "Nuestro Trabajo"</h1>
+                <p class="text-gray-600">Administra las imágenes que se muestran en la página principal.</p>
+                <p class="text-sm text-gray-500 mt-2">Imágenes en galería: {{ total_imagenes }}/9</p>
+            </div>
+            
+            <!-- Formulario para agregar nueva imagen -->
+            <div class="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
+                <h2 class="text-xl font-semibold mb-4">Agregar Nueva Imagen</h2>
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Imagen*</label>
+                            {{ form.imagen }}
+                            {% if form.imagen.errors %}
+                                <p class="text-red-500 text-xs mt-1">{{ form.imagen.errors.as_text }}</p>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Orden*</label>
+                            {{ form.orden }}
+                            {% if form.orden.errors %}
+                                <p class="text-red-500 text-xs mt-1">{{ form.orden.errors.as_text }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Título (opcional)</label>
+                        {{ form.titulo }}
+                    </div>
+                    <button type="submit" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+                        <i class="material-icons align-middle">file_upload</i> Subir Imagen
+                    </button>
+                </form>
+            </div>
+            
+            <!-- Galería existente -->
+            <div>
+                <h2 class="text-xl font-semibold mb-4">Imágenes Actuales</h2>
+                
+                {% if messages %}
+                <div class="mb-4">
+                    {% for message in messages %}
+                    <div class="px-4 py-2 rounded {% if message.tags == 'success' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                    {% for imagen in imagenes %}
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow">
+                        <div class="relative">
+                            <img src="{{ imagen.imagen.url }}" alt="{{ imagen.titulo|default:'Imagen galería' }}" 
+                                class="w-full h-48 object-cover">
+                            <div class="absolute top-2 right-2 flex space-x-2">
+                                <form method="post" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit" name="toggle_activa" value="{{ imagen.id }}"
+                                            class="{% if imagen.activa %}bg-yellow-500 hover:bg-yellow-600{% else %}bg-green-500 hover:bg-green-600{% endif %} text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors"
+                                            title="{% if imagen.activa %}Ocultar imagen{% else %}Mostrar imagen{% endif %}">
+                                        <i class="material-icons text-sm">{% if imagen.activa %}visibility_off{% else %}visibility{% endif %}</i>
+                                    </button>
+                                </form>
+                                <form method="post" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit" name="eliminar" value="{{ imagen.id }}"
+                                            class="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors"
+                                            onclick="return confirm('¿Eliminar esta imagen permanentemente?')"
+                                            title="Eliminar imagen">
+                                        <i class="material-icons text-sm">delete</i>
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                        <div class="p-4">
+                            <p class="font-medium">
+                                {% if imagen.titulo %}
+                                    {{ imagen.titulo }}
+                                {% else %}
+                                    <span class="text-gray-400">Sin título</span>
+                                {% endif %}
+                            </p>
+                            <p class="text-sm text-gray-600">Orden: {{ imagen.orden }}</p>
+                            <p class="text-sm mt-2">
+                                Estado: 
+                                <span class="font-medium {% if imagen.activa %}text-green-600{% else %}text-red-600{% endif %}">
+                                    {% if imagen.activa %}Activa{% else %}Oculta{% endif %}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-span-3 text-center py-8 text-gray-500">
+                        No hay imágenes en la galería aún
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Mostrar nombre del archivo seleccionado
+        document.querySelectorAll('input[type="file"]').forEach(input => {
+            input.addEventListener('change', function() {
+                const fileName = this.files[0]?.name || 'Ningún archivo seleccionado';
+                const label = this.parentElement.querySelector('div');
+                if (label) {
+                    const infoDiv = document.createElement('div');
+                    infoDiv.className = 'mt-1 text-xs text-gray-500';
+                    infoDiv.textContent = `Archivo: ${fileName}`;
+                    
+                    // Eliminar info anterior si existe
+                    const oldInfo = label.querySelector('.file-info');
+                    if (oldInfo) oldInfo.remove();
+                    
+                    infoDiv.classList.add('file-info');
+                    label.appendChild(infoDiv);
+                }
+            });
+        });
+    </script>
+</body>
+</html>{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modificar Galería</title>
+    <link rel="icon" href="{% static 'Images/logo.png' %}"/>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="w-full md:w-72 bg-gradient-to-br from-[#33C0F1] to-[#1E2D93] text-white p-7 md:fixed md:h-full top-0 left-0 z-10">
+        <img class="h-24 mx-auto mb-4" src="{% static 'Images/logo2.png' %}" alt="Logo" />
         <ul class="space-y-3">
         <li><a href="{% url 'gestioncitas' %}" class="block hover:bg-white/20 p-2 rounded">Citas Solicitadas</a></li>
         <li><a href="{% url 'registroc' %}" class="block hover:bg-white/20 p-2 rounded">Registro Citas</a></li>

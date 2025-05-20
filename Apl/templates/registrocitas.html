@@ -15,6 +15,144 @@
     <!-- Sidebar -->
     <div class="w-full md:w-72 bg-gradient-to-br from-[#33C0F1] to-[#1E2D93] text-white p-7 md:fixed md:h-full top-0 left-0 z-10 font-sans"> 
         <img class="h-24 mx-auto mb-4" src="{% static 'Images/logo2.png' %}" alt="Logo" />
+        <ul class="space-y-4 text-lg">
+            <li><a href="{% url 'gestioncitas' %}" class="block hover:bg-white/20 p-2 rounded">Citas Solicitadas</a></li>
+            <li><a href="{% url 'registroc' %}" class="block bg-white/30 hover:bg-white/40 p-2 rounded text-gray-900">Registro Citas</a></li>
+            <li><a href="{% url 'Tipdelasemana' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Tip de la Semana</a></li>
+            <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Galería</a></li>
+            <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Servicios</a></li>
+            <li><a href="{% url 'backup' %}" class="block hover:bg-white/20 p-2 rounded">Copia de seguridad</a></li>
+            <li><a href="{% url 'index' %}" class="block hover:bg-red-500/80 p-2 rounded">Cerrar sesión</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 md:ml-72 p-6 fade-in">
+      <div class="max-w-7xl mx-auto bg-white rounded-2xl shadow-lg p-6">
+        <h2 class="text-3xl font-bold mb-6 text-blue-800">📅 Registro de Citas</h2>
+
+        <!-- Mensaje de éxito -->
+        <div id="mensaje-exito" class="hidden mb-4 p-3 rounded-md bg-green-100 text-green-800 text-sm font-medium transition duration-300">
+          ✅ Cita agregada exitosamente.
+        </div>
+
+        <!-- Formulario -->
+        <form id="form-cita" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <input type="text" id="cliente" placeholder="Nombre del cliente" required class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400" />
+          <input type="date" id="fecha" required class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400" />
+          <input type="time" id="hora" required class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400" />
+
+          <select id="servicio" required class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400">
+            <option value="" disabled selected>Seleccione un servicio</option>
+            <option value="Consulta">Consulta</option>
+            <option value="Esterilización Canina y Felina">Esterilización Canina y Felina</option>
+            <option value="Guardería">Guardería</option>
+            <option value="Vacunación">Vacunación</option>
+            <option value="Profilaxis">Profilaxis</option>
+            <option value="Hospitalización">Hospitalización</option>
+            <option value="Cirugías">Cirugías</option>
+            <option value="Asistencia Médica">Asistencia Médica</option>
+          </select>
+
+          <select id="estado" required class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400">
+            <option value="Realizada">Realizada</option>
+            <option value="Reprogramada">Reprogramada</option>
+            <option value="Cancelada">Cancelada</option>
+          </select>
+
+          <input type="text" id="observaciones" placeholder="Observaciones" class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400" />
+
+          <button type="submit" class="col-span-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 active:scale-95 transition">Agregar Cita</button>
+        </form>
+
+        <!-- Tabla -->
+        <div class="overflow-x-auto">
+          <table class="min-w-full border border-gray-200 text-sm" id="tabla-citas">
+            <thead class="bg-gray-100 text-gray-700 font-semibold">
+              <tr>
+                <th class="px-4 py-2 text-left">Cliente</th>
+                <th class="px-4 py-2 text-left">Fecha</th>
+                <th class="px-4 py-2 text-left">Hora</th>
+                <th class="px-4 py-2 text-left">Servicio</th>
+                <th class="px-4 py-2 text-left">Estado</th>
+                <th class="px-4 py-2 text-left">Observaciones</th>
+              </tr>
+            </thead>
+            <tbody id="cuerpo-tabla" class="divide-y divide-gray-200 text-gray-700">
+              <!-- Filas dinámicas aquí -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Script -->
+  <script>
+    const form = document.getElementById("form-cita");
+    const tabla = document.getElementById("cuerpo-tabla");
+    const mensajeExito = document.getElementById("mensaje-exito");
+
+    form.addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const cliente = document.getElementById("cliente").value.trim();
+      const fecha = document.getElementById("fecha").value;
+      const hora = document.getElementById("hora").value;
+      const servicio = document.getElementById("servicio").value;
+      const estado = document.getElementById("estado").value;
+      const observaciones = document.getElementById("observaciones").value.trim();
+
+      if (!cliente || !fecha || !hora || !servicio || !estado) {
+        alert("Por favor, complete todos los campos obligatorios.");
+        return;
+      }
+
+      const estadoClases = {
+        "Realizada": "bg-green-100 text-green-800",
+        "Reprogramada": "bg-yellow-100 text-yellow-800",
+        "Cancelada": "bg-red-100 text-red-800"
+      };
+
+      const fila = document.createElement("tr");
+      fila.classList.add("fade-in");
+      fila.innerHTML = `
+        <td class="px-4 py-2">${cliente}</td>
+        <td class="px-4 py-2">${fecha}</td>
+        <td class="px-4 py-2">${hora}</td>
+        <td class="px-4 py-2">${servicio}</td>
+        <td class="px-4 py-2">
+          <span class="px-2 py-1 ${estadoClases[estado]} rounded-full text-xs font-medium">${estado}</span>
+        </td>
+        <td class="px-4 py-2">${observaciones}</td>
+      `;
+
+      tabla.appendChild(fila);
+      form.reset();
+
+      mensajeExito.classList.remove("hidden");
+      setTimeout(() => mensajeExito.classList.add("hidden"), 2500);
+    });
+  </script>
+</body>
+</html>
+{%load static%}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registro de Citas</title>
+  <link rel="icon" href="{% static 'Images/logo.png' %}"/>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    
+  </style>
+</head>
+<body class="bg-gray-100 font-sans">
+    <!-- Sidebar -->
+    <div class="w-full md:w-72 bg-gradient-to-br from-[#33C0F1] to-[#1E2D93] text-white p-7 md:fixed md:h-full top-0 left-0 z-10 font-sans"> 
+        <img class="h-24 mx-auto mb-4" src="{% static 'Images/logo2.png' %}" alt="Logo" />
         <ul class="space-y-3">
           <li><a href="{% url 'gestioncitas' %}" class="block hover:bg-white/20 p-2 rounded">Citas Solicitadas</a></li>
           <li><a href="{% url 'registroc' %}" class="block hover:bg-white/20 p-2 rounded">Registro Citas</a></li>

@@ -47,43 +47,72 @@
             <h2>Agendar Cita</h2>
             <h4></h4>
             <p>Complete el formulario para agendar una cita con nuestros veterinarios.</p>
-            <form action="#" method="POST" id="appointment-form">
+            <form action="{% url 'agendar' %}" method="POST" id="appointment-form">
+                {% csrf_token %}
+                <!-- Ejemplo para el campo de nombre -->
                 <div class="form-group">
-                    <label for="nombre">Nombre (Dueño) </label>
-                    <input type="text" id="nombre" name="nombre" required placeholder="Ingresa tu nombre">
+                    <label for="nombre">Nombre (Dueño)</label>
+                    <input type="text" id="nombre" name="nombre" required 
+                        pattern="[A-Za-záéíóúÁÉÍÓÚñÑ ]+" 
+                        title="Solo letras y espacios" 
+                        placeholder="Ingresa tu nombre"
+                        maxlength="50"> 
+                    <div class="error-message" id="nombre-error"></div>
                 </div>
                 <div class="form-group">
-                    <label for="apellido">Apellido</label>
-                    <input type="text" id="apellido" name="apellido" required placeholder="Ingresa tu Apellido">
+                    <label for="apellido">Apellido (Dueño)</label>
+                    <input type="text" id="apellido" name="apellido" required
+                        pattern="[A-Za-záéíóúÁÉÍÓÚñÑ ]{2,50}"
+                        title="Solo letras (entre 2 y 50 caracteres)"
+                        placeholder="Ingresa tu apellido"
+                        maxlength="50">
+                    <div class="error-message" id="apellido-error"></div>
                 </div>
                 <div class="form-group">
                     <label for="tipo_documento">Tipo de Documento</label>
                     <select id="tipo_documento" name="tipo_documento" required>
-                        <option value="">Selecciona Documento</option>
+                        <option value="Targeta de Identidad">Seleccione su tipo de documento</option>
+                        <option value="Targeta de Identidad">Targeta de Identidad</option>
                         <option value="cedula">Cedula de Ciudadania</option>
                         <option value="extranjeria">Cedula de Extranjeria</option>
                     </select>
                 </div>
                 <div class="form-group">
-                    <label for="num_domumento">Número de documento </label>
-                    <input type="text" id="documento" name="documento" required placeholder="Ingresa tu número de documento">
+                    <label for="documento">Número de documento</label>
+                    <input type="text" id="documento" name="documento" required
+                        pattern="[0-9]{6,12}"
+                        pattern="[0-9]{6,10}|[A-Za-z]{1,2}[0-9]{4,8}"
+                        title="Entre 6 y 12 dígitos numéricos"
+                        placeholder="Ingresa tu número de documento">
+                    <div class="error-message" id="documento-error"></div>
                 </div>
+                <!-- Ejemplo para el campo de email -->
                 <div class="form-group">
                     <label for="correo">Correo Electrónico</label>
-                    <input type="email" id="correo" name="correo" required placeholder="Ingresa tu correo electrónico">
+                    <input type="email" id="correo" name="correo" required 
+                        placeholder="Ingresa tu correo electrónico">
+                    <div class="error-message" id="correo-error"></div>
                 </div>
                 <div class="form-group">
                     <label for="telefono">Número de Teléfono</label>
-                    <input type="tel" id="telefono" name="telefono" required placeholder="Ingresa tu número de teléfono">
+                    <input type="tel" id="telefono" name="telefono" required
+                        pattern="[0-9]{10}" 
+                        title="10 dígitos numéricos"
+                        placeholder="Ingresa tu número de teléfono">
+                    <div class="error-message" id="telefono-error"></div>
                 </div>
                 <div class="form-group">
                     <label for="mascota">Nombre de la Mascota</label>
-                    <input type="text" id="mascota" name="mascota" required placeholder="Ingresa el nombre de tu mascota">
+                    <input type="text" id="mascota" name="mascota" required
+                        pattern="[A-Za-záéíóúÁÉÍÓÚñÑ ]{2,30}"
+                        title="Solo letras (entre 2 y 30 caracteres)"
+                        placeholder="Ingresa el nombre de tu mascota">
+                    <div class="error-message" id="mascota-error"></div>
                 </div>
                 <div class="form-group">
-                    <label for="clase-mascota">Clase de Mascota</label>
+                    <label for="clase-mascota">Especie de la Mascota</label>
                     <select id="clase-mascota" name="clase-mascota" required>
-                        <option value="">Selecciona la clase de tu mascota</option>
+                        <option value="">Selecciona la especie de tu mascota</option>
                         <option value="Perro">Perro</option>
                         <option value="Gato">Gato</option>
                     </select>
@@ -108,10 +137,363 @@
                     </div>
                 </div>
                 <button type="submit" class="agendar">Enviar</button>
+                <div id="form-error" class="alert alert-danger" style="display: none;"></div>
                 <a class="dispo" href="#inicio"><h3>⬆️ Disponibilidad ⬆️</h3></a>
             </form>
         </div>
     </section>
+    </section>
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }}">
+                {{ message }}
+            </div>
+        {% endfor %}
+    {% endif %}
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Obtener elementos del formulario
+        const form = document.getElementById('appointment-form');
+        const nombreInput = document.getElementById('nombre');
+        const apellidoInput = document.getElementById('apellido');
+        const documentoInput = document.getElementById('documento');
+        const correoInput = document.getElementById('correo');
+        const telefonoInput = document.getElementById('telefono');
+        const mascotaInput = document.getElementById('mascota');
+        const fechaInput = document.getElementById('fecha');
+        const horaInput = document.getElementById('hora');
+        const tipoDocumentoSelect = document.getElementById('tipo_documento');
+        const claseMascotaSelect = document.getElementById('clase-mascota');
+
+        // Expresiones regulares para validación
+        const regexSoloLetras = /^[A-Za-záéíóúÁÉÍÓÚñÑ\s]+$/;
+        const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const regexTelefono = /^[0-9]{10}$/;
+        const regexDocumentoCC = /^[0-9]{6,10}$/;
+        const regexDocumentoCE = /^[A-Za-z]{1,2}[0-9]{4,8}$/;
+        const regexDocumentoTI = /^[0-9]{6,12}$/;
+
+        // Horario laboral
+        const horarioLaboral = {
+            diasLaborales: [1, 2, 3, 4, 5], // Lunes a Viernes (0=Domingo, 1=Lunes...)
+            sabado: 6, // Sábado
+            apertura: { hora: 8, minuto: 0 }, // 8:00 AM
+            cierre: { hora: 18, minuto: 0 }, // 6:00 PM
+            aperturaSabado: { hora: 9, minuto: 0 }, // 9:00 AM
+            cierreSabado: { hora: 14, minuto: 0 } // 2:00 PM
+        };
+
+        // Función para mostrar errores
+        function showError(input, message) {
+            const errorElement = document.getElementById(`${input.id}-error`);
+            errorElement.textContent = message;
+            errorElement.classList.add('visible');
+            input.classList.add('input-error');
+        }
+
+        // Función para limpiar errores
+        function clearError(input) {
+            const errorElement = document.getElementById(`${input.id}-error`);
+            errorElement.textContent = '';
+            errorElement.classList.remove('visible');
+            input.classList.remove('input-error');
+        }
+
+        // Función para mostrar error en grupo de checkboxes
+        function showCheckboxError(group, message) {
+            let errorElement = group.querySelector('.error-message');
+            if (!errorElement) {
+                errorElement = document.createElement('div');
+                errorElement.className = 'error-message visible';
+                group.appendChild(errorElement);
+            }
+            errorElement.textContent = message;
+            errorElement.classList.add('visible');
+            group.classList.add('input-error');
+        }
+
+        // Función para limpiar error en grupo de checkboxes
+        function clearCheckboxError(group) {
+            const errorElement = group.querySelector('.error-message');
+            if (errorElement) {
+                errorElement.classList.remove('visible');
+            }
+            group.classList.remove('input-error');
+        }
+
+        // Validar fecha no sea antigua
+        function validarFechaNoAntigua(fecha) {
+            const hoy = new Date();
+            hoy.setHours(0, 0, 0, 0);
+            return fecha >= hoy;
+        }
+
+        // Validar horario laboral
+        function validarHorarioLaboral(fecha, hora) {
+            const diaSemana = fecha.getDay();
+            const horaCita = hora.split(':');
+            const horaNum = parseInt(horaCita[0]);
+            const minutoNum = parseInt(horaCita[1]);
+
+            // Validar sábado
+            if (diaSemana === horarioLaboral.sabado) {
+                if (horaNum < horarioLaboral.aperturaSabado.hora || 
+                    (horaNum === horarioLaboral.cierreSabado.hora && minutoNum > 0) || 
+                    horaNum > horarioLaboral.cierreSabado.hora) {
+                    return false;
+                }
+            } 
+            // Validar días laborales (L-V)
+            else if (horarioLaboral.diasLaborales.includes(diaSemana)) {
+                if (horaNum < horarioLaboral.apertura.hora || 
+                    (horaNum === horarioLaboral.cierre.hora && minutoNum > 0) || 
+                    horaNum > horarioLaboral.cierre.hora) {
+                    return false;
+                }
+            } 
+            // Domingo no laboral
+            else {
+                return false;
+            }
+
+            return true;
+        }
+
+        // Validación en tiempo real para cada campo
+        nombreInput.addEventListener('input', function() {
+            if (!regexSoloLetras.test(nombreInput.value)) {
+                showError(nombreInput, 'Solo se permiten letras y espacios');
+            } else {
+                clearError(nombreInput);
+            }
+        });
+
+        apellidoInput.addEventListener('input', function() {
+            if (!regexSoloLetras.test(apellidoInput.value)) {
+                showError(apellidoInput, 'Solo se permiten letras y espacios');
+            } else if (apellidoInput.value.length < 2) {
+                showError(apellidoInput, 'Mínimo 2 caracteres');
+            } else {
+                clearError(apellidoInput);
+            }
+        });
+
+        tipoDocumentoSelect.addEventListener('change', function() {
+            clearError(documentoInput);
+        });
+
+        documentoInput.addEventListener('input', function() {
+            const tipoDocumento = tipoDocumentoSelect.value;
+            let isValid = false;
+            
+            if (tipoDocumento === 'cedula' || tipoDocumento === 'Targeta de Identidad') {
+                isValid = regexDocumentoCC.test(documentoInput.value) || regexDocumentoTI.test(documentoInput.value);
+            } else if (tipoDocumento === 'extranjeria') {
+                isValid = regexDocumentoCE.test(documentoInput.value);
+            }
+            
+            if (!isValid) {
+                showError(documentoInput, 'Número de documento inválido para el tipo seleccionado');
+            } else {
+                clearError(documentoInput);
+            }
+        });
+
+        correoInput.addEventListener('input', function() {
+            if (!regexEmail.test(correoInput.value)) {
+                showError(correoInput, 'Ingrese un correo electrónico válido');
+            } else {
+                clearError(correoInput);
+            }
+        });
+
+        telefonoInput.addEventListener('input', function() {
+            if (!regexTelefono.test(telefonoInput.value)) {
+                showError(telefonoInput, 'El teléfono debe tener 10 dígitos numéricos');
+            } else {
+                clearError(telefonoInput);
+            }
+        });
+
+        mascotaInput.addEventListener('input', function() {
+            if (!regexSoloLetras.test(mascotaInput.value)) {
+                showError(mascotaInput, 'Solo se permiten letras y espacios');
+            } else if (mascotaInput.value.length < 2) {
+                showError(mascotaInput, 'Mínimo 2 caracteres');
+            } else {
+                clearError(mascotaInput);
+            }
+        });
+
+        fechaInput.addEventListener('change', function() {
+            const fechaSeleccionada = new Date(fechaInput.value);
+            if (!validarFechaNoAntigua(fechaSeleccionada)) {
+                showError(fechaInput, 'No puede seleccionar una fecha pasada');
+            } else {
+                clearError(fechaInput);
+            }
+        });
+
+        horaInput.addEventListener('change', function() {
+            if (fechaInput.value) {
+                const fechaSeleccionada = new Date(fechaInput.value);
+                if (!validarHorarioLaboral(fechaSeleccionada, horaInput.value)) {
+                    showError(horaInput, 'Horario no laboral. L-V: 8AM-6PM, Sáb: 9AM-2PM');
+                } else {
+                    clearError(horaInput);
+                }
+            }
+        });
+
+        // Validación al enviar el formulario
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            let isValid = true;
+
+            // Validar nombre
+            if (!regexSoloLetras.test(nombreInput.value)) {
+                showError(nombreInput, 'Solo se permiten letras y espacios');
+                isValid = false;
+            }
+
+            // Validar apellido
+            if (!regexSoloLetras.test(apellidoInput.value) || apellidoInput.value.length < 2) {
+                showError(apellidoInput, 'Solo se permiten letras y espacios (mínimo 2 caracteres)');
+                isValid = false;
+            }
+
+            // Validar documento según tipo
+            const tipoDocumento = tipoDocumentoSelect.value;
+            let docIsValid = false;
+            
+            if (tipoDocumento === 'cedula' || tipoDocumento === 'Targeta de Identidad') {
+                docIsValid = regexDocumentoCC.test(documentoInput.value) || regexDocumentoTI.test(documentoInput.value);
+            } else if (tipoDocumento === 'extranjeria') {
+                docIsValid = regexDocumentoCE.test(documentoInput.value);
+            }
+            
+            if (!docIsValid) {
+                showError(documentoInput, 'Número de documento inválido para el tipo seleccionado');
+                isValid = false;
+            }
+
+            // Validar correo
+            if (!regexEmail.test(correoInput.value)) {
+                showError(correoInput, 'Ingrese un correo electrónico válido');
+                isValid = false;
+            }
+
+            // Validar teléfono
+            if (!regexTelefono.test(telefonoInput.value)) {
+                showError(telefonoInput, 'El teléfono debe tener 10 dígitos numéricos');
+                isValid = false;
+            }
+
+            // Validar mascota
+            if (!regexSoloLetras.test(mascotaInput.value) || mascotaInput.value.length < 2) {
+                showError(mascotaInput, 'Solo se permiten letras y espacios (mínimo 2 caracteres)');
+                isValid = false;
+            }
+
+            // Validar clase de mascota
+            if (claseMascotaSelect.value === '') {
+                showError(claseMascotaSelect, 'Seleccione la clase de mascota');
+                isValid = false;
+            } else {
+                clearError(claseMascotaSelect);
+            }
+
+            // Validar fecha
+            if (fechaInput.value === '') {
+                showError(fechaInput, 'Seleccione una fecha del calendario');
+                isValid = false;
+            } else {
+                const fechaSeleccionada = new Date(fechaInput.value);
+                if (!validarFechaNoAntigua(fechaSeleccionada)) {
+                    showError(fechaInput, 'No puede seleccionar una fecha pasada');
+                    isValid = false;
+                } else {
+                    clearError(fechaInput);
+                }
+            }
+
+            // Validar hora
+            if (horaInput.value === '') {
+                showError(horaInput, 'Seleccione una hora');
+                isValid = false;
+            } else if (fechaInput.value) {
+                const fechaSeleccionada = new Date(fechaInput.value);
+                if (!validarHorarioLaboral(fechaSeleccionada, horaInput.value)) {
+                    showError(horaInput, 'Horario no laboral. L-V: 8AM-6PM, Sáb: 9AM-2PM');
+                    isValid = false;
+                } else {
+                    clearError(horaInput);
+                }
+            }
+
+            // Validar al menos un servicio seleccionado
+            const servicesGroup = document.querySelector('.checkbox-group');
+            const servicesChecked = document.querySelectorAll('input[name="services"]:checked').length > 0;
+            if (!servicesChecked) {
+                showCheckboxError(servicesGroup, 'Seleccione al menos un motivo de cita');
+                isValid = false;
+            } else {
+                clearCheckboxError(servicesGroup);
+            }
+
+            if (isValid) {
+                // Aquí va tu lógica para procesar el formulario cuando es válido
+                alert('Formulario válido, procediendo con el envío...');
+                // form.submit(); // Descomenta esta línea para enviar el formulario
+            } else {
+                window.scrollTo({
+                    top: document.getElementById('formulario').offsetTop,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+    </script>
+
+    <style>
+        .input-error {
+            border: 2px solid #ff4444 !important;
+        }
+        
+        .error-message {
+            color: #ff4444;
+            font-size: 0.8em;
+            margin-top: 5px;
+            display: none;
+            height: auto;
+        }
+        
+        .error-message.visible {
+            display: block;
+        }
+        
+        .checkbox-group {
+            position: relative;
+        }
+        
+        .checkbox-group .error-message {
+            position: absolute;
+            bottom: -20px;
+            left: 0;
+            background: #fff;
+            padding: 2px 5px;
+            border-radius: 3px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 1;
+        }
+        
+        .checkbox-group.input-error {
+            border: 2px solid #ff4444;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 25px; /* Más espacio para el mensaje de error */
+        }
+    </style>
 
     <footer>
         <div class="footer-container">
