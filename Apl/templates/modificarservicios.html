@@ -209,25 +209,30 @@
           <!-- Sección para el cuadro inicial -->
           <div class="space-y-4">
             <h3 class="font-medium text-lg">Cuadro Inicial</h3>
+        
             
-            <div>
-              <label for="nombreServicio" class="block mb-2">Nombre del Servicio</label>
-              <input type="text" id="nombreServicio" name="nombre" class="w-full p-2 border rounded" required>
-            </div>
-            
-            <div class="image-uploader">
-                <label class="block mb-2">Imagen Principal</label>
-                <div class="flex items-center gap-4">
-                    <label for="imagenCuadro" class="cursor-pointer">
-                        <div class="preview-container">
-                            <img id="previewImagenCuadro" src="{{ servicio.imagen_cuadro.url|default:'/static/images/placeholder.jpg' }}" class="preview-image">
-                            <div class="upload-overlay">
-                                <i class="fas fa-camera text-2xl"></i>
-                                <span>Haz clic para cambiar</span>
+            <div class="space-y-4">
+                <h3 class="font-medium text-lg">Cuadro Inicial</h3>
+                
+                <div>
+                    <label for="nombreServicio" class="block mb-2">Nombre del Servicio</label>
+                    <input type="text" id="nombreServicio" name="nombre" class="w-full p-2 border rounded" required>
+                </div>
+                
+                <div class="image-uploader">
+                    <label class="block mb-2">Imagen Principal</label>
+                    <div class="flex items-center gap-4">
+                        <label for="imagenCuadro" class="cursor-pointer">
+                            <div class="preview-container">
+                                <img id="previewImagenCuadro" src="{{ servicio.imagen_cuadro.url|default:'/static/images/placeholder.jpg' }}" class="preview-image">
+                                <div class="upload-overlay">
+                                    <i class="fas fa-camera text-2xl"></i>
+                                    <span>Haz clic para cambiar</span>
+                                </div>
                             </div>
-                        </div>
-                    </label>
-                    <input type="file" id="imagenCuadro" name="imagen_cuadro" accept="image/*" class="hidden">
+                        </label>
+                        <input type="file" id="imagenCuadro" name="imagen_cuadro" accept="image/*" class="hidden">
+                    </div>
                 </div>
             </div>
             
@@ -311,16 +316,16 @@
       <div class="overflow-x-auto">
         <table class="min-w-full bg-white">
           <thead>
-              <tr class="bg-gray-100">
-                  <th class="py-2 px-4 border">Servicio</th>
-                  <th class="py-2 px-4 border">Imagen Principal</th>
-                  <th class="py-2 px-4 border">Título Ventana</th>
-                  <th class="py-2 px-4 border">Subtítulo Ventana</th>
-                  <th class="py-2 px-4 border">Imagen Ventana</th>
-                  <th class="py-2 px-4 border">Botón Agendar</th>
-                  <th class="py-2 px-4 border">Acciones</th>
-              </tr>
-          </thead>
+                <tr class="bg-gray-100">
+                    <th class="py-2 px-4 border">Servicio</th>
+                    <th class="py-2 px-4 border">Imagen Principal</th>
+                    <th class="py-2 px-4 border">Título Ventana</th>
+                    <th class="py-2 px-4 border">Subtítulo Ventana</th>
+                    <th class="py-2 px-4 border">Imagen Ventana</th>
+                    <th class="py-2 px-4 border">Botón Agendar</th>
+                    <th class="py-2 px-4 border">Acciones</th>
+                </tr>
+            </thead>
           <tbody id="tablaServicios">
               {% for servicio in servicios %}
               <tr>
