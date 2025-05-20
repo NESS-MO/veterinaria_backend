@@ -41,17 +41,15 @@
         {% for servicio in servicios %}
         <div class="servicio-card">
             <div class="servicio-imagen-container">
-                {% if servicio.imagen_cuadro %}
-                    <img src="{{ servicio.imagen_cuadro.url }}" alt="{{ servicio.nombre }}" class="servicio-imagen">
-                {% else %}
-                    <img src="/static/images/placeholder.jpg" alt="Sin imagen" class="servicio-imagen">
-                    {% endif %}
+                <img src="{{ servicio.imagen_cuadro.url }}" alt="{{ servicio.nombre }}" class="servicio-imagen">
             </div>
             <h3 class="servicio-titulo">{{ servicio.nombre }}</h3>
             <div class="servicio-botones">
+                {% if servicio.mostrar_boton_consulta %}
                 <button onclick="mostrarDetalleServicio('{{ servicio.nombre|slugify }}')" class="btn-consulta">
-                    <i class="fas fa-info-circle"></i> Detalles
+                    <i class="fas fa-info-circle"></i> Consultar
                 </button>
+                {% endif %}
                 {% if servicio.mostrar_boton_agendar %}
                 <a href="{% url 'agendar' %}#formulario" class="btn-agendar">
                     <i class="fas fa-calendar-alt"></i> Agendar

@@ -12,286 +12,172 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <style>
-    /* Estilos generales mejorados */
-    .admin-container {
-      background-color: #f8fafc;
-      min-height: 100vh;
-      padding: 2rem;
-    }
-    
-    .form-container {
-      background: white;
-      border-radius: 12px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-      padding: 2.5rem;
-      margin-bottom: 2rem;
-      border: 1px solid #e2e8f0;
-    }
-    
-    .form-title {
-      color: #1e40af;
-      font-size: 1.75rem;
-      font-weight: 600;
-      margin-bottom: 1.5rem;
-      padding-bottom: 0.75rem;
-      border-bottom: 2px solid #1e40af;
-      display: inline-block;
-    }
-    
-    .section-title {
-      color: #1e293b;
-      font-size: 1.25rem;
-      font-weight: 600;
-      margin-bottom: 1.25rem;
-      position: relative;
-      padding-left: 1rem;
-    }
-    
-    .section-title:before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 50%;
-      transform: translateY(-50%);
-      height: 70%;
-      width: 4px;
-      background: #1e40af;
-      border-radius: 4px;
-    }
-    
-    .form-group {
-      margin-bottom: 1.5rem;
-    }
-    
-    .form-label {
-      display: block;
-      margin-bottom: 0.5rem;
-      color: #334155;
-      font-weight: 500;
-    }
-    
-    .form-input {
-      width: 100%;
-      padding: 0.75rem 1rem;
-      border: 1px solid #cbd5e1;
-      border-radius: 8px;
-      transition: all 0.3s;
-      font-size: 1rem;
-    }
-    
-    .form-input:focus {
-      border-color: #1e40af;
-      box-shadow: 0 0 0 3px rgba(30, 64, 175, 0.1);
-      outline: none;
-    }
-    
-    .form-textarea {
-      min-height: 120px;
-      resize: vertical;
-    }
-    
-    /* Mejoras para el preview de imágenes */
-    .preview-container {
-      width: 200px;
-      height: 150px;
-      border-radius: 10px;
-      overflow: hidden;
-      position: relative;
-      border: 2px solid #e2e8f0;
-      transition: all 0.3s;
-    }
-    
-    .preview-container:hover {
-      border-color: #1e40af;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(30, 64, 175, 0.15);
-    }
-    
-    .preview-image {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-    }
-    
-    .upload-overlay {
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background: rgba(30, 64, 175, 0.7);
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-    
-    .preview-container:hover .upload-overlay {
-      opacity: 1;
-    }
-    
-    /* Botones mejorados */
-    .btn-group {
-      display: flex;
-      justify-content: flex-end;
-      gap: 1rem;
-      margin-top: 2rem;
-    }
-    
-    .btn {
-      padding: 0.75rem 1.5rem;
-      border-radius: 8px;
-      font-weight: 500;
-      transition: all 0.3s;
-      cursor: pointer;
-      border: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    
-    .btn-primary {
-      background-color: #1e40af;
-      color: white;
-    }
-    
-    .btn-primary:hover {
-      background-color: #1e3a8a;
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(30, 64, 175, 0.3);
-    }
-    
-    .btn-secondary {
-      background-color: #e2e8f0;
-      color: #334155;
-    }
-    
-    .btn-secondary:hover {
-      background-color: #cbd5e1;
-      transform: translateY(-2px);
-    }
-    
-    /* Toggle switch mejorado */
-    .toggle-container {
-      position: relative;
-      display: inline-block;
-      width: 50px;
-      height: 26px;
-    }
-    
-    .toggle-slider {
-      position: absolute;
-      cursor: pointer;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      background-color: #cbd5e1;
-      border-radius: 34px;
-      transition: .4s;
-    }
-    
-    .toggle-slider:before {
-      position: absolute;
-      content: "";
-      height: 18px;
-      width: 18px;
-      left: 4px;
-      bottom: 4px;
-      background-color: white;
-      border-radius: 50%;
-      transition: .4s;
-    }
-    
-    .toggle-input:checked + .toggle-slider {
-      background-color: #1e40af;
-    }
-    
-    .toggle-input:checked + .toggle-slider:before {
-      transform: translateX(24px);
-    }
-    
-    /* Tabla mejorada */
-    .services-table {
-      width: 100%;
-      border-collapse: separate;
-      border-spacing: 0;
-      background: white;
-      border-radius: 12px;
-      overflow: hidden;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-    }
-    
-    .services-table th {
-      background-color: #1e40af;
-      color: white;
-      padding: 1rem;
-      text-align: left;
-    }
-    
-    .services-table td {
-      padding: 1rem;
-      border-bottom: 1px solid #e2e8f0;
-      vertical-align: middle;
-    }
-    
-    .services-table tr:last-child td {
-      border-bottom: none;
-    }
-    
-    .services-table tr:hover td {
-      background-color: #f8fafc;
-    }
-    
-    .action-btn {
-      padding: 0.5rem;
-      border-radius: 50%;
-      transition: all 0.3s;
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      cursor: pointer;
-      border: none;
-    }
-    
-    .action-btn.edit {
-      background-color: #dbeafe;
-      color: #1e40af;
-    }
-    
-    .action-btn.edit:hover {
-      background-color: #bfdbfe;
-      transform: scale(1.1);
-    }
-    
-    .action-btn.delete {
-      background-color: #fee2e2;
-      color: #dc2626;
-    }
-    
-    .action-btn.delete:hover {
-      background-color: #fecaca;
-      transform: scale(1.1);
-    }
-    
-    /* Responsive */
-    @media (max-width: 768px) {
-      .grid-cols-1.md\:grid-cols-2 {
-        grid-template-columns: 1fr;
-      }
-      
-      .btn-group {
-        flex-direction: column;
-      }
-      
-      .btn {
-        width: 100%;
-        justify-content: center;
-      }
-    }
+  /* Selector de imágenes */
+.preview-container {
+    width: 200px;
+    height: 150px;
+    border: 2px dashed #cbd5e1;
+    border-radius: 10px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s;
+}
+
+.preview-container:hover {
+    border-color: #1e40af;
+    transform: translateY(-2px);
+}
+
+.preview-image {
+    max-width: 100%;
+    max-height: 100%;
+    object-fit: cover;
+}
+
+.upload-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s;
+}
+
+.preview-container:hover .upload-overlay {
+    opacity: 1;
+}
+
+/* Toggle switches */
+.toggle-group {
+    background: #f8fafc;
+    padding: 12px;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    transition: background 0.3s;
+}
+
+.toggle-group:hover {
+    background: #f1f5f9;
+}
+
+.toggle-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+}
+
+.toggle-container {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #cbd5e1;
+    border-radius: 34px;
+    transition: .4s;
+}
+
+.toggle-slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 4px;
+    bottom: 4px;
+    background-color: white;
+    border-radius: 50%;
+    transition: .4s;
+}
+
+.toggle-input:checked + .toggle-slider {
+    background-color: #1e40af;
+}
+
+.toggle-input:checked + .toggle-slider:before {
+    transform: translateX(24px);
+}
+
+.toggle-description {
+    font-size: 13px;
+    color: #64748b;
+    margin-top: 5px;
+}
+
+/* Contenedor de imagen */
+.preview-container {
+    width: 200px;
+    height: 150px;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+/* Imagen dentro del contenedor */
+.preview-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;  /* Cambia a "contain" si prefieres ver la imagen completa */
+}
+
+/* Overlay al pasar el mouse */
+.upload-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.preview-container:hover .upload-overlay {
+    opacity: 1;
+}
+
+/* Estilo del toggle switch (igual que el anterior) */
+.toggle-container {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 26px;
+}
+
+.toggle-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 34px;
+}
+
+.toggle-input:checked + .toggle-slider {
+    background-color: #1e40af;  /* Azul de tu paleta */
+}
 </style>
 <body>
 
@@ -309,165 +195,168 @@
       </ul>
   </div>
 
-  
-  <div class="admin-container md:ml-80 p-8">
-    <div class="form-container">
-      <h2 class="form-title">{% if editing %}Editar{% else %}Agregar{% endif %} Servicio</h2>
+   <div class="admin-container md:ml-80 p-8">
+    <h1 class="text-2xl font-bold mb-6">Administrar Servicios</h1>
+
+    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+      <h2 class="text-xl font-semibold mb-4">{% if editing %}Editar{% else %}Agregar{% endif %} Servicio</h2>
       
       <form id="servicioForm" method="post" enctype="multipart/form-data" action="{% url 'api_servicios' %}">
-        {% csrf_token %}
-        <input type="hidden" id="servicioId" name="servicio_id" value="">
+      {% csrf_token %}
+      <input type="hidden" id="servicioId" name="servicio_id" value="">
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <!-- Sección para el cuadro inicial -->
-          <div class="space-y-6">
-            <h3 class="section-title">Cuadro Inicial</h3>
+          <div class="space-y-4">
+            <h3 class="font-medium text-lg">Cuadro Inicial</h3>
             
-            <div class="form-group">
-              <label for="nombreServicio" class="form-label">Nombre del Servicio</label>
-              <input type="text" id="nombreServicio" name="nombre" class="form-input" required>
+            <div>
+              <label for="nombreServicio" class="block mb-2">Nombre del Servicio</label>
+              <input type="text" id="nombreServicio" name="nombre" class="w-full p-2 border rounded" required>
             </div>
             
-            <div class="form-group">
-              <label class="form-label">Imagen Principal</label>
-              <div class="flex items-center gap-4">
-                <label for="imagenCuadro" class="cursor-pointer">
-                  <div class="preview-container">
-                    <img id="previewImagenCuadro" src="{{ servicio.imagen_cuadro.url|default:'/static/images/placeholder.jpg' }}" class="preview-image">
-                    <div class="upload-overlay">
-                      <i class="fas fa-camera text-2xl mb-1"></i>
-                      <span class="text-sm">Cambiar imagen</span>
+            <div class="image-uploader">
+                <label class="block mb-2">Imagen Principal</label>
+                <div class="flex items-center gap-4">
+                    <label for="imagenCuadro" class="cursor-pointer">
+                        <div class="preview-container">
+                            <img id="previewImagenCuadro" src="{{ servicio.imagen_cuadro.url|default:'/static/images/placeholder.jpg' }}" class="preview-image">
+                            <div class="upload-overlay">
+                                <i class="fas fa-camera text-2xl"></i>
+                                <span>Haz clic para cambiar</span>
+                            </div>
+                        </div>
+                    </label>
+                    <input type="file" id="imagenCuadro" name="imagen_cuadro" accept="image/*" class="hidden">
+                </div>
+            </div>
+            
+            <div class="toggle-group">
+                <label class="toggle-label">
+                    <span class="toggle-text">Mostrar botón "Detalles"</span>
+                    <div class="toggle-container">
+                        <input type="checkbox" id="mostrarBotonConsulta" name="mostrar_boton_consulta" {% if servicio.mostrar_boton_consulta %}checked{% endif %} class="toggle-input">
+                        <span class="toggle-slider"></span>
                     </div>
-                  </div>
                 </label>
-                <input type="file" id="imagenCuadro" name="imagen_cuadro" accept="image/*" class="hidden">
-              </div>
+                <p class="toggle-description">Activa para mostrar el botón de detalles en la página principal</p>
             </div>
           </div>
           
           <!-- Sección para la ventana flotante -->
-          <div class="space-y-6">
-            <h3 class="section-title">Ventana Flotante</h3>
+          <div class="space-y-4">
+            <h3 class="font-medium text-lg">Ventana Flotante</h3>
             
-            <div class="form-group">
-              <label for="tituloVentana" class="form-label">Título</label>
-              <input type="text" id="tituloVentana" name="titulo_ventana" class="form-input" required>
+            <div>
+              <label for="tituloVentana" class="block mb-2">Título</label>
+              <input type="text" id="tituloVentana" name="titulo_ventana" class="w-full p-2 border rounded" required>
             </div>
             
-            <div class="form-group">
-              <label for="subtituloVentana" class="form-label">Subtítulo</label>
-              <input type="text" id="subtituloVentana" name="subtitulo_ventana" class="form-input" required>
+            <div>
+              <label for="subtituloVentana" class="block mb-2">Subtítulo</label>
+              <input type="text" id="subtituloVentana" name="subtitulo_ventana" class="w-full p-2 border rounded" required>
             </div>
             
-            <div class="form-group">
-              <label class="form-label">Imagen para Ventana</label>
-              <div class="flex items-center gap-4">
-                <label for="imagenVentana" class="cursor-pointer">
-                  <div class="preview-container">
-                    <img id="previewImagenVentana" 
-                        src="{% if servicio.imagen_ventana %}{{ servicio.imagen_ventana.url }}{% else %}{% static 'images/placeholder.jpg' %}{% endif %}" 
-                        class="preview-image">
-                    <div class="upload-overlay">
-                      <i class="fas fa-camera text-2xl mb-1"></i>
-                      <span class="text-sm">Cambiar imagen</span>
+            <div class="image-uploader mt-8">
+                <label class="block mb-3 text-sm font-medium text-gray-700">Imagen para Ventana de Detalles</label>
+                <div class="flex items-center gap-4">
+                    <label for="imagenVentana" class="cursor-pointer">
+                        <div class="preview-container bg-gray-50 rounded-lg border-2 border-dashed border-gray-300 hover:border-blue-500 transition-all">
+                            <img id="previewImagenVentana" 
+                                src="{% if servicio.imagen_ventana %}{{ servicio.imagen_ventana.url }}{% else %}{% static 'images/placeholder.jpg' %}{% endif %}" 
+                                class="preview-image object-contain">
+                            <div class="upload-overlay flex flex-col items-center justify-center">
+                                <i class="fas fa-camera text-2xl mb-2"></i>
+                                <span class="text-sm">Haz clic para subir</span>
+                            </div>
+                        </div>
+                    </label>
+                    <input type="file" id="imagenVentana" name="imagen_ventana" accept="image/*" class="hidden">
+                </div>
+            </div>
+            
+            <div>
+              <label for="contenidoVentana" class="block mb-2">Contenido</label>
+              <textarea id="contenidoVentana" name="contenido_ventana" class="w-full p-2 border rounded" rows="3" required></textarea>
+            </div>
+            
+            <div class="toggle-group mt-6">
+                <label class="toggle-label flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg cursor-pointer">
+                    <div>
+                        <span class="toggle-text font-medium text-gray-700">Mostrar botón "Agendar"</span>
+                        <p class="toggle-description text-xs text-gray-500 mt-1">Activa esta opción para mostrar el botón de agendar cita en la ventana flotante.</p>
                     </div>
-                  </div>
+                    <div class="toggle-container">
+                        <input type="checkbox" id="mostrarBotonAgendar" name="mostrar_boton_agendar" 
+                              {% if servicio.mostrar_boton_agendar %}checked{% endif %} class="toggle-input">
+                        <span class="toggle-slider"></span>
+                    </div>
                 </label>
-                <input type="file" id="imagenVentana" name="imagen_ventana" accept="image/*" class="hidden">
-              </div>
-            </div>
-            
-            <div class="form-group">
-              <label for="contenidoVentana" class="form-label">Contenido</label>
-              <textarea id="contenidoVentana" name="contenido_ventana" class="form-input form-textarea" required></textarea>
-            </div>
-            
-            <div class="form-group">
-              <label class="toggle-label flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer">
-                <div>
-                  <span class="form-label">Mostrar botón "Agendar"</span>
-                  <p class="text-sm text-gray-500 mt-1">Activar para mostrar el botón de agendar cita</p>
-                </div>
-                <div class="toggle-container">
-                  <input type="checkbox" id="mostrarBotonAgendar" name="mostrar_boton_agendar" 
-                        {% if servicio.mostrar_boton_agendar %}checked{% endif %} class="toggle-input">
-                  <span class="toggle-slider"></span>
-                </div>
-              </label>
             </div>
           </div>
         </div>
         
-        <div class="btn-group">
-          <button type="button" onclick="resetForm()" class="btn btn-secondary">
-            <i class="fas fa-times"></i> Cancelar
-          </button>
-          <button type="submit" class="btn btn-primary">
-            <i class="fas fa-save"></i> {% if editing %}Actualizar{% else %}Agregar{% endif %} Servicio
+        <div class="mt-6 flex justify-end space-x-4">
+          <button type="button" onclick="resetForm()" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancelar</button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+            {% if editing %}Actualizar{% else %}Agregar{% endif %} Servicio
           </button>
         </div>
       </form>
     </div>
 
-    <div class="form-container">
-      <h2 class="form-title">Lista de Servicios</h2>
+    <div class="bg-white p-6 rounded-lg shadow-md">
+      <h2 class="text-xl font-semibold mb-4">Lista de Servicios</h2>
       
       <div class="overflow-x-auto">
-        <table class="services-table">
+        <table class="min-w-full bg-white">
           <thead>
-              <tr>
-                  <th>Servicio</th>
-                  <th>Imagen Principal</th>
-                  <th>Título Ventana</th>
-                  <th>Subtítulo Ventana</th>
-                  <th>Imagen Ventana</th>
-                  <th>Botón Agendar</th>
-                  <th>Acciones</th>
+              <tr class="bg-gray-100">
+                  <th class="py-2 px-4 border">Servicio</th>
+                  <th class="py-2 px-4 border">Imagen Principal</th>
+                  <th class="py-2 px-4 border">Título Ventana</th>
+                  <th class="py-2 px-4 border">Subtítulo Ventana</th>
+                  <th class="py-2 px-4 border">Imagen Ventana</th>
+                  <th class="py-2 px-4 border">Botón Agendar</th>
+                  <th class="py-2 px-4 border">Acciones</th>
               </tr>
           </thead>
           <tbody id="tablaServicios">
               {% for servicio in servicios %}
               <tr>
                   <!-- Columna Nombre -->
-                  <td>{{ servicio.nombre }}</td>
+                  <td class="py-2 px-4 border">{{ servicio.nombre }}</td>
                   
                   <!-- Columna Imagen Principal -->
-                  <td>
-                    <div class="flex justify-center">
-                        <div class="w-16 h-16 flex items-center justify-center overflow-hidden rounded-md bg-gray-50">
-                            {% if servicio.imagen_cuadro %}
-                                <img src="{{ servicio.imagen_cuadro.url }}"
-                                    alt="{{ servicio.nombre }}"
-                                    class="max-w-full max-h-full object-contain p-1">
-                            {% else %}
-                                <span>No Image</span>  {% endif %}
-                        </div>
-                    </div>
-                </td>
-                  
-                  <!-- Columna Título Ventana -->
-                  <td>{{ servicio.titulo_ventana|truncatechars:20 }}</td>
-                  
-                  <!-- Columna Subtítulo Ventana -->
-                  <td>{{ servicio.subtitulo_ventana|truncatechars:20 }}</td>
-                  
-                  <!-- Columna Imagen Ventana -->
-                  <td>
+                  <td class="py-2 px-4 border">
                       <div class="flex justify-center">
                           <div class="w-16 h-16 flex items-center justify-center overflow-hidden rounded-md bg-gray-50">
-                              {% if servicio.imagen_ventana %}
-                                  <img src="{{ servicio.imagen_ventana.url }}" 
-                                      alt="{{ servicio.titulo_ventana }}" 
-                                      class="max-w-full max-h-full object-contain p-1">
-                              {% else %}
-                                  <span>No Image</span>
-                                  {% endif %}
+                              <img src="{{ servicio.imagen_cuadro.url }}" 
+                                  alt="{{ servicio.nombre }}" 
+                                  class="max-w-full max-h-full object-contain p-1">
+                          </div>
+                      </div>
+                  </td>
+                  
+                  <!-- Columna Título Ventana -->
+                  <td class="py-2 px-4 border">{{ servicio.titulo_ventana|truncatechars:20 }}</td>
+                  
+                  <!-- Columna Subtítulo Ventana -->
+                  <td class="py-2 px-4 border">{{ servicio.subtitulo_ventana|truncatechars:20 }}</td>
+                  
+                  <!-- Columna Imagen Ventana -->
+                  <td class="py-2 px-4 border">
+                      <div class="flex justify-center">
+                          <div class="w-16 h-16 flex items-center justify-center overflow-hidden rounded-md bg-gray-50">
+                              <img src="{{ servicio.imagen_ventana.url }}" 
+                                  alt="{{ servicio.titulo_ventana }}" 
+                                  class="max-w-full max-h-full object-contain p-1">
                           </div>
                       </div>
                   </td>
                   
                   <!-- Columna Botón Agendar -->
-                  <td class="text-center">
+                  <td class="py-2 px-4 border text-center">
                       {% if servicio.mostrar_boton_agendar %}
                       <span class="text-green-500">✓</span>
                       {% else %}
@@ -476,15 +365,15 @@
                   </td>
                   
                   <!-- Columna Acciones -->
-                  <td>
-                      <div class="flex justify-center space-x-2">
+                  <td class="py-2 px-4 border">
+                      <div class="flex justify-center space-x-3">
                           <button onclick="editarServicio({{ servicio.id }})" 
-                                  class="action-btn edit"
+                                  class="p-2 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-full transition-colors"
                                   title="Editar">
                               <i class="fas fa-edit fa-sm"></i>
                           </button>
                           <button onclick="eliminarServicio({{ servicio.id }})" 
-                                  class="action-btn delete"
+                                  class="p-2 bg-red-50 text-red-600 hover:bg-red-100 rounded-full transition-colors"
                                   title="Eliminar">
                               <i class="fas fa-trash fa-sm"></i>
                           </button>
@@ -496,7 +385,7 @@
         </table>
       </div>
     </div>
-  </div>    
+  </div>
 
 <script>
     // Mostrar previsualización de imágenes
@@ -525,41 +414,40 @@
     });
 
     // Función para editar servicio
-function editarServicio(id) {
-    fetch(`/api/servicios/${id}/`)
-        .then(response => response.json())
-        .then(data => {
-            document.getElementById('servicioId').value = data.id;
-            document.getElementById('nombreServicio').value = data.nombre;
-            document.getElementById('tituloVentana').value = data.titulo_ventana;
-            document.getElementById('subtituloVentana').value = data.subtitulo_ventana;
-            document.getElementById('contenidoVentana').value = data.contenido_ventana;
-            document.getElementById('mostrarBotonAgendar').checked = data.mostrar_boton_agendar;
-
-            // Mostrar imágenes existentes (Asegúrate de que las URLs sean correctas)
-            const previewCuadro = document.getElementById('previewImagenCuadro');
-            const previewVentana = document.getElementById('previewImagenVentana');
-
-            if (data.imagen_cuadro) {
-                previewCuadro.src = data.imagen_cuadro; // Asumiendo que ahora es la URL completa
-            } else {
-                previewCuadro.src = '/static/images/placeholder.jpg'; // O una imagen por defecto
-            }
-
-            if (data.imagen_ventana) {
-                previewVentana.src = data.imagen_ventana; // Asumiendo que ahora es la URL completa
-            } else {
-                previewVentana.src = '/static/images/placeholder.jpg'; // O una imagen por defecto
-            }
-
-            // Cambiar texto del botón
-            document.querySelector('button[type="submit"]').textContent = 'Actualizar Servicio';
-
-            // Scroll al formulario
-            document.getElementById('servicioForm').scrollIntoView({ behavior: 'smooth' });
-        })
-        .catch(error => console.error('Error:', error));
-}
+    function editarServicio(id) {
+        fetch(`/api/servicios/${id}/`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('servicioId').value = data.id;
+                document.getElementById('nombreServicio').value = data.nombre;
+                document.getElementById('mostrarBotonConsulta').checked = data.mostrar_boton_consulta;
+                
+                document.getElementById('tituloVentana').value = data.titulo_ventana;
+                document.getElementById('subtituloVentana').value = data.subtitulo_ventana;
+                document.getElementById('contenidoVentana').value = data.contenido_ventana;
+                document.getElementById('mostrarBotonAgendar').checked = data.mostrar_boton_agendar;
+                
+                // Mostrar imágenes existentes
+                if (data.imagen_cuadro) {
+                    const previewCuadro = document.getElementById('previewImagenCuadro');
+                    previewCuadro.src = data.imagen_cuadro;
+                    previewCuadro.classList.remove('hidden');
+                }
+                
+                if (data.imagen_ventana) {
+                    const previewVentana = document.getElementById('previewImagenVentana');
+                    previewVentana.src = data.imagen_ventana;
+                    previewVentana.classList.remove('hidden');
+                }
+                
+                // Cambiar texto del botón
+                document.querySelector('button[type="submit"]').textContent = 'Actualizar Servicio';
+                
+                // Scroll al formulario
+                document.getElementById('servicioForm').scrollIntoView({ behavior: 'smooth' });
+            })
+            .catch(error => console.error('Error:', error));
+    }
 
     // Función para eliminar servicio
     function eliminarServicio(id) {
@@ -591,15 +479,12 @@ function editarServicio(id) {
     }
 
     // Manejar envío del formulario
-    // Manejar envío del formulario
     document.getElementById('servicioForm').addEventListener('submit', function(e) {
         e.preventDefault();
-
+        
         const formData = new FormData(this);
-        const servicioId = document.getElementById('servicioId').value;
-        const url = servicioId ? `/api/servicios/${servicioId}/` : `/api/servicios/`; // Construir URL dinámicamente
-
-        fetch(url, {
+        
+        fetch(this.action, {
             method: 'POST',
             body: formData,
             headers: {
@@ -621,6 +506,21 @@ function editarServicio(id) {
             alert('Error al guardar el servicio');
         });
     });
+
+    document.querySelectorAll('input[type="file"]').forEach(input => {
+    input.addEventListener('change', function(e) {
+        const previewId = this.id.replace('imagen', 'previewImagen');
+        const preview = document.getElementById(previewId);
+        
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+            }
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+});
 
 // Efecto para toggles
 document.querySelectorAll('.toggle-input').forEach(toggle => {

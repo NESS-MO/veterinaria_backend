@@ -9,6 +9,7 @@ class Servicio(models.Model):
         verbose_name="Imagen para el cuadro",
         validators=[FileExtensionValidator(['jpg', 'jpeg', 'png'])]
     )
+    mostrar_boton_consulta = models.BooleanField(default=True, verbose_name="Mostrar botón de consulta")
     
     # Para la ventana flotante
     titulo_ventana = models.CharField(max_length=250, verbose_name="Título en ventana")
