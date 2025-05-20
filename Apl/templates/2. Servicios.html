@@ -45,11 +45,10 @@
             </div>
             <h3 class="servicio-titulo">{{ servicio.nombre }}</h3>
             <div class="servicio-botones">
-                {% if servicio.mostrar_boton_consulta %}
+                <!-- Botón de consulta siempre visible -->
                 <button onclick="mostrarDetalleServicio('{{ servicio.nombre|slugify }}')" class="btn-consulta">
-                    <i class="fas fa-info-circle"></i> Consultar
+                    <i class="fas fa-info-circle"></i> Detalles
                 </button>
-                {% endif %}
                 {% if servicio.mostrar_boton_agendar %}
                 <a href="{% url 'agendar' %}#formulario" class="btn-agendar">
                     <i class="fas fa-calendar-alt"></i> Agendar
