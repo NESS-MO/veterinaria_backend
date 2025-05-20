@@ -11,10 +11,10 @@ class Administrador(models.Model):
     )
     telefono = models.CharField(max_length=11, validators=[MinLengthValidator(7)])
     contraseña = models.CharField(max_length=250)
-
     class Meta:
         verbose_name = "Administrador"
         verbose_name_plural = "Administradores"
 
     def __str__(self):
         return self.nombre_completo
+ 

@@ -38,191 +38,45 @@
     </header>
 
     <div class="sect">
-        
-        <!--Servicio/Botón consulta-->
-        <a class="servicio" href="javascript:consultaS()">
-            <div id="consulta">
-                <img class="img2" src={% static "Images/m1.jpg" %} alt="Consulta">
-                <p><strong>Consulta</strong></p>
-                <a href="3. Agendar.html#formulario">
+        {% for servicio in servicios %}
+        <!--Servicio/Botón {{ servicio.nombre }}-->
+        <div class="servicio">
+            <div id="{{ servicio.nombre|slugify }}">
+                <img class="img2" src="{{ servicio.imagen_cuadro.url }}" alt="{{ servicio.nombre }}">
+                <p><strong>{{ servicio.nombre }}</strong></p>
+                {% if servicio.mostrar_boton_consulta %}
+                <a href="javascript:mostrarDetalleServicio('{{ servicio.nombre|slugify }}')">
+                    <button class="agendar">Consultar</button>
+                </a>
+                {% endif %}
+                {% if servicio.mostrar_boton_agendar %}
+                <a href="{% url "agendar" %}#formulario">
                     <button class="agendar">Agendar</button>
                 </a>
+                {% endif %}
             </div>
-        </a>
-        
-        <!--Servicio/Botón Esterilización-->
-        <a class="servicio" href="javascript:esteriS()">
-            <div id="esterilizacion">
-                <img class="img2" src={% static "Images/m2.jpg" %} alt="Esterilización">
-                <p><strong>Esterilización Canina y Felina</strong></p>
-                <a href="3. Agendar.html#formulario">
-                    <button class="agendar">Agendar</button>
-                </a>
-            </div>
-        </a>
-
-        <!--Servicio/Botón Guarderia-->
-        <a class="servicio" href="javascript:guarderiaS()">
-            <div id="guarderia">
-                <img class="img2" src={% static "Images/m6.jpg" %} alt="Guardería">
-                <p><strong>Guardería</strong></p>
-                <a href="3. Agendar.html#formulario">
-                    <button class="agendar">Agendar</button>
-                </a>
-            </div>
-        </a>
-
-    </div>
-
-    <div class="sect">
-
-        <!--Servicio/Botón Vacunación-->
-        <a class="servicio" href="javascript:vacunaS()">
-            <div id="vacunacion">
-                <img class="img2" src={% static "Images/m4.jpg" %} alt="Vacunación">
-                <p><strong>Vacunación</strong></p>
-                <a href="3. Agendar.html#formulario">
-                    <button class="agendar">Agendar</button>
-                </a>
-            </div>
-        </a>
-
-        <!--Servicio/Botón Profilaxis-->
-        <a class="servicio" href="javascript:profilaS()">
-            <div id="profilaxis">
-                <img class="img2" src={% static "Images/m5.jpg" %} alt="Profilaxis">
-                <p><strong>Profilaxis</strong></p>
-                <a href="3. Agendar.html#formulario">
-                    <button class="agendar">Agendar</button>
-                </a>
-            </div>
-        </a>
-
-        <!--Servicio/Botón Cirujias-->
-        <a class="servicio" href="javascript:cirugiaS()">
-            <div id="cirugias">
-                <img class="img2" src={% static "Images/m8.jpg" %} alt="Cirugías">
-                <p><strong>Cirugías</strong></p>
-                <a href="3. Agendar.html#formulario">
-                    <button class="agendar">Agendar</button>
-                </a>
-            </div>
-        </a>
-
-    </div>
-
-
-
-    <div class="sect">
-
-        <!--Servicio/Botón Hospitalización-->
-        <a class="servicio" href="javascript:hospitalS()">
-            <div id="hospitalizacion">
-                <img class="img2" src={% static "Images/m3.jpg" %} alt="Hospitalización">
-                <p><strong>Hospitalización</strong></p>
-            </div>
-        </a>    
-
-        <!--Servicio/Botón Asistencia-->
-        <a class="servicio" href="javascript:asistS()">
-            <div id="asistencia">
-                <img class="img2" src={% static "Images/m7.jpg" %} alt="Asistencia Técnica">
-                <p><strong>Asistencia Técnica</strong></p>
-            </div>
-        </a>
+        </div>
+        {% endfor %}
     </div>
 
     <div id="fondo-oscuro" class="fondo-oscuro"></div>  
 
-        <!--Ventana Consultas-->
-        <div class="detalles" id="consultaD">
-            <button class="salir-garantizado" onclick="salir1()">×</button>
-            <h1><strong>Detalles del Servicio</strong></h1>
-            <h2><strong>Consulta</strong></h2>
-            <img class="img2" src={% static "Images/d1.png" %} alt="Consulta">
-            <p>En nuestra clínica veterinaria, ofrecemos consultas personalizadas y exhaustivas para evaluar el estado de salud de tu mascota. Nuestros equipo está capacitados para diagnosticar y tratar una amplia variedad de condiciones.</p>
-            <a href="3. Agendar.html#formulario">
-                <button class="agendar">Agendar</button>
-            </a>
-        </div>
-
-        <!--Ventana Estarilización-->
-        <div class="detalles" id="esteriD">
-            <button class="salir-garantizado" onclick="salir1()">×</button>
-            <h1><strong>Detalles del Servicio</strong></h1>
-            <h2><strong>Esterilización Canina y Felina</strong></h2>
-            <img class="img2" src={% static "Images/d2.jpg" %} alt="Esterilización">
-            <p>La esterilización es un procedimiento seguro y esencial que no solo ayuda a controlar la población animal, sino que también previene enfermedades y mejora la calidad de vida de tus mascotas.</p>
-            <a href="3. Agendar.html#formulario">
-                <button class="agendar">Agendar</button>
-            </a>
-        </div>
-
-        <!--Ventana Guardería-->
-        <div class="detalles" id="guarderiaD">
-            <button class="salir-garantizado" onclick="salir1()">×</button>
-            <h1><strong>Detalles del Servicio</strong></h1>
-            <h2><strong>Guardería</strong></h2>
-            <img class="img2" src={% static "Images/d3.jpg" %} alt="Guardería">
-            <p>Nuestra guardería canina y felina ofrece un ambiente seguro, limpio y vigilado, donde tus compañeros peludos recibirán atención personalizada y mucho cariño.</p>
-            <a href="3. Agendar.html#formulario">
-                <button class="agendar">Agendar</button>
-            </a>
-        </div>
-
-        <!--Ventana Vacunación-->
-        <div class="detalles" id="vacunaD">
-            <button class="salir-garantizado" onclick="salir1()">×</button>
-            <h1><strong>Detalles del Servicio</strong></h1>
-            <h2><strong>Vacunación</strong></h2>
-            <img class="img2" src={% static "Images/d4.jpg" %} alt="Vacunación">
-            <p>La vacunación es fundamental para prevenir enfermedades graves y proteger la salud de tu mascota. Ofrecemos un calendario de vacunación completo y personalizado.</p>
-            <a href="3. Agendar.html#formulario">
-                <button class="agendar">Agendar</button>
-            </a>
-        </div>
-
-        <!--Ventana Profilaxis-->
-        <div class="detalles" id="profilaD">
-            <button class="salir-garantizado" onclick="salir1()">×</button>
-            <h1><strong>Detalles del Servicio</strong></h1>
-            <h2><strong>Profilaxis</strong></h2>
-            <img class="img2" src={% static "Images/d5.jpg" %} alt="Profilaxis">
-            <p>La salud bucal es clave para el bienestar general de tu mascota. Nuestro servicio de profilaxis ayuda a prevenir problemas como gingivitis, sarro y enfermedades periodontales.</p>
-            <a href="3. Agendar.html#formulario">
-                <button class="agendar">Agendar</button>
-            </a>
-        </div>
-
-        <!--Ventana Cirujias-->
-        <div class="detalles" id="cirugiaD">
-            <button class="salir-garantizado" onclick="salir1()">×</button>
-            <h1><strong>Detalles del Servicio</strong></h1>
-            <h2><strong>Cirugías</strong></h2>
-            <img class="img2" src={% static "Images/d6.jpg" %} alt="Cirugías">
-            <p>Realizamos cirugías de diversa complejidad, desde procedimientos rutinarios como castraciones hasta intervenciones más especializadas.</p>
-            <a href="3. Agendar.html#formulario">
-                <button class="agendar">Agendar</button>
-            </a>
-        </div>
-
-        <!--Ventana Hospitalización-->
-        <div class="detalles" id="hospitalD">
-            <button class="salir-garantizado" onclick="salir1()">×</button>
-            <h1><strong>Detalles del Servicio</strong></h1>
-            <h2><strong>Hospitalizacion</strong></h2>
-            <img class="img2" src={% static "Images/d7.jpg"%} alt="Hospitalización">
-            <p>En casos de emergencia o enfermedades que requieren cuidados intensivos, contamos con un área de hospitalización equipada con tecnología actualizada y monitoreo constante.</p>
-        </div>
-
-        <!--Ventana Asistencia-->
-        <div class="detalles" id="asistD">
-            <button class="salir-garantizado" onclick="salir1()">×</button>
-            <h1><strong>Detalles del Servicio</strong></h1>
-            <h2><strong>Asistencia Técnica</strong></h2>
-            <img class="img2" src={% static "Images/d8.jpg" %} alt="Asistencia Técnica">
-            <p>Ofrecemos servicios de asistencia técnica que incluyen análisis clínicos, radiografías, ecografías y otros estudios especializados.</p>
-        </div>
+    {% for servicio in servicios %}
+    <!--Ventana {{ servicio.nombre }}-->
+    <div class="detalles" id="{{ servicio.nombre|slugify }}D">
+        <button class="salir-garantizado" onclick="cerrarDetalleServicio()">×</button>
+        <h1><strong>Detalles del Servicio</strong></h1>
+        <h2><strong>{{ servicio.titulo_ventana }}</strong></h2>
+        <h3>{{ servicio.subtitulo_ventana }}</h3>
+        <img class="img2" src="{{ servicio.imagen_ventana.url }}" alt="{{ servicio.nombre }}">
+        <p>{{ servicio.contenido_ventana }}</p>
+        {% if servicio.mostrar_boton_agendar %}
+        <a href="{% url "agendar" %}#formulario">
+            <button class="agendar">Agendar</button>
+        </a>
+        {% endif %}
+    </div>
+    {% endfor %}
 
     <!--Pie de pagina-->    
     <footer>
@@ -275,29 +129,53 @@
         </div>
     </footer>
 
-<script src={% static "JavaScript/2. Servicios.js" %}></script>
-<script src={% static "JavaScript/MenuHamburguesa.js" %}></script>
+    <script>
+    // Función para mostrar el detalle del servicio
+    function mostrarDetalleServicio(servicioSlug) {
+        document.getElementById('fondo-oscuro').style.display = 'block';
+        document.getElementById(servicioSlug + 'D').style.display = 'block';
+    }
 
-<script>
-    window.siennaOptions = {
-        buttonColor: '#3a6ead',
-        buttonIconColor: '#ffffff',
-        highlightColor: '#3a6ead',
-        menuBackgroundColor: '#ffffff',
-        menuTextColor: '#333333'
-    };
+    // Función para cerrar el detalle del servicio
+    function cerrarDetalleServicio() {
+        document.getElementById('fondo-oscuro').style.display = 'none';
+        document.querySelectorAll('.detalles').forEach(detalle => {
+            detalle.style.display = 'none';
+        });
+    }
+
+    // Cerrar al hacer clic en el fondo oscuro
+    document.getElementById('fondo-oscuro').addEventListener('click', cerrarDetalleServicio);
+
+    // Menú hamburguesa
+    document.addEventListener('DOMContentLoaded', function() {
+        const abrirMenu = document.getElementById('abrir-menu');
+        const cerrarMenu = document.getElementById('cerrar-menu');
+        const menu = document.getElementById('menu');
+        
+        abrirMenu.addEventListener('click', function() {
+            menu.style.display = 'flex';
+        });
+        
+        cerrarMenu.addEventListener('click', function() {
+            menu.style.display = 'none';
+        });
+        
+        // Cerrar menú al hacer clic en un enlace
+        document.querySelectorAll('#menu a').forEach(enlace => {
+            enlace.addEventListener('click', function() {
+                menu.style.display = 'none';
+            });
+        });
+    });
 </script>
 
-<!--Boton Tip de la semana-->
-<script src={% static "JavaScript/js-BotonTipSemana.js" %}></script>
-<!--Boton Whatsapp-->
-<script src={% static "JavaScript/js-BotonWhatsapp.js" %}></script>
-<!--Boton Ayuda-->
-<script src={% static "JavaScript/js-botonAyuda.js" %}></script>
-
-<script src={% static "JavaScript/sienna.js" %}></script>
-<script src={% static "JavaScript/custom.js" %}></script>
-
-</script>
+    <!-- Scripts adicionales -->
+    <script src={% static "JavaScript/MenuHamburguesa.js" %}></script>
+    <script src={% static "JavaScript/js-BotonTipSemana.js" %}></script>
+    <script src={% static "JavaScript/js-BotonWhatsapp.js" %}></script>
+    <script src={% static "JavaScript/js-botonAyuda.js" %}></script>
+    <script src={% static "JavaScript/sienna.js" %}></script>
+    <script src={% static "JavaScript/custom.js" %}></script>
 </body>
 </html>

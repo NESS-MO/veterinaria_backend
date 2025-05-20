@@ -1,57 +1,65 @@
-{%load static%}
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Modificar Galería</title>
+    <link rel="icon" href="{% static 'Images/logo.png' %}"/>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
     <!-- Sidebar -->
     <div class="w-full md:w-72 bg-gradient-to-br from-[#33C0F1] to-[#1E2D93] text-white p-7 md:fixed md:h-full top-0 left-0 z-10">
         <img class="h-24 mx-auto mb-4" src="{% static 'Images/logo2.png' %}" alt="Logo" />
-        <ul class="space-y-3">
-          <li><a href="{% url 'gestioncitas' %}" class="block hover:bg-white/20 p-2 rounded">Citas Solicitadas</a></li>
-          <li><a href="{% url 'registroc' %}" class="block hover:bg-white/20 p-2 rounded">Registro Citas</a></li>
-          <li><a href="{% url 'Tipdelasemana' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Tip de la Semana</a></li>
-          <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded">Modificar fotos "Nuestro trabajo"</a></li>
-          <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Servicios</a></li>
-          <li><a href="{% url 'backup' %}">Copia de seguridad</a><li>
-          <li><a href="{% url 'index' %}" class="block hover:bg-white/20 p-2 rounded">Cerrar sesión</a></li>
+        <ul class="space-y-4 text-lg">
+            <li><a href="{% url 'gestioncitas' %}" class="block hover:bg-white/20 p-2 rounded">Citas Solicitadas</a></li>
+            <li><a href="{% url 'registroc' %}" class="block hover:bg-white/20 p-2 rounded">Registro Citas</a></li>
+            <li><a href="{% url 'Tipdelasemana' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Tip de la Semana</a></li>
+            <li><a href="{% url 'Galeria' %}" class="block bg-white/30 hover:bg-white/40 p-2 rounded text-gray-900">Modificar Galería</a></li>
+            <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Servicios</a></li>
+             <li><a href="{% url 'backup' %}" class="block hover:bg-white/20 p-2 rounded">Copia de seguridad</a></li>
+            <li><a href="{% url 'index' %}" class="block hover:bg-red-500/80 p-2 rounded">Cerrar sesión</a></li>
         </ul>
     </div>
     
-    {% block content %}
     <div class="content md:ml-72 p-8 bg-gray-50 min-h-screen mt-16 md:mt-0">
         <div class="max-w-6xl mx-auto bg-white rounded-xl shadow-md overflow-hidden p-6">
             <!-- Encabezado -->
             <div class="mb-8 text-center">
                 <h1 class="text-3xl font-bold text-[#1E2D93] mb-2">Galería "Nuestro Trabajo"</h1>
-                <p class="text-gray-600">Administra las imágenes que se muestran en la página principal (3x3 grid)</p>
+                <p class="text-gray-600">Administra las imágenes que se muestran en la página principal.</p>
+                <p class="text-sm text-gray-500 mt-2">Imágenes en galería: {{ total_imagenes }}/9</p>
             </div>
             
             <!-- Formulario para agregar nueva imagen -->
-            <div class="mb-8 p-6 bg-gray-50 rounded-lg">
+            <div class="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
                 <h2 class="text-xl font-semibold mb-4">Agregar Nueva Imagen</h2>
                 <form method="post" enctype="multipart/form-data">
                     {% csrf_token %}
-                    <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-                        <div class="md:col-span-3">
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Imagen</label>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Imagen*</label>
                             {{ form.imagen }}
+                            {% if form.imagen.errors %}
+                                <p class="text-red-500 text-xs mt-1">{{ form.imagen.errors.as_text }}</p>
+                            {% endif %}
                         </div>
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 mb-1">Orden</label>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Orden*</label>
                             {{ form.orden }}
+                            {% if form.orden.errors %}
+                                <p class="text-red-500 text-xs mt-1">{{ form.orden.errors.as_text }}</p>
+                            {% endif %}
                         </div>
                     </div>
                     <div class="mt-4">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Título (opcional)</label>
                         {{ form.titulo }}
                     </div>
-                    <button type="submit" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
-                        Subir Imagen
+                    <button type="submit" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+                        <i class="material-icons align-middle">file_upload</i> Subir Imagen
                     </button>
                 </form>
             </div>
@@ -59,19 +67,39 @@
             <!-- Galería existente -->
             <div>
                 <h2 class="text-xl font-semibold mb-4">Imágenes Actuales</h2>
+                
+                {% if messages %}
+                <div class="mb-4">
+                    {% for message in messages %}
+                    <div class="px-4 py-2 rounded {% if message.tags == 'success' %}bg-green-100 text-green-800{% else %}bg-red-100 text-red-800{% endif %}">
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                     {% for imagen in imagenes %}
-                    <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200">
+                    <div class="bg-white rounded-lg shadow-md overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow">
                         <div class="relative">
                             <img src="{{ imagen.imagen.url }}" alt="{{ imagen.titulo|default:'Imagen galería' }}" 
                                 class="w-full h-48 object-cover">
-                            <div class="absolute top-2 right-2">
+                            <div class="absolute top-2 right-2 flex space-x-2">
+                                <form method="post" class="inline">
+                                    {% csrf_token %}
+                                    <button type="submit" name="toggle_activa" value="{{ imagen.id }}"
+                                            class="{% if imagen.activa %}bg-yellow-500 hover:bg-yellow-600{% else %}bg-green-500 hover:bg-green-600{% endif %} text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors"
+                                            title="{% if imagen.activa %}Ocultar imagen{% else %}Mostrar imagen{% endif %}">
+                                        <i class="material-icons text-sm">{% if imagen.activa %}visibility_off{% else %}visibility{% endif %}</i>
+                                    </button>
+                                </form>
                                 <form method="post" class="inline">
                                     {% csrf_token %}
                                     <button type="submit" name="eliminar" value="{{ imagen.id }}"
-                                            class="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600"
-                                            onclick="return confirm('¿Eliminar esta imagen?')">
-                                        ×
+                                            class="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors"
+                                            onclick="return confirm('¿Eliminar esta imagen permanentemente?')"
+                                            title="Eliminar imagen">
+                                        <i class="material-icons text-sm">delete</i>
                                     </button>
                                 </form>
                             </div>
@@ -102,298 +130,27 @@
             </div>
         </div>
     </div>
-    {% endblock %}
 
     <script>
-        // Contador para llevar registro de las imágenes
-        let imageCounter = 0;
-        let imagenesOrdenadas = [];
-        
-        // Función para mostrar/ocultar el menú en móviles
-        function toggleMenu() {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('-translate-x-full');
-            
-            // Agregar/remover clase al body para evitar scroll cuando el menú está abierto
-            document.body.classList.toggle('overflow-hidden');
-        }
-        
-        // Resto del JavaScript permanece igual...
-        // Función para crear un nuevo cuadro de imagen
-        function crearNuevoCuadroImagen(imagenData = null, posicion = null) {
-            imageCounter++;
-            const container = document.getElementById('imagenes-container');
-            const posicionFinal = posicion !== null ? posicion : imageCounter;
-            
-            const nuevoCuadro = document.createElement('div');
-            nuevoCuadro.className = 'bg-gray-50 p-4 rounded-lg border border-gray-200 relative';
-            nuevoCuadro.id = `imagen-${posicionFinal}`;
-            nuevoCuadro.dataset.posicion = posicionFinal;
-            
-            const previewContent = imagenData 
-                ? `<img src="${imagenData.data}" class="w-full h-full object-cover rounded-lg">`
-                : `<span class="text-gray-400">Haz clic para subir</span>`;
-            
-            nuevoCuadro.innerHTML = `
-                <label class="block text-sm font-medium text-gray-700 mb-2">Imagen ${posicionFinal}</label>
-                <div class="flex items-center justify-center w-full">
-                    <label class="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100 transition-colors">
-                        <div id="preview-${posicionFinal}" class="w-full h-full flex items-center justify-center">
-                            ${previewContent}
-                        </div>
-                        <input id="img-${posicionFinal}" type="file" class="hidden" accept="image/*" 
-                               onchange="mostrarPreview(this, 'preview-${posicionFinal}', ${posicionFinal})">
-                    </label>
-                </div>
-                <button onclick="eliminarCuadro('imagen-${posicionFinal}')" 
-                        class="absolute top-2 right-2 bg-red-500 text-white rounded-full w-6 h-6 flex items-center justify-center hover:bg-red-600 transition-colors">
-                    ×
-                </button>
-            `;
-            
-            if (imagenData) {
-                const input = nuevoCuadro.querySelector(`#img-${posicionFinal}`);
-                // Creamos un objeto File simulado para mantener la referencia
-                const file = new File([""], imagenData.name, { type: `image/${imagenData.name.split('.').pop()}` });
-                const dataTransfer = new DataTransfer();
-                dataTransfer.items.add(file);
-                input.files = dataTransfer.files;
-                
-                // Registrar la imagen en el array de orden
-                imagenesOrdenadas[posicionFinal - 1] = {
-                    id: `imagen-${posicionFinal}`,
-                    data: imagenData.data,
-                    name: imagenData.name
-                };
-            }
-            
-            // Insertar en la posición correcta
-            if (posicion !== null) {
-                const cuadros = Array.from(container.children);
-                const cuadroExistente = cuadros.find(c => parseInt(c.dataset.posicion) > posicionFinal);
-                
-                if (cuadroExistente) {
-                    container.insertBefore(nuevoCuadro, cuadroExistente);
-                } else {
-                    container.appendChild(nuevoCuadro);
-                }
-            } else {
-                container.appendChild(nuevoCuadro);
-            }
-            
-            return nuevoCuadro;
-        }
-        
-        // Función para mostrar la preview de la imagen seleccionada
-        function mostrarPreview(input, previewId, posicion) {
-            const preview = document.getElementById(previewId);
-            preview.innerHTML = '';
-            
-            if (input.files && input.files[0]) {
-                const reader = new FileReader();
-                
-                reader.onload = function(e) {
-                    const img = document.createElement('img');
-                    img.src = e.target.result;
-                    img.className = 'w-full h-full object-cover rounded-lg';
-                    preview.innerHTML = '';
-                    preview.appendChild(img);
-                    
-                    // Actualizar el array de orden
-                    imagenesOrdenadas[posicion - 1] = {
-                        id: `imagen-${posicion}`,
-                        data: e.target.result,
-                        name: input.files[0].name
-                    };
-                }
-                
-                reader.readAsDataURL(input.files[0]);
-            }
-        }
-        
-        // Función para eliminar un cuadro de imagen
-        function eliminarCuadro(id) {
-            const cuadro = document.getElementById(id);
-            if (cuadro) {
-                const posicion = parseInt(cuadro.dataset.posicion);
-                
-                // Eliminar del array de orden
-                imagenesOrdenadas[posicion - 1] = null;
-                
-                cuadro.remove();
-                
-                // Reorganizar los números de las imágenes restantes
-                reorganizarNumerosImagenes();
-            }
-        }
-        
-        // Función para reorganizar los números de las imágenes
-        function reorganizarNumerosImagenes() {
-            const cuadros = Array.from(document.querySelectorAll('#imagenes-container > div')).sort((a, b) => {
-                return parseInt(a.dataset.posicion) - parseInt(b.dataset.posicion);
-            });
-            
-            cuadros.forEach((cuadro, index) => {
-                const nuevaPosicion = index + 1;
-                cuadro.dataset.posicion = nuevaPosicion;
-                const label = cuadro.querySelector('label');
+        // Mostrar nombre del archivo seleccionado
+        document.querySelectorAll('input[type="file"]').forEach(input => {
+            input.addEventListener('change', function() {
+                const fileName = this.files[0]?.name || 'Ningún archivo seleccionado';
+                const label = this.parentElement.querySelector('div');
                 if (label) {
-                    label.textContent = `Imagen ${nuevaPosicion}`;
+                    const infoDiv = document.createElement('div');
+                    infoDiv.className = 'mt-1 text-xs text-gray-500';
+                    infoDiv.textContent = `Archivo: ${fileName}`;
+                    
+                    // Eliminar info anterior si existe
+                    const oldInfo = label.querySelector('.file-info');
+                    if (oldInfo) oldInfo.remove();
+                    
+                    infoDiv.classList.add('file-info');
+                    label.appendChild(infoDiv);
                 }
-                
-                // Actualizar IDs y eventos
-                cuadro.id = `imagen-${nuevaPosicion}`;
-                const input = cuadro.querySelector('input[type="file"]');
-                if (input) {
-                    input.id = `img-${nuevaPosicion}`;
-                    input.setAttribute('onchange', `mostrarPreview(this, 'preview-${nuevaPosicion}', ${nuevaPosicion})`);
-                }
-                const preview = cuadro.querySelector('div[id^="preview-"]');
-                if (preview) {
-                    preview.id = `preview-${nuevaPosicion}`;
-                }
-                
-                // Actualizar el array de orden si existe esta imagen
-                if (imagenesOrdenadas[index]) {
-                    imagenesOrdenadas[index].id = `imagen-${nuevaPosicion}`;
-                }
-            });
-            
-            // Compactar el array de orden
-            imagenesOrdenadas = imagenesOrdenadas.filter(img => img !== null);
-        }
-        
-        // Función para actualizar las imágenes (modificada)
-        function actualizarGaleria() {
-            const imagenesParaGuardar = imagenesOrdenadas.filter(img => img !== null);
-            
-            if (imagenesParaGuardar.length === 0) {
-                mostrarNotificacion('Por favor, seleccione al menos una imagen', 'error');
-                return;
-            }
-            
-            // Guardar en localStorage
-            localStorage.setItem('galeriaImagenes', JSON.stringify(imagenesParaGuardar));
-            
-            mostrarNotificacion('¡Galería actualizada con éxito!', 'success');
-        }
-        
-        // Función para mostrar notificaciones
-        function mostrarNotificacion(mensaje, tipo) {
-            const notification = document.createElement('div');
-            notification.className = `fixed top-4 right-4 px-4 py-2 rounded-lg shadow-lg animate-fade-in ${
-                tipo === 'success' ? 'bg-green-500 text-white' : 'bg-red-500 text-white'
-            }`;
-            notification.textContent = mensaje;
-            document.body.appendChild(notification);
-            
-            setTimeout(() => {
-                notification.classList.add('animate-fade-out');
-                setTimeout(() => notification.remove(), 500);
-            }, 3000);
-        }
-        
-        // Inicializar la galería al cargar la página
-        document.addEventListener('DOMContentLoaded', () => {
-            // Configurar el botón del menú hamburguesa
-            document.getElementById('menu-toggle').addEventListener('click', toggleMenu);
-            
-            // Cerrar el menú al hacer clic en un enlace (solo en móviles)
-            if (window.innerWidth < 768) {
-                document.querySelectorAll('#sidebar a').forEach(link => {
-                    link.addEventListener('click', toggleMenu);
-                });
-            }
-            
-            const imagenesGuardadas = JSON.parse(localStorage.getItem('galeriaImagenes')) || [];
-            
-            // Inicializar el array de orden
-            imagenesOrdenadas = [];
-            
-            // Si hay imágenes guardadas, cargarlas en sus posiciones originales
-            if (imagenesGuardadas.length > 0) {
-                imagenesGuardadas.forEach((imagen, index) => {
-                    imagenesOrdenadas[index] = imagen;
-                    crearNuevoCuadroImagen(imagen, index + 1);
-                });
-            } else {
-                // Si no hay imágenes guardadas, crear 6 cuadros vacíos
-                for (let i = 0; i < 6; i++) {
-                    crearNuevoCuadroImagen(null, i + 1);
-                    imagenesOrdenadas[i] = null;
-                }
-            }
-            
-            // Evento para el botón de añadir imagen
-            document.getElementById('add-image-btn').addEventListener('click', () => {
-                const nuevaPosicion = imagenesOrdenadas.length + 1;
-                crearNuevoCuadroImagen(null, nuevaPosicion);
-                imagenesOrdenadas[nuevaPosicion - 1] = null;
             });
         });
     </script>
-
-    <style>
-        /* Animaciones para la notificación */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes fadeOut {
-            from { opacity: 1; transform: translateY(0); }
-            to { opacity: 0; transform: translateY(-20px); }
-        }
-        
-        .animate-fade-in {
-            animation: fadeIn 0.3s ease-out forwards;
-        }
-        
-        .animate-fade-out {
-            animation: fadeOut 0.3s ease-out forwards;
-        }
-        
-        /* Estilo para el área de arrastrar y soltar */
-        [type="file"] + label {
-            transition: all 0.3s ease;
-        }
-        
-        [type="file"] + label:hover {
-            border-color: #33C0F1;
-        }
-        
-        /* Ajustes para móviles */
-        @media (max-width: 767px) {
-            .content {
-                padding-top: 5rem; /* Más espacio para la barra superior */
-            }
-            
-            #sidebar {
-                width: 80%;
-                max-width: 300px;
-                height: 100vh;
-                position: fixed;
-                z-index: 40;
-                top: 0;
-                padding-top: 5rem; /* Espacio para la barra superior */
-            }
-            
-            /* Fondo oscuro cuando el menú está abierto */
-            .sidebar-overlay {
-                position: fixed;
-                top: 0;
-                left: 0;
-                right: 0;
-                bottom: 0;
-                background-color: rgba(0, 0, 0, 0.5);
-                z-index: 30;
-                display: none;
-            }
-            
-            .sidebar-open .sidebar-overlay {
-                display: block;
-            }
-        }
-    </style>
 </body>
 </html>

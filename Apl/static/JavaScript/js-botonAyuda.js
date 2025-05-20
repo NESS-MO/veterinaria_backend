@@ -26,7 +26,7 @@ function addAyudaStyles() {
       visibility: hidden;
       width: 0;
       opacity: 0;
-      background: linear-gradient(135deg, #2563eb, #0891b2);
+      background: linear-gradient(135deg, #22d3ee, #1e40af);
       color: #fff;
       text-align: center;
       border-radius: 6px;

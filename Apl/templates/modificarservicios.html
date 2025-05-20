@@ -6,80 +6,257 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Administrar Servicios - DR.PUL</title>
+  <link rel="icon" href="{% static 'Images/logo.png' %}"/>
   <link rel="stylesheet" href=" {% static 'css/ModServicio.css' %}">
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 <body>
 
   <!-- Sidebar -->
-    <div class="w-full md:w-72 bg-gradient-to-br from-[#33C0F1] to-[#1E2D93] text-white p-7 md:fixed md:h-full top-0 left-0 z-10">
-        <img class="h-24 mx-auto mb-4" src="{% static 'Images/logo2.png' %}" alt="Logo" />
-        <ul class="space-y-3">
+  <div class="w-full md:w-72 bg-gradient-to-br from-[#33C0F1] to-[#1E2D93] text-white p-7 md:fixed md:h-full top-0 left-0 z-10 font-sans"> 
+      <img class="h-24 mx-auto mb-4" src="{% static 'Images/logo2.png' %}" alt="Logo" />
+      <ul class="space-y-4 text-lg">
           <li><a href="{% url 'gestioncitas' %}" class="block hover:bg-white/20 p-2 rounded">Citas Solicitadas</a></li>
           <li><a href="{% url 'registroc' %}" class="block hover:bg-white/20 p-2 rounded">Registro Citas</a></li>
           <li><a href="{% url 'Tipdelasemana' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Tip de la Semana</a></li>
-          <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded">Modificar fotos "Nuestro trabajo"</a></li>
-          <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Servicios</a></li>
-          <li><a href="{% url 'backup' %}">Copia de seguridad</a><li>
-          <li><a href="{% url 'index' %}" class="block hover:bg-white/20 p-2 rounded">Cerrar sesión</a></li>
-        </ul>
-    </div>
-
-  <div class="admin-container">
-    <h1>Administrar Servicios</h1>
-
-    <div class="input-group">
-      <label for="nombreServicio">Nombre del Servicio</label>
-      <input type="text" id="nombreServicio" placeholder="Nombre del Servicio">
-      
-      <label for="imagenServicio">Imagen del Servicio</label>
-      <input type="file" id="imagenServicio" accept="image/*">
-
-      <label for="descripcionServicio">Descripción del Servicio</label>
-      <input type="text" id="descripcionServicio" placeholder="Descripción del Servicio">
-    </div>
-
-    <button onclick="agregarServicio()">Agregar Servicio</button>
-
-    <table>
-      <thead>
-        <tr>
-          <th>Servicio</th>
-          <th>Imagen</th>
-          <th>Descripción</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody id="tablaServicios">
-        <!-- Servicios se cargan aquí -->
-      
-      </tbody>
-    </table>
-   
+          <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Galería</a></li>
+          <li><a href="{% url 'modificarservicio' %}" class="block bg-white/30 hover:bg-white/40 p-2 rounded text-gray-900">Modificar Servicios</a></li>
+           <li><a href="{% url 'backup' %}" class="block hover:bg-white/20 p-2 rounded">Copia de seguridad</a></li>
+          <li><a href="{% url 'index' %}" class="block hover:bg-red-500/80 p-2 rounded">Cerrar sesión</a></li>
+      </ul>
   </div>
 
-  <script>
-    let servicios = [];
+   <div class="admin-container md:ml-80 p-8">
+    <h1 class="text-2xl font-bold mb-6">Administrar Servicios</h1>
 
-    function renderizarServicios() {
-      const tabla = document.getElementById('tablaServicios');
-      tabla.innerHTML = '';
-      servicios.forEach((servicio, index) => {
-        tabla.innerHTML += `
-          <tr>
-            <td>${servicio.nombre}</td>
-            <td><img src="${servicio.imagen}" alt="${servicio.nombre}"></td>
-            <td>${servicio.descripcion}</td>
-            <td>
-              <button onclick="editarServicio(${index})">Editar</button>
-              <button onclick="eliminarServicio(${index})">Eliminar</button>
-            </td>
-          </tr>
-        `;
-      });
+    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+      <h2 class="text-xl font-semibold mb-4">{% if editing %}Editar{% else %}Agregar{% endif %} Servicio</h2>
+      
+      <form id="servicioForm" method="post" enctype="multipart/form-data" action="{% url 'api_servicios' %}">
+      {% csrf_token %}
+      <input type="hidden" id="servicioId" name="servicio_id" value="">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <!-- Sección para el cuadro inicial -->
+          <div class="space-y-4">
+            <h3 class="font-medium text-lg">Cuadro Inicial</h3>
+            
+            <div>
+              <label for="nombreServicio" class="block mb-2">Nombre del Servicio</label>
+              <input type="text" id="nombreServicio" name="nombre" class="w-full p-2 border rounded" required>
+            </div>
+            
+            <div>
+              <label for="imagenCuadro" class="block mb-2">Imagen del Cuadro</label>
+              <input type="file" id="imagenCuadro" name="imagen_cuadro" accept="image/*" class="w-full">
+              <img id="previewImagenCuadro" src="" class="mt-2 max-h-32 hidden">
+            </div>
+            
+            <div class="flex items-center">
+              <input type="checkbox" id="mostrarBotonConsulta" name="mostrar_boton_consulta" class="mr-2" checked>
+              <label for="mostrarBotonConsulta">Mostrar botón de consulta</label>
+            </div>
+          </div>
+          
+          <!-- Sección para la ventana flotante -->
+          <div class="space-y-4">
+            <h3 class="font-medium text-lg">Ventana Flotante</h3>
+            
+            <div>
+              <label for="tituloVentana" class="block mb-2">Título</label>
+              <input type="text" id="tituloVentana" name="titulo_ventana" class="w-full p-2 border rounded" required>
+            </div>
+            
+            <div>
+              <label for="subtituloVentana" class="block mb-2">Subtítulo</label>
+              <input type="text" id="subtituloVentana" name="subtitulo_ventana" class="w-full p-2 border rounded" required>
+            </div>
+            
+            <div>
+              <label for="imagenVentana" class="block mb-2">Imagen</label>
+              <input type="file" id="imagenVentana" name="imagen_ventana" accept="image/*" class="w-full">
+              <img id="previewImagenVentana" src="" class="mt-2 max-h-32 hidden">
+            </div>
+            
+            <div>
+              <label for="contenidoVentana" class="block mb-2">Contenido</label>
+              <textarea id="contenidoVentana" name="contenido_ventana" class="w-full p-2 border rounded" rows="3" required></textarea>
+            </div>
+            
+            <div class="flex items-center">
+              <input type="checkbox" id="mostrarBotonAgendar" name="mostrar_boton_agendar" class="mr-2" checked>
+              <label for="mostrarBotonAgendar">Mostrar botón de agendar</label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="mt-6 flex justify-end space-x-4">
+          <button type="button" onclick="resetForm()" class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400">Cancelar</button>
+          <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+            {% if editing %}Actualizar{% else %}Agregar{% endif %} Servicio
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="bg-white p-6 rounded-lg shadow-md">
+      <h2 class="text-xl font-semibold mb-4">Lista de Servicios</h2>
+      
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white">
+          <thead>
+            <tr class="bg-gray-100">
+              <th class="py-2 px-4 border">Servicio</th>
+              <th class="py-2 px-4 border">Imagen Cuadro</th>
+              <th class="py-2 px-4 border">Botón Consulta</th>
+              <th class="py-2 px-4 border">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="tablaServicios">
+            {% for servicio in servicios %}
+            <tr>
+              <td class="py-2 px-4 border">{{ servicio.nombre }}</td>
+              <td class="py-2 px-4 border">
+                <img src="{{ servicio.imagen_cuadro.url }}" alt="{{ servicio.nombre }}" class="h-16">
+              </td>
+              <td class="py-2 px-4 border text-center">
+                {% if servicio.mostrar_boton_consulta %}
+                <span class="text-green-500">✓</span>
+                {% else %}
+                <span class="text-red-500">✗</span>
+                {% endif %}
+              </td>
+              <td class="py-2 px-4 border">
+                <button onclick="editarServicio({{ servicio.id }})" class="px-3 py-1 bg-yellow-500 text-white rounded hover:bg-yellow-600 mr-2">Editar</button>
+                <button onclick="eliminarServicio({{ servicio.id }})" class="px-3 py-1 bg-red-500 text-white rounded hover:bg-red-600">Eliminar</button>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+<script>
+    // Mostrar previsualización de imágenes
+    document.getElementById('imagenCuadro').addEventListener('change', function(e) {
+        const preview = document.getElementById('previewImagenCuadro');
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+            }
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+
+    document.getElementById('imagenVentana').addEventListener('change', function(e) {
+        const preview = document.getElementById('previewImagenVentana');
+        if (this.files && this.files[0]) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.classList.remove('hidden');
+            }
+            reader.readAsDataURL(this.files[0]);
+        }
+    });
+
+    // Función para editar servicio
+    function editarServicio(id) {
+        fetch(`/api/servicios/${id}/`)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('servicioId').value = data.id;
+                document.getElementById('nombreServicio').value = data.nombre;
+                document.getElementById('mostrarBotonConsulta').checked = data.mostrar_boton_consulta;
+                
+                document.getElementById('tituloVentana').value = data.titulo_ventana;
+                document.getElementById('subtituloVentana').value = data.subtitulo_ventana;
+                document.getElementById('contenidoVentana').value = data.contenido_ventana;
+                document.getElementById('mostrarBotonAgendar').checked = data.mostrar_boton_agendar;
+                
+                // Mostrar imágenes existentes
+                if (data.imagen_cuadro) {
+                    const previewCuadro = document.getElementById('previewImagenCuadro');
+                    previewCuadro.src = data.imagen_cuadro;
+                    previewCuadro.classList.remove('hidden');
+                }
+                
+                if (data.imagen_ventana) {
+                    const previewVentana = document.getElementById('previewImagenVentana');
+                    previewVentana.src = data.imagen_ventana;
+                    previewVentana.classList.remove('hidden');
+                }
+                
+                // Cambiar texto del botón
+                document.querySelector('button[type="submit"]').textContent = 'Actualizar Servicio';
+                
+                // Scroll al formulario
+                document.getElementById('servicioForm').scrollIntoView({ behavior: 'smooth' });
+            })
+            .catch(error => console.error('Error:', error));
     }
-  </script>
-<CENTEr>
-</body>
 
+    // Función para eliminar servicio
+    function eliminarServicio(id) {
+        if (confirm('¿Estás seguro de que deseas eliminar este servicio?')) {
+            fetch(`/api/servicios/${id}/`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+                }
+            })
+            .then(response => {
+                if (response.ok) {
+                    location.reload();
+                }
+            })
+            .catch(error => console.error('Error:', error));
+        }
+    }
+
+    // Función para resetear el formulario
+    function resetForm() {
+        document.getElementById('servicioForm').reset();
+        document.getElementById('servicioId').value = '';
+        document.getElementById('previewImagenCuadro').src = '';
+        document.getElementById('previewImagenCuadro').classList.add('hidden');
+        document.getElementById('previewImagenVentana').src = '';
+        document.getElementById('previewImagenVentana').classList.add('hidden');
+        document.querySelector('button[type="submit"]').textContent = 'Agregar Servicio';
+    }
+
+    // Manejar envío del formulario
+    document.getElementById('servicioForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const formData = new FormData(this);
+        
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert('Servicio guardado correctamente');
+                location.reload();
+            } else {
+                alert('Error: ' + (data.error || 'Error desconocido'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error al guardar el servicio');
+        });
+    });
+</script>
+</body>
 </html>
