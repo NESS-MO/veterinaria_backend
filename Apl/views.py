@@ -106,7 +106,7 @@ def RContrasena(request):
             # Si ocurre alguna excepción al enviar el correo, se muestra un mensaje de error con la descripción
             messages.error(request, f"Error al enviar el correo: {str(e)}")
             # Vuelve a renderizar el formulario de recuperación en caso de error
-            return render(request, '4.1 RecuperarContrasena.html')
+            return render(request, 'RecuperarContrasena.html')
         
     return render(request, "4.1 RecuperarContrasena.html")
 
@@ -124,7 +124,7 @@ def cambia_con(request, token):
         # Si el token es inválido o ha expirado, se muestra un mensaje de error
         messages.error(request, "El enlace de recuperación es inválido o ha expirado.")
         # Se redirige al usuario a la página de recuperación de contraseña para volver a solicitar un nuevo enlace
-        return redirect("recuperar_contraseña")
+        return redirect("4.1 RecuperarContrasena.html")
     
     # Verifica si el método HTTP es POST, lo que indica que se envió el formulario para cambiar la contraseña
     if request.method == 'POST':
@@ -138,7 +138,7 @@ def cambia_con(request, token):
             # Si no coinciden, muestra un mensaje de error
             messages.error(request, "Las contraseñas no coinciden.")
             # Vuelve a renderizar el formulario para cambiar la contraseña
-            return render(request, 'accounts/cambia_contraseña.html')
+            return render(request, 'cambia_contraseña.html')
         
         # Si las contraseñas coinciden, se actualiza la contraseña del usuario,
         # utilizando make_password para encriptarla adecuadamente
@@ -155,8 +155,7 @@ def cambia_con(request, token):
     return render(request, 'cambia_contraseña.html')
 
 
-def RContrasenaDos(requets):
-    return render(requets, "4.2 RecuperarContrasena.html")
+
 
 def modificar(request):
     return gestion_galeria(request)

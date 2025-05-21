@@ -9,7 +9,6 @@ urlpatterns = [
     path('Agendar/', views.Agendar, name='agendar'),
     path('login/', views.login, name='login'),
     path('RecuperarContrasena/', views.RContrasena, name='RContrasena'),
-    path('RecuperarContrasena2/', views.RContrasenaDos, name='RContrasenaDos'),
     path('Galeria/', views.gestion_galeria, name='Galeria'),
     path('Tipdelasemana/', views.gestion_tip, name='Tipdelasemana'),
     path('Gestioncitas/', views.gestion, name='gestioncitas'),
@@ -22,7 +21,7 @@ urlpatterns = [
     path('backup/', views.backup, name='backup'),
     path('api/servicios/', views.api_servicios, name='api_servicios'),
     path('api/servicios/<int:servicio_id>/', views.api_servicios, name='api_servicio_detail'),
-    path('cambia_contraseña/<str:token>/', views.cambia_con, name='cambia_con'), #vista para cambiar contraseña con token, en name se le pasa el token para contsruir la url
+    path('cambia_contraseña/<str:token>/', views.cambia_con, name='cambia_con'),
   
 
 
