@@ -315,7 +315,6 @@ def api_servicios(request, servicio_id=None):
                 'id': servicio.id,
                 'nombre': servicio.nombre,
                 'imagen_cuadro': servicio.imagen_cuadro.url if servicio.imagen_cuadro else '',
-                'mostrar_boton_consulta': servicio.mostrar_boton_consulta,
                 'titulo_ventana': servicio.titulo_ventana,
                 'subtitulo_ventana': servicio.subtitulo_ventana,
                 'imagen_ventana': servicio.imagen_ventana.url if servicio.imagen_ventana else '',
@@ -329,7 +328,6 @@ def api_servicios(request, servicio_id=None):
                 'id': s.id,
                 'nombre': s.nombre,
                 'imagen_cuadro': s.imagen_cuadro.url if s.imagen_cuadro else '',
-                'mostrar_boton_consulta': s.mostrar_boton_consulta,
             } for s in servicios]
             return JsonResponse(data, safe=False)
     
@@ -342,7 +340,6 @@ def api_servicios(request, servicio_id=None):
                 # Actualizar servicio existente
                 servicio = Servicio.objects.get(id=data['servicio_id'])
                 servicio.nombre = data.get('nombre', servicio.nombre)
-                servicio.mostrar_boton_consulta = data.get('mostrar_boton_consulta', 'off') == 'on'
                 
                 servicio.titulo_ventana = data.get('titulo_ventana', servicio.titulo_ventana)
                 servicio.subtitulo_ventana = data.get('subtitulo_ventana', servicio.subtitulo_ventana)
@@ -360,7 +357,6 @@ def api_servicios(request, servicio_id=None):
                 servicio = Servicio.objects.create(
                     nombre=data['nombre'],
                     imagen_cuadro=files['imagen_cuadro'],
-                    mostrar_boton_consulta=data.get('mostrar_boton_consulta', 'off') == 'on',
                     titulo_ventana=data['titulo_ventana'],
                     subtitulo_ventana=data['subtitulo_ventana'],
                     imagen_ventana=files['imagen_ventana'],

@@ -24,7 +24,22 @@
         <li><a href="{% url 'index' %}" class="block hover:bg-red-500/80 p-2 rounded">Cerrar sesión</a></li>
       </ul>
   </div>
-
+<!-- Breadcrumb -->
+<nav class="text-sm text-gray-600 px-4 md:ml-72 mt-4" aria-label="Breadcrumb">
+  <ol class="flex items-center space-x-2">
+    <li>
+      <a href="{% url 'index' %}" class="text-blue-600 hover:underline flex items-center">
+        <!-- Icono casita -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9-9 9 9M4 10v10a1 1 0 001 1h3m10-11v10a1 1 0 01-1 1h-3m-4 0h4" />
+        </svg>
+        Inicio
+      </a>
+    </li>
+    <li><span class="mx-1">/</span></li>
+    <li class="text-gray-500">Modificar Tip de la Semana</li>
+  </ol>
+</nav>
   <div class="main-content fade-in">
     <div class="content-container">
       <form id="tipForm" method="POST" enctype="multipart/form-data">
