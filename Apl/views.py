@@ -1,10 +1,8 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from .models import Administrador, Cliente 
 from django.shortcuts import get_object_or_404
-from .forms import craeteNewTask
-from datetime import date, timedelta
-
+from .forms import DatosCliente
 # Create your views here.
 
 def index(request): 
@@ -14,12 +12,28 @@ def servicios(request):
     return render(request, "2. Servicios.html" )
 
 def Agendar(request):
-    min_date = date.today().strftime('%Y-%m-%d')
-    max_date = (date.today() + timedelta(days=60)).strftime('%Y-%m-%d')
-    return render(request, "3. Agendar.html", {
-        'min_date': min_date,
-        'max_date': max_date
-    })
+    if request.method == 'POST':
+        try:
+            # Crear el cliente directamente con los datos del formulario
+            Cliente.objects.create(
+                primer_nombre=request.POST['primer_nombre'],
+                primer_apellido=request.POST['primer_apellido'],
+                tipo_documento=request.POST['tipo_documento'],
+                numero_documento=request.POST['numero_documento'],
+                correo_electronico=request.POST['correo_electronico'],
+                telefono=request.POST['telefono']
+            )
+            messages.success(request, "Cliente registrado exitosamente")
+            return redirect('confirmarcion')  # Redirige a confirmación
+            
+        except Exception as e:
+            messages.error(request, f"Error al registrar: {str(e)}")
+    
+    # Si es GET, muestra el formulario vacío
+    return render(request, '3. Agendar.html')     
+
+def confirmar(request):
+    return render(request, "Confirmacion.html")
 
 def login(request):
     return render(request, "4. login.html")

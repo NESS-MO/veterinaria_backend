@@ -1,10 +1,7 @@
 from ftplib import MAXLINE
 from django import forms 
-
-class craeteNewTask(forms.Form):
-    nombre = forms.CharField(label="nombre de la persona", max_length=250)
-    apellido = forms.CharField(label="segundo nombre ", max_length=250)
-
+from django.core.validators import MinLengthValidator, EmailValidator
+from .models import Cliente
 from .models import ImagenGaleria
 
 class ImagenGaleriaForm(forms.ModelForm):
@@ -26,3 +23,61 @@ class ImagenGaleriaForm(forms.ModelForm):
             'class': 'border rounded px-2 py-1 w-full',
             'placeholder': 'Título opcional'
         })
+        
+class DatosCliente(forms.Form):
+    class Meta:
+        model = Cliente
+        fields = [
+            'primer_nombre', 
+            'primer_apellido', 
+            'tipo_documento', 
+            'correo_electronico', 
+            'telefono'
+            'numero_documento'
+        ]
+        widgets = {
+            'primer_nombre': forms.TextInput(attrs={
+                'placeholder': 'Ingresa tu nombre',
+                'pattern': '[A-Za-záéíóúÁÉÍÓÚñÑ ]+',
+                'title': 'Solo letras y espacios'
+            }),
+            'primer_apellido': forms.TextInput(attrs={
+                'placeholder': 'Ingresa tu apellido',
+                'pattern': '[A-Za-záéíóúÁÉÍÓÚñÑ ]{2,50}',
+                'title': 'Solo letras (entre 2 y 50 caracteres)'
+            }),
+            'tipo_documento': forms.Select(attrs={
+                'required': 'required'
+            }),
+            'correo_electronico': forms.EmailInput(attrs={
+                'placeholder': 'Ingresa tu correo electrónico',
+                'required': 'required'
+            }),
+            'telefono': forms.TextInput(attrs={
+                'placeholder': 'Ingresa tu número de teléfono',
+                'pattern': '[0-9]{10}',
+                'title': '10 dígitos numéricos',
+                'required': 'required'
+            }),
+            'numero_documento': forms.TextInput(attrs={
+                'placeholder': 'Ingresa tu número de documento',
+                'pattern': '[0-9]{6,12}|[A-Za-z]{1,2}[0-9]{4,8}',
+                'title': 'Formato: 6-12 dígitos o letras + números para extranjería'
+            }),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        super(DatosCliente, self).__init__(*args, **kwargs)
+        # Asegurarnos de que los campos requeridos coincidan con el frontend
+        if 'primer_nombre' in self.fields: 
+            self.fields['primer_nombre'].required = True
+        if 'primer_apellido' in self.fields:
+            self.fields['primer_apellido'].required = True
+        if 'tipo_documento' in self.fields:
+            self.fields['tipo_documento'].required = True
+        if 'correo_electronico' in self.fields:    
+            self.fields['correo_electronico'].required = True
+        if 'telefono' in self.fields: 
+            self.fields['telefono'].required = True
+        if 'numero_docuemnto' in self.fields:
+            self.fields['numero_docuemnto'].required = True

@@ -21,7 +21,7 @@
             <li><a href="{% url 'Tipdelasemana' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Tip de la Semana</a></li>
             <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Galería</a></li>
             <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Servicios</a></li>
-             <li><a href="{% url 'backup' %}" class="block hover:bg-white/20 p-2 rounded">Copia de seguridad</a></li>
+            <li><a href="{% url 'backup' %}" class="block hover:bg-white/20 p-2 rounded">Copia de seguridad</a></li>
             <li><a href="{% url 'index' %}" class="block hover:bg-red-500/80 p-2 rounded">Cerrar sesión</a></li>
         </ul>
     </div>
@@ -84,12 +84,23 @@
                     <th>Acciones</th>
                 </tr>
             </thead>
-            <tbody></tbody>
+            <tbody>
+                <tr>
+                    <th>{{ citas.name}}</th>
+                    <th>Correo</th>
+                    <th>Teléfono</th>
+                    <th>Mascota</th>
+                    <th>Fecha</th>
+                    <th>Hora</th>
+                    <th>Servicios</th>
+                    <th>Acciones</th>
+                </tr>
+            </tbody>
         </table>
     </section>
 
     <script>
-       document.addEventListener('DOMContentLoaded', () => {
+    document.addEventListener('DOMContentLoaded', () => {
     const loadingElement = document.getElementById('loading');
     const tablaCitas = document.getElementById('tabla-citas').getElementsByTagName('tbody')[0];
     const toggleBtn = document.getElementById('toggle-filtros');
