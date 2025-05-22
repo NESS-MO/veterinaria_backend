@@ -11,7 +11,6 @@
     <link rel="stylesheet" href="{% static 'css/GestionCitas.css' %}">
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Estilos CSS actualizados */
         .table-container {
             margin-left: 19rem;
             padding: 2rem;
@@ -87,6 +86,12 @@
             font-size: 0.875rem;
             margin-top: 0.25rem;
         }
+        #passwordFields {
+            transition: all 0.3s ease;
+        }
+        .hidden {
+            display: none !important;
+        }
     </style>
 </head>
 <body>
@@ -158,7 +163,7 @@
         <!-- Botón para agregar nuevo usuario -->
         <div class="mt-6">
             <button id="btnNuevoUsuario" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-                <i class="fas fa-plus-circle"></i> Agregar Nuevo Usuario
+                <i class="fas fa-plus-circle"></i> Agregar Nuevo Administrador
             </button>
         </div>
     </div>
@@ -200,20 +205,23 @@
                     <div id="documentoError" class="error-message"></div>
                 </div>
                 
-                <div class="form-group relative">
-                    <label for="inputPassword" class="block text-sm font-medium text-gray-700">Contraseña *</label>
-                    <input type="password" name="password" id="inputPassword" required
-                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                    <i class="fas fa-eye password-toggle" onclick="togglePassword('inputPassword')"></i>
-                    <div id="passwordError" class="error-message"></div>
-                </div>
-                
-                <div class="form-group relative">
-                    <label for="inputConfirmPassword" class="block text-sm font-medium text-gray-700">Confirmar Contraseña *</label>
-                    <input type="password" name="confirm_password" id="inputConfirmPassword" required
-                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                    <i class="fas fa-eye password-toggle" onclick="togglePassword('inputConfirmPassword')"></i>
-                    <div id="confirmPasswordError" class="error-message"></div>
+                <!-- Campos de contraseña (solo visibles en creación) -->
+                <div id="passwordFields">
+                    <div class="form-group relative">
+                        <label for="inputPassword" class="block text-sm font-medium text-gray-700">Contraseña *</label>
+                        <input type="password" name="password" id="inputPassword" required
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <i class="fas fa-eye password-toggle" onclick="togglePassword('inputPassword')"></i>
+                        <div id="passwordError" class="error-message"></div>
+                    </div>
+                    
+                    <div class="form-group relative">
+                        <label for="inputConfirmPassword" class="block text-sm font-medium text-gray-700">Confirmar Contraseña *</label>
+                        <input type="password" name="confirm_password" id="inputConfirmPassword" required
+                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                        <i class="fas fa-eye password-toggle" onclick="togglePassword('inputConfirmPassword')"></i>
+                        <div id="confirmPasswordError" class="error-message"></div>
+                    </div>
                 </div>
                 
                 <div class="flex items-center">
@@ -236,21 +244,21 @@
         </div>
     </div>
 
-    <!-- JavaScript Completo Actualizado -->
+    <!-- JavaScript Completo -->
     <script>
         // Variables globales
         let isEditMode = false;
         let currentDocumento = '';
 
-        // ==================== FUNCIONES DEL MODAL ====================
+        // Funciones del modal
         function abrirModal() {
             document.getElementById('usuarioModal').style.display = 'block';
-            document.body.style.overflow = 'hidden'; // Bloquear scroll
+            document.body.style.overflow = 'hidden';
         }
 
         function cerrarModal() {
             document.getElementById('usuarioModal').style.display = 'none';
-            document.body.style.overflow = 'auto'; // Restaurar scroll
+            document.body.style.overflow = 'auto';
             resetForm();
         }
 
@@ -266,7 +274,7 @@
             }
         }
 
-        // ==================== FUNCIONES DEL FORMULARIO ====================
+        // Funciones del formulario
         function resetForm() {
             const form = document.getElementById('usuarioForm');
             form.reset();
@@ -277,15 +285,13 @@
             document.getElementById('modalTitle').textContent = 'Nuevo Administrador';
             document.getElementById('submitButton').textContent = 'Crear';
             
-            // Habilitar y requerir campos de contraseña
-            document.getElementById('inputDocumentoLogin').readOnly = false;
+            // Mostrar campos de contraseña y hacerlos requeridos
+            document.getElementById('passwordFields').style.display = 'block';
             document.getElementById('inputPassword').required = true;
             document.getElementById('inputConfirmPassword').required = true;
             
-            // Restaurar labels
-            document.querySelectorAll('label[for^="inputPassword"]').forEach(el => {
-                el.textContent = el.textContent.replace(' (dejar en blanco para no cambiar)', '');
-            });
+            // Habilitar edición de documento
+            document.getElementById('inputDocumentoLogin').readOnly = false;
         }
 
         function clearErrors() {
@@ -294,102 +300,20 @@
             });
         }
 
-        function validateForm() {
-            let isValid = true;
-            clearErrors();
-
-            // Validar campos requeridos
-            const requiredFields = [
-                'inputNombre', 'inputCorreo', 
-                'inputTelefono', 'inputDocumentoLogin'
-            ];
-
-            if (!isEditMode) {
-                requiredFields.push('inputPassword', 'inputConfirmPassword');
-            }
-
-            requiredFields.forEach(fieldId => {
-                const field = document.getElementById(fieldId);
-                if (!field.value.trim()) {
-                    document.getElementById(`${fieldId}Error`).textContent = 'Este campo es requerido';
-                    isValid = false;
-                }
-            });
-
-            // Validar formato de correo
-            const email = document.getElementById('inputCorreo').value;
-            if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                document.getElementById('inputCorreoError').textContent = 'Ingrese un correo válido';
-                isValid = false;
-            }
-
-            // Validar contraseñas
-            const password = document.getElementById('inputPassword').value;
-            const confirmPassword = document.getElementById('inputConfirmPassword').value;
-            
-            if (!isEditMode || password) {
-                if (password && password.length < 8) {
-                    document.getElementById('passwordError').textContent = 'La contraseña debe tener al menos 8 caracteres';
-                    isValid = false;
-                }
-                
-                if (password !== confirmPassword) {
-                    document.getElementById('confirmPasswordError').textContent = 'Las contraseñas no coinciden';
-                    isValid = false;
-                }
-            }
-
-            return isValid;
-        }
-
-        // ==================== FUNCIONES DE API ====================
-        async function fetchWithCSRF(url, options = {}) {
-            const defaults = {
-                headers: {
-                    'X-CSRFToken': '{{ csrf_token }}',
-                    'Accept': 'application/json',
-                },
-                credentials: 'same-origin'
-            };
-
-            const config = {
-                ...defaults,
-                ...options,
-                headers: {
-                    ...defaults.headers,
-                    ...options.headers
-                }
-            };
-
-            try {
-                const response = await fetch(url, config);
-                
-                // Verificar si la respuesta es JSON
-                const contentType = response.headers.get('content-type');
-                if (!contentType || !contentType.includes('application/json')) {
-                    const errorText = await response.text();
-                    throw new Error(`El servidor respondió con: ${errorText.substring(0, 100)}...`);
-                }
-
-                const data = await response.json();
-
-                if (!response.ok) {
-                    throw new Error(data.message || `Error ${response.status}`);
-                }
-
-                return data;
-            } catch (error) {
-                console.error('Error en la solicitud:', error);
-                throw error;
-            }
-        }
-
-        // ==================== FUNCIONES PRINCIPALES ====================
+        // Funciones de negocio
         async function cargarUsuarioParaEditar(documento) {
             try {
-                const data = await fetchWithCSRF(`/usuarios/editar/${documento}/`, {
-                    method: 'GET'
+                const response = await fetch(`/usuarios/editar/${documento}/`, {
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                    },
                 });
+                
+                if (!response.ok) {
+                    throw new Error(`Error ${response.status}`);
+                }
+                
+                const data = await response.json();
 
                 // Configurar modal en modo edición
                 isEditMode = true;
@@ -405,20 +329,18 @@
                 document.getElementById('inputDocumentoLogin').value = data.documento;
                 document.getElementById('inputActivo').checked = data.is_active;
                 
-                // Configuración especial para edición
-                document.getElementById('inputDocumentoLogin').readOnly = true;
+                // Ocultar campos de contraseña en edición
+                document.getElementById('passwordFields').style.display = 'none';
                 document.getElementById('inputPassword').required = false;
                 document.getElementById('inputConfirmPassword').required = false;
                 
-                document.querySelectorAll('label[for^="inputPassword"]').forEach(el => {
-                    if (!el.textContent.includes('(dejar en blanco')) {
-                        el.textContent += ' (dejar en blanco para no cambiar)';
-                    }
-                });
-
+                // Bloquear edición de documento
+                document.getElementById('inputDocumentoLogin').readOnly = true;
+                
                 abrirModal();
             } catch (error) {
-                Swal.fire('Error', error.message || 'No se pudieron cargar los datos del usuario', 'error');
+                console.error('Error al cargar usuario:', error);
+                Swal.fire('Error', 'No se pudieron cargar los datos del usuario', 'error');
             }
         }
 
@@ -436,9 +358,19 @@
                 });
 
                 if (result.isConfirmed) {
-                    await fetchWithCSRF(`/usuarios/eliminar/${documento}/`, {
-                        method: 'POST'
+                    const response = await fetch(`/usuarios/eliminar/${documento}/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': '{{ csrf_token }}',
+                            'Content-Type': 'application/json',
+                        },
                     });
+                    
+                    if (!response.ok) {
+                        throw new Error(`Error ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
                     
                     Swal.fire(
                         '¡Eliminado!',
@@ -447,23 +379,60 @@
                     ).then(() => window.location.reload());
                 }
             } catch (error) {
-                Swal.fire('Error', error.message || 'Error al eliminar el usuario', 'error');
+                console.error('Error al eliminar usuario:', error);
+                Swal.fire('Error', 'No se pudo eliminar el usuario', 'error');
             }
         }
 
-        async function cambiarEstadoUsuario(documento) {
-            try {
-                await fetchWithCSRF(`/usuarios/toggle-estado/${documento}/`, {
-                    method: 'POST'
-                });
-                window.location.reload();
-            } catch (error) {
-                Swal.fire('Error', error.message || 'Error al cambiar el estado', 'error');
+        function validarFormulario() {
+            let isValid = true;
+            clearErrors();
+
+            // Validar campos requeridos (todos menos contraseña en edición)
+            const camposRequeridos = [
+                'inputNombre', 'inputCorreo', 
+                'inputTelefono', 'inputDocumentoLogin'
+            ];
+
+            // Solo validar contraseñas en modo creación
+            if (!isEditMode) {
+                camposRequeridos.push('inputPassword', 'inputConfirmPassword');
+                
+                const password = document.getElementById('inputPassword').value;
+                const confirmPassword = document.getElementById('inputConfirmPassword').value;
+                
+                if (password.length < 8) {
+                    document.getElementById('passwordError').textContent = 'Mínimo 8 caracteres';
+                    isValid = false;
+                }
+                
+                if (password !== confirmPassword) {
+                    document.getElementById('confirmPasswordError').textContent = 'Las contraseñas no coinciden';
+                    isValid = false;
+                }
             }
+
+            // Validar campos requeridos
+            camposRequeridos.forEach(id => {
+                const campo = document.getElementById(id);
+                if (!campo.value.trim()) {
+                    document.getElementById(`${id}Error`).textContent = 'Campo obligatorio';
+                    isValid = false;
+                }
+            });
+
+            // Validar formato de correo
+            const email = document.getElementById('inputCorreo').value;
+            if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                document.getElementById('inputCorreoError').textContent = 'Ingrese un correo válido';
+                isValid = false;
+            }
+
+            return isValid;
         }
 
         async function enviarFormulario() {
-            if (!validateForm()) return;
+            if (!validarFormulario()) return;
 
             const formData = new FormData(document.getElementById('usuarioForm'));
             const url = isEditMode 
@@ -471,10 +440,19 @@
                 : `/usuarios/crear/`;
 
             try {
-                const data = await fetchWithCSRF(url, {
+                const response = await fetch(url, {
                     method: 'POST',
-                    body: formData
+                    body: formData,
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',
+                    },
                 });
+
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || `Error ${response.status}`);
+                }
 
                 if (data.success) {
                     Swal.fire({
@@ -495,15 +473,16 @@
                     });
                 }
             } catch (error) {
-                Swal.fire(
-                    'Error',
-                    error.message || 'Ocurrió un error al procesar la solicitud',
-                    'error'
-                );
+                console.error('Error al enviar formulario:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: error.message || 'Ocurrió un error al procesar la solicitud',
+                    icon: 'error'
+                });
             }
         }
 
-        // ==================== INICIALIZACIÓN ====================
+        // Event Listeners
         document.addEventListener('DOMContentLoaded', function() {
             // Botón nuevo usuario
             document.getElementById('btnNuevoUsuario').addEventListener('click', function(e) {
@@ -524,7 +503,7 @@
                 }
                 // Cambiar estado
                 else if (e.target.closest('.toggle-estado')) {
-                    cambiarEstadoUsuario(e.target.closest('.toggle-estado').dataset.documento);
+                    // Implementa esta función si es necesario
                 }
             });
 
@@ -541,7 +520,7 @@
                 }
             });
 
-            // Cerrar modal con escape key
+            // Cerrar modal con tecla Escape
             document.addEventListener('keydown', function(e) {
                 if (e.key === 'Escape') {
                     cerrarModal();

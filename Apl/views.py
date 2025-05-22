@@ -323,39 +323,26 @@ def editar_usuario(request, documento):
     
     if request.method == 'POST':
         try:
-            # Actualizar campos básicos
+            # Actualizar solo estos campos (no contraseña)
             admin.nombre_completo = request.POST.get('nombre_completo')
             admin.correo_electronico = request.POST.get('correo_electronico')
             admin.telefono = request.POST.get('telefono')
             admin.is_active = request.POST.get('is_active', False) == 'on'
-            
-            # Actualizar contraseña solo si se proporcionó
-            nueva_password = request.POST.get('password')
-            if nueva_password:
-                admin.password = make_password(nueva_password)
-            
             admin.save()
             
-            return JsonResponse({
-                'success': True,
-                'message': 'Usuario actualizado correctamente'
-            })
+            return JsonResponse({'success': True})
             
         except Exception as e:
-            return JsonResponse({
-                'success': False,
-                'message': str(e)
-            }, status=400)
+            return JsonResponse({'success': False, 'error': str(e)})
     
-    elif request.method == 'GET':
-        # Para solicitudes AJAX (obtener datos del usuario)
-        return JsonResponse({
-            'documento': admin.documento,
-            'nombre_completo': admin.nombre_completo,
-            'correo_electronico': admin.correo_electronico,
-            'telefono': admin.telefono,
-            'is_active': admin.is_active
-        })
+    # GET request
+    return JsonResponse({
+        'documento': admin.documento,
+        'nombre_completo': admin.nombre_completo,
+        'correo_electronico': admin.correo_electronico,
+        'telefono': admin.telefono,
+        'is_active': admin.is_active
+    })
 
 def toggle_estado_usuario(request, documento):
     if request.method == 'POST':
