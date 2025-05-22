@@ -21,8 +21,31 @@ def Agendar(request):
         'max_date': max_date
     })
 
+# views.py
+from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
+from django.shortcuts import render, redirect
+from .forms import LoginForm
+
 def login(request):
-    return render(request, "4. login.html")
+    if request.method == 'POST':
+        form = LoginForm(request, data=request.POST)
+        if form.is_valid():
+            username = form.cleaned_data.get('username')
+            password = form.cleaned_data.get('password')
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                auth_login(request, user)
+                return redirect('gestioncitas')
+            else:
+                form.add_error(None, "Documento o contraseña incorrectos")
+    else:
+        form = LoginForm()
+    
+    return render(request, "4. login.html", {'form': form})
+
+def logout(request):
+    auth_logout(request)
+    return redirect('index')
 
 def RContrasena(requets):
     return render(requets, "4.1 RecuperarContrasena.html")
@@ -47,6 +70,10 @@ def ModificarS(request):
 
 def RegistroC(request):
     return render(request, "registrocitas.html")
+
+def usuarios(request):
+    return render(request, "GestionUsuarios.html")
+
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
