@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
-from django.http import JsonResponse
-from .models import Administrador, Cliente 
+from django.http import JsonResponse, HttpResponse
+from django.contrib import messages
+from .models import Administrador, Cliente, Mascota 
 from django.shortcuts import get_object_or_404
-from .forms import DatosCliente
+from .forms import DatosMascota
 # Create your views here.
 
 def index(request): 
@@ -14,8 +15,8 @@ def servicios(request):
 def Agendar(request):
     if request.method == 'POST':
         try:
-            # Crear el cliente directamente con los datos del formulario
-            Cliente.objects.create(
+            # Procesar cliente
+            cliente = Cliente.objects.create(
                 primer_nombre=request.POST['primer_nombre'],
                 primer_apellido=request.POST['primer_apellido'],
                 tipo_documento=request.POST['tipo_documento'],
@@ -23,13 +24,42 @@ def Agendar(request):
                 correo_electronico=request.POST['correo_electronico'],
                 telefono=request.POST['telefono']
             )
-            messages.success(request, "Cliente registrado exitosamente")
-            return redirect('confirmarcion')  # Redirige a confirmación
             
+            # Procesar mascota
+            mascota_data = {
+                'mascota': request.POST.get('mascota'),
+                'clase_mascota': request.POST.get('clase-mascota'),
+                'edad_numero': request.POST.get('edad-numero'),
+                'edad_unidad': request.POST.get('edad-unidad'),
+                'raza_mascota': request.POST.get('raza-mascota'),
+                'otra_raza': request.POST.get('otra-raza')
+            }
+            
+            mascota_form = DatosMascota(mascota_data)
+            
+            if mascota_form.is_valid():
+                # Determinar la raza final
+                raza = mascota_form.cleaned_data['otra_raza'] if mascota_form.cleaned_data['raza_mascota'] == 'otro' else mascota_form.cleaned_data['raza_mascota']
+                
+                # Crear la mascota
+                Mascota.objects.create(
+                    nombre_mascota=mascota_form.cleaned_data['mascota'],
+                    especie=mascota_form.cleaned_data['clase_mascota'],
+                    raza=raza,
+                    edad=f"{mascota_form.cleaned_data['edad_numero']} {mascota_form.cleaned_data['edad_unidad']}",
+                    cliente=cliente
+                )
+                
+                messages.success(request, "Cita enviada exitosamente")
+                return redirect('/Confirmacion')
+            else:
+                for field, errors in mascota_form.errors.items():
+                    for error in errors:
+                        messages.error(request, f"{field}: {error}")
+                        
         except Exception as e:
             messages.error(request, f"Error al registrar: {str(e)}")
     
-    # Si es GET, muestra el formulario vacío
     return render(request, '3. Agendar.html')     
 
 def confirmar(request):

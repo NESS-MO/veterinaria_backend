@@ -1,7 +1,7 @@
 from ftplib import MAXLINE
 from django import forms 
 from django.core.validators import MinLengthValidator, EmailValidator
-from .models import Cliente
+from .models import Cliente, Mascota
 from .models import ImagenGaleria
 
 class ImagenGaleriaForm(forms.ModelForm):
@@ -80,4 +80,96 @@ class DatosCliente(forms.Form):
         if 'telefono' in self.fields: 
             self.fields['telefono'].required = True
         if 'numero_docuemnto' in self.fields:
-            self.fields['numero_docuemnto'].required = True
+            self.fields['numero_docuemnto'].required = True     
+            
+class DatosMascota(forms.Form):
+    mascota = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Ingresa el nombre de tu mascota',
+            'pattern': '[A-Za-záéíóúÁÉÍÓÚñÑ ]{2,30}',
+            'title': 'Solo letras (entre 2 y 30 caracteres)',
+            'required': 'required',
+            'id': 'mascota'
+        })
+    )
+    
+    clase_mascota = forms.ChoiceField(
+        widget=forms.Select(attrs={
+            'required': 'required',
+            'id': 'clase-mascota'
+        }),
+        choices=[('', 'Selecciona la especie de tu mascota'), ('Perro', 'Perro'), ('Gato', 'Gato')]
+    )
+    
+    edad_numero = forms.IntegerField(
+        widget=forms.NumberInput(attrs={
+            'placeholder': 'Número',
+            'min': '0',
+            'max': '30',
+            'required': 'required',
+            'style': 'width: 60%; display: inline-block;',
+            'id': 'edad-numero'
+        })
+    )
+    
+    edad_unidad = forms.ChoiceField(
+        widget=forms.Select(attrs={
+            'style': 'width: 35%; display: inline-block; margin-left: 5%;',
+            'id': 'edad-unidad'
+        }),
+        choices=[('meses', 'Meses'), ('años', 'Años')],
+        initial='meses'
+    )
+    
+    raza_mascota = forms.ChoiceField(
+        widget=forms.Select(attrs={
+            'required': 'required',
+            'id': 'raza-mascota'
+        }),
+        choices=[]
+    )
+    
+    otra_raza = forms.CharField(
+        required=False,
+        widget=forms.TextInput(attrs={
+            'placeholder': 'Especifique la raza',
+            'id': 'otra-raza',
+            'style': 'display: none;'
+        })
+    )
+
+    def __init__(self, *args, **kwargs):
+        super(DatosMascota, self).__init__(*args, **kwargs)
+        self.fields['raza_mascota'].choices = self.get_raza_choices()
+        
+    def get_raza_choices(self):
+        return [
+            ('', 'Seleccione la raza'),
+            ('Criollo', 'Criollo'),
+            ('Labrador Retriever', 'Labrador Retriever'),
+            ('Bulldog Francés', 'Bulldog Francés'),
+            ('Poodle', 'Poodle'),
+            ('Golden Retriever', 'Golden Retriever'),
+            ('Pug', 'Pug'),
+            ('Bulldog Inglés', 'Bulldog Inglés'),
+            ('Beagle', 'Beagle'),
+            ('Rottweiler', 'Rottweiler'),
+            ('Pastor Alemán', 'Pastor Alemán'),
+            ('Persa', 'Persa'),
+            ('Siamés', 'Siamés'),
+            ('Bengalí', 'Bengalí'),
+            ('Maine Coon', 'Maine Coon'),
+            ('Ragdoll', 'Ragdoll'),
+            ('Esfinge', 'Esfinge'),
+            ('Angora', 'Angora'),
+            ('otro', 'Otro (especificar)')
+        ]
+
+    def clean(self):
+        cleaned_data = super().clean()
+        
+        # Validación para raza "otro"
+        if cleaned_data.get('raza_mascota') == 'otro' and not cleaned_data.get('otra_raza'):
+            self.add_error('otra_raza', 'Por favor especifique la raza')
+        
+        return cleaned_data

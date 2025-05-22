@@ -1,6 +1,5 @@
 from django.db import models
 from django.core.validators import MinLengthValidator, EmailValidator
-
 from Apl.models.administrador import Administrador
 
 
