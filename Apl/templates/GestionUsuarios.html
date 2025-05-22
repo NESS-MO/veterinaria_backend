@@ -4,29 +4,550 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Citas - Veterinaria</title>
+    <title>Gestión de Usuarios - Veterinaria</title>
     <link rel="icon" href="{% static 'Images/logo.png' %}"/>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href=" {% static 'css/GestionCitas.css' %}">
+    <link rel="stylesheet" href="{% static 'css/GestionCitas.css' %}">
     <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Estilos CSS actualizados */
+        .table-container {
+            margin-left: 19rem;
+            padding: 2rem;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #f8f9fa;
+            font-weight: 600;
+            color:black;
+        }
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+        .action-buttons button {
+            margin-right: 5px;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 100;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 5% auto;
+            padding: 25px;
+            border: 1px solid #888;
+            width: 50%;
+            max-width: 600px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        .close:hover {
+            color: black;
+        }
+        .password-toggle {
+            cursor: pointer;
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .form-group {
+            margin-bottom: 1.5rem;
+            position: relative;
+        }
+        .error-message {
+            color: #e53e3e;
+            font-size: 0.875rem;
+            margin-top: 0.25rem;
+        }
+    </style>
 </head>
 <body>
     <!-- Sidebar -->
     <div class="w-full md:w-72 bg-gradient-to-br from-[#33C0F1] to-[#1E2D93] text-white p-7 md:fixed md:h-full top-0 left-0 z-10 font-sans"> 
         <img class="h-24 mx-auto mb-4" src="{% static 'Images/logo2.png' %}" alt="Logo" />
         <ul class="space-y-4 text-lg">
-            <li><a href="{% url 'gestioncitas' %}" class="block hover:bg-white/20 p-2 rounded" >Citas Solicitadas</a></li>
+            <li><a href="{% url 'gestioncitas' %}" class="block hover:bg-white/20 p-2 rounded">Citas Solicitadas</a></li>
             <li><a href="{% url 'registroc' %}" class="block hover:bg-white/20 p-2 rounded">Registro Citas</a></li>
-            <li><a href="{% url 'registroc' %}" class="block bg-white/30 hover:bg-white/40 p-2 rounded text-gray-900">Gestión de Usuario</a></li>
+            <li><a href="{% url 'usuarios' %}" class="block bg-white/30 hover:bg-white/40 p-2 rounded text-gray-900">Gestión de Usuario</a></li>
             <li><a href="{% url 'Tipdelasemana' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Tip de la Semana</a></li>
             <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Galería</a></li>
             <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Servicios</a></li>
-             <li><a href="{% url 'backup' %}" class="block hover:bg-white/20 p-2 rounded">Copia de seguridad</a></li>
+            <li><a href="{% url 'backup' %}" class="block hover:bg-white/20 p-2 rounded">Copia de seguridad</a></li>
             <li><a href="{% url 'index' %}" class="block hover:bg-red-500/80 p-2 rounded">Cerrar sesión</a></li>
         </ul>
     </div>
-</body>
-</html>
 
+    <!-- Contenido principal -->
+    <div class="table-container">
+        <h1 class="text-2xl font-bold mb-6">Gestión de Usuarios Administradores</h1>
+        
+        <!-- Tabla de usuarios -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Documento</th>
+                    <th>Nombre Completo</th>
+                    <th>Correo Electrónico</th>
+                    <th>Teléfono</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for admin in administradores %}
+                <tr>
+                    <td>{{ admin.documento }}</td>
+                    <td>{{ admin.nombre_completo }}</td>
+                    <td>{{ admin.correo_electronico }}</td>
+                    <td>{{ admin.telefono }}</td>
+                    <td>
+                        {% if admin.is_active %}
+                            <span class="text-green-600">Activo</span>
+                        {% else %}
+                            <span class="text-red-600">Inactivo</span>
+                        {% endif %}
+                    </td>
+                    <td class="action-buttons">
+                        <button class="btn-editar bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600" data-documento="{{ admin.documento }}">
+                            <i class="fas fa-edit"></i> Editar
+                        </button>
+                        <button class="btn-eliminar bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" data-documento="{{ admin.documento }}">
+                            <i class="fas fa-trash-alt"></i> Eliminar
+                        </button>
+                        <button class="toggle-estado bg-{{ admin.is_active|yesno:'yellow,green' }}-500 text-white px-3 py-1 rounded hover:bg-{{ admin.is_active|yesno:'yellow,green' }}-600" data-documento="{{ admin.documento }}">
+                            <i class="fas fa-{{ admin.is_active|yesno:'ban,check' }}"></i> {{ admin.is_active|yesno:'Desactivar,Activar' }}
+                        </button>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-4">No hay usuarios registrados</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Botón para agregar nuevo usuario -->
+        <div class="mt-6">
+            <button id="btnNuevoUsuario" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                <i class="fas fa-plus-circle"></i> Agregar Nuevo Usuario
+            </button>
+        </div>
+    </div>
+
+    <!-- Modal para crear/editar usuario -->
+    <div id="usuarioModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="cerrarModal()">&times;</span>
+            <h2 id="modalTitle" class="text-xl font-bold mb-4">Nuevo Administrador</h2>
+            <form id="usuarioForm" method="POST" class="space-y-4">
+                {% csrf_token %}
+                <input type="hidden" name="documento" id="inputDocumento">
+                
+                <div class="form-group">
+                    <label for="inputNombre" class="block text-sm font-medium text-gray-700">Nombre Completo *</label>
+                    <input type="text" name="nombre_completo" id="inputNombre" required
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    <div id="nombreError" class="error-message"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="inputCorreo" class="block text-sm font-medium text-gray-700">Correo Electrónico *</label>
+                    <input type="email" name="correo_electronico" id="inputCorreo" required
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    <div id="correoError" class="error-message"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="inputTelefono" class="block text-sm font-medium text-gray-700">Teléfono *</label>
+                    <input type="text" name="telefono" id="inputTelefono" required
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    <div id="telefonoError" class="error-message"></div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="inputDocumentoLogin" class="block text-sm font-medium text-gray-700">Documento (para inicio de sesión) *</label>
+                    <input type="text" name="documento_login" id="inputDocumentoLogin" required
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    <div id="documentoError" class="error-message"></div>
+                </div>
+                
+                <div class="form-group relative">
+                    <label for="inputPassword" class="block text-sm font-medium text-gray-700">Contraseña *</label>
+                    <input type="password" name="password" id="inputPassword" required
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    <i class="fas fa-eye password-toggle" onclick="togglePassword('inputPassword')"></i>
+                    <div id="passwordError" class="error-message"></div>
+                </div>
+                
+                <div class="form-group relative">
+                    <label for="inputConfirmPassword" class="block text-sm font-medium text-gray-700">Confirmar Contraseña *</label>
+                    <input type="password" name="confirm_password" id="inputConfirmPassword" required
+                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
+                    <i class="fas fa-eye password-toggle" onclick="togglePassword('inputConfirmPassword')"></i>
+                    <div id="confirmPasswordError" class="error-message"></div>
+                </div>
+                
+                <div class="flex items-center">
+                    <input type="checkbox" name="is_active" id="inputActivo" checked
+                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                    <label for="inputActivo" class="ml-2 block text-sm text-gray-900">Usuario activo</label>
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" onclick="cerrarModal()"
+                        class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
+                        Cancelar
+                    </button>
+                    <button type="submit" id="submitButton"
+                        class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+                        Crear
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- JavaScript Completo Actualizado -->
+    <script>
+        // Variables globales
+        let isEditMode = false;
+        let currentDocumento = '';
+
+        // ==================== FUNCIONES DEL MODAL ====================
+        function abrirModal() {
+            document.getElementById('usuarioModal').style.display = 'block';
+            document.body.style.overflow = 'hidden'; // Bloquear scroll
+        }
+
+        function cerrarModal() {
+            document.getElementById('usuarioModal').style.display = 'none';
+            document.body.style.overflow = 'auto'; // Restaurar scroll
+            resetForm();
+        }
+
+        function togglePassword(inputId) {
+            const input = document.getElementById(inputId);
+            const icon = input.nextElementSibling;
+            if (input.type === 'password') {
+                input.type = 'text';
+                icon.classList.replace('fa-eye', 'fa-eye-slash');
+            } else {
+                input.type = 'password';
+                icon.classList.replace('fa-eye-slash', 'fa-eye');
+            }
+        }
+
+        // ==================== FUNCIONES DEL FORMULARIO ====================
+        function resetForm() {
+            const form = document.getElementById('usuarioForm');
+            form.reset();
+            clearErrors();
+            
+            isEditMode = false;
+            currentDocumento = '';
+            document.getElementById('modalTitle').textContent = 'Nuevo Administrador';
+            document.getElementById('submitButton').textContent = 'Crear';
+            
+            // Habilitar y requerir campos de contraseña
+            document.getElementById('inputDocumentoLogin').readOnly = false;
+            document.getElementById('inputPassword').required = true;
+            document.getElementById('inputConfirmPassword').required = true;
+            
+            // Restaurar labels
+            document.querySelectorAll('label[for^="inputPassword"]').forEach(el => {
+                el.textContent = el.textContent.replace(' (dejar en blanco para no cambiar)', '');
+            });
+        }
+
+        function clearErrors() {
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.textContent = '';
+            });
+        }
+
+        function validateForm() {
+            let isValid = true;
+            clearErrors();
+
+            // Validar campos requeridos
+            const requiredFields = [
+                'inputNombre', 'inputCorreo', 
+                'inputTelefono', 'inputDocumentoLogin'
+            ];
+
+            if (!isEditMode) {
+                requiredFields.push('inputPassword', 'inputConfirmPassword');
+            }
+
+            requiredFields.forEach(fieldId => {
+                const field = document.getElementById(fieldId);
+                if (!field.value.trim()) {
+                    document.getElementById(`${fieldId}Error`).textContent = 'Este campo es requerido';
+                    isValid = false;
+                }
+            });
+
+            // Validar formato de correo
+            const email = document.getElementById('inputCorreo').value;
+            if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                document.getElementById('inputCorreoError').textContent = 'Ingrese un correo válido';
+                isValid = false;
+            }
+
+            // Validar contraseñas
+            const password = document.getElementById('inputPassword').value;
+            const confirmPassword = document.getElementById('inputConfirmPassword').value;
+            
+            if (!isEditMode || password) {
+                if (password && password.length < 8) {
+                    document.getElementById('passwordError').textContent = 'La contraseña debe tener al menos 8 caracteres';
+                    isValid = false;
+                }
+                
+                if (password !== confirmPassword) {
+                    document.getElementById('confirmPasswordError').textContent = 'Las contraseñas no coinciden';
+                    isValid = false;
+                }
+            }
+
+            return isValid;
+        }
+
+        // ==================== FUNCIONES DE API ====================
+        async function fetchWithCSRF(url, options = {}) {
+            const defaults = {
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Accept': 'application/json',
+                },
+                credentials: 'same-origin'
+            };
+
+            const config = {
+                ...defaults,
+                ...options,
+                headers: {
+                    ...defaults.headers,
+                    ...options.headers
+                }
+            };
+
+            try {
+                const response = await fetch(url, config);
+                
+                // Verificar si la respuesta es JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    const errorText = await response.text();
+                    throw new Error(`El servidor respondió con: ${errorText.substring(0, 100)}...`);
+                }
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.message || `Error ${response.status}`);
+                }
+
+                return data;
+            } catch (error) {
+                console.error('Error en la solicitud:', error);
+                throw error;
+            }
+        }
+
+        // ==================== FUNCIONES PRINCIPALES ====================
+        async function cargarUsuarioParaEditar(documento) {
+            try {
+                const data = await fetchWithCSRF(`/usuarios/editar/${documento}/`, {
+                    method: 'GET'
+                });
+
+                // Configurar modal en modo edición
+                isEditMode = true;
+                currentDocumento = documento;
+                document.getElementById('modalTitle').textContent = 'Editar Administrador';
+                document.getElementById('submitButton').textContent = 'Actualizar';
+                
+                // Llenar formulario
+                document.getElementById('inputDocumento').value = data.documento;
+                document.getElementById('inputNombre').value = data.nombre_completo;
+                document.getElementById('inputCorreo').value = data.correo_electronico;
+                document.getElementById('inputTelefono').value = data.telefono;
+                document.getElementById('inputDocumentoLogin').value = data.documento;
+                document.getElementById('inputActivo').checked = data.is_active;
+                
+                // Configuración especial para edición
+                document.getElementById('inputDocumentoLogin').readOnly = true;
+                document.getElementById('inputPassword').required = false;
+                document.getElementById('inputConfirmPassword').required = false;
+                
+                document.querySelectorAll('label[for^="inputPassword"]').forEach(el => {
+                    if (!el.textContent.includes('(dejar en blanco')) {
+                        el.textContent += ' (dejar en blanco para no cambiar)';
+                    }
+                });
+
+                abrirModal();
+            } catch (error) {
+                Swal.fire('Error', error.message || 'No se pudieron cargar los datos del usuario', 'error');
+            }
+        }
+
+        async function eliminarUsuario(documento) {
+            try {
+                const result = await Swal.fire({
+                    title: '¿Estás seguro?',
+                    text: "¡No podrás revertir esta acción!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Sí, eliminar',
+                    cancelButtonText: 'Cancelar'
+                });
+
+                if (result.isConfirmed) {
+                    await fetchWithCSRF(`/usuarios/eliminar/${documento}/`, {
+                        method: 'POST'
+                    });
+                    
+                    Swal.fire(
+                        '¡Eliminado!',
+                        'El usuario ha sido eliminado correctamente.',
+                        'success'
+                    ).then(() => window.location.reload());
+                }
+            } catch (error) {
+                Swal.fire('Error', error.message || 'Error al eliminar el usuario', 'error');
+            }
+        }
+
+        async function cambiarEstadoUsuario(documento) {
+            try {
+                await fetchWithCSRF(`/usuarios/toggle-estado/${documento}/`, {
+                    method: 'POST'
+                });
+                window.location.reload();
+            } catch (error) {
+                Swal.fire('Error', error.message || 'Error al cambiar el estado', 'error');
+            }
+        }
+
+        async function enviarFormulario() {
+            if (!validateForm()) return;
+
+            const formData = new FormData(document.getElementById('usuarioForm'));
+            const url = isEditMode 
+                ? `/usuarios/editar/${currentDocumento}/` 
+                : `/usuarios/crear/`;
+
+            try {
+                const data = await fetchWithCSRF(url, {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (data.success) {
+                    Swal.fire({
+                        title: '¡Éxito!',
+                        text: isEditMode ? 'Usuario actualizado correctamente' : 'Usuario creado correctamente',
+                        icon: 'success'
+                    }).then(() => {
+                        cerrarModal();
+                        window.location.reload();
+                    });
+                } else if (data.errors) {
+                    // Mostrar errores de validación del servidor
+                    Object.entries(data.errors).forEach(([field, message]) => {
+                        const errorElement = document.getElementById(`${field}Error`);
+                        if (errorElement) {
+                            errorElement.textContent = message;
+                        }
+                    });
+                }
+            } catch (error) {
+                Swal.fire(
+                    'Error',
+                    error.message || 'Ocurrió un error al procesar la solicitud',
+                    'error'
+                );
+            }
+        }
+
+        // ==================== INICIALIZACIÓN ====================
+        document.addEventListener('DOMContentLoaded', function() {
+            // Botón nuevo usuario
+            document.getElementById('btnNuevoUsuario').addEventListener('click', function(e) {
+                e.preventDefault();
+                resetForm();
+                abrirModal();
+            });
+
+            // Delegación de eventos para elementos dinámicos
+            document.addEventListener('click', function(e) {
+                // Editar
+                if (e.target.closest('.btn-editar')) {
+                    cargarUsuarioParaEditar(e.target.closest('.btn-editar').dataset.documento);
+                }
+                // Eliminar
+                else if (e.target.closest('.btn-eliminar')) {
+                    eliminarUsuario(e.target.closest('.btn-eliminar').dataset.documento);
+                }
+                // Cambiar estado
+                else if (e.target.closest('.toggle-estado')) {
+                    cambiarEstadoUsuario(e.target.closest('.toggle-estado').dataset.documento);
+                }
+            });
+
+            // Submit del formulario
+            document.getElementById('usuarioForm').addEventListener('submit', function(e) {
+                e.preventDefault();
+                enviarFormulario();
+            });
+
+            // Cerrar modal al hacer clic fuera
+            window.addEventListener('click', function(e) {
+                if (e.target === document.getElementById('usuarioModal')) {
+                    cerrarModal();
+                }
+            });
+
+            // Cerrar modal con escape key
+            document.addEventListener('keydown', function(e) {
+                if (e.key === 'Escape') {
+                    cerrarModal();
+                }
+            });
+        });
+    </script>
+</body>
 </html>
