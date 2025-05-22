@@ -1,3 +1,4 @@
+<!-- 4. Login.html -->
 {% load static %}
 <!DOCTYPE html>
 <html lang="es">
@@ -22,11 +23,11 @@
             <h3 class="eslogan">COMPROMETIDOS CON LA SALUD ANIMAL</h3>
         </div>
         <nav class="opciones" id="menu">
-            <a href="{% url "index" %}">INICIO</a>
-            <a href="{% url "index" %}#conocenos">CONÓCENOS</a>
-            <a href="{% url "servicios" %}">SERVICIOS</a>
-            <a href="{% url "agendar" %}">AGENDAR CITA</a>
-            <a href="{% url "login" %}"><img class="perfil" src={% static "Images/perfil.png" %} alt="logo DR.PUL"></a>
+            <a href="{% url 'index' %}">INICIO</a>
+            <a href="{% url 'index' %}#conocenos">CONÓCENOS</a>
+            <a href="{% url 'servicios' %}">SERVICIOS</a>
+            <a href="{% url 'agendar' %}">AGENDAR CITA</a>
+            <a href="{% url 'login' %}"><img class="perfil" src={% static "Images/perfil.png" %} alt="logo DR.PUL"></a>
         </nav>
     </header>
     <div class="formulario">
@@ -36,20 +37,29 @@
             </div>
             INICIAR SESION 
         </h1>
-        <form id="login-form" method="POST" action= {% url "Galeria" %}>
+        <form id="login-form" method="POST" action="{% url 'login' %}">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="error-message">
+                    {% for error in form.non_field_errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
             <div class="username">
-                <label>Nombre de usuario</label>
-                <input type="text" id="username" required>
+                <label for="id_username">Documento</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <div class="error-message">{{ form.username.errors }}</div>
+                {% endif %}
             </div>
             <div class="username">
-                <label>Contraseña</label>
-                <input type="password" id="password" required>
-            </div>
-            <!-- Campo para seleccionar el tipo de usuario (role) -->
-            <div class="rol">
-                <select id="user-type" required>
-                    <option value="administrador">Administrador</option>
-                </select>
+                <label for="id_password">Contraseña</label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                    <div class="error-message">{{ form.password.errors }}</div>
+                {% endif %}
             </div>
             <div class="recordar">
                 <a href={% url "RContrasena" %}>¿Olvidaste tu contraseña?</a>
@@ -57,46 +67,5 @@
             <input type="submit" value="Iniciar">
         </form>
     </div>
-
-    <script>
-        const usuarios = [
-            { username: "admin", password: "veterinaria", role: "administrador" },
-        ];
-
-        document.getElementById("login-form").addEventListener("submit", function(event) {
-            event.preventDefault();
-
-            const username = document.getElementById("username").value.trim();
-            const password = document.getElementById("password").value.trim();
-            const userType = document.getElementById("user-type").value;
-
-            const usuarioValido = usuarios.find(user => user.username === username && user.password === password);
-
-            if (!usuarioValido) {
-                alert("Usuario o contraseña incorrectos.");
-            } else if (usuarioValido.role !== userType) {
-                alert("El rol seleccionado no coincide con el usuario.");
-            } else {
-                alert(`Inicio de sesión exitoso. Bienvenido ${username} como ${userType}!`);
-
-                if (userType === "administrador") {
-                    window.location.href = "{% url 'gestioncitas' %}";
-                }
-            }
-        });
-
-        // Mantener labels arriba cuando hay contenido
-        document.querySelectorAll('.username input').forEach(input => {
-            // Verificar si hay contenido al cargar
-            if(input.value) {
-                input.nextElementSibling.classList.add('active-label');
-            }
-            
-            // Escuchar cambios en los inputs
-            input.addEventListener('input', function() {
-                this.nextElementSibling.classList.toggle('active-label', this.value.trim() !== '');
-            });
-        });
-    </script>
 </body>
 </html>
