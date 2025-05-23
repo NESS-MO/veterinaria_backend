@@ -425,12 +425,25 @@ def usuarios(request):
         'user': request.user  # Esto ya está incluido automáticamente por Django
     })
 
+from django.contrib.auth import logout as auth_logout
+
 def eliminar_usuario(request, documento):
     if request.method == 'POST':
         admin = get_object_or_404(Administrador, documento=documento)
+        es_usuario_actual = (request.user.documento == documento)
         admin.delete()
-        messages.success(request, 'Usuario eliminado correctamente')
-        return redirect('usuarios')
+        
+        if es_usuario_actual:
+            auth_logout(request)
+            return JsonResponse({
+                'success': True, 
+                'message': 'Usuario eliminado correctamente. Sesión cerrada.'
+            })
+            
+        return JsonResponse({
+            'success': True, 
+            'message': 'Usuario eliminado correctamente'
+        })
     return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 from django.views.decorators.http import require_http_methods
@@ -463,15 +476,27 @@ def editar_usuario(request, documento):
         'is_active': admin.is_active
     })
 
+from django.contrib.auth import logout as auth_logout
+
 def toggle_estado_usuario(request, documento):
     if request.method == 'POST':
         admin = get_object_or_404(Administrador, documento=documento)
+        es_usuario_actual = (request.user.documento == documento)
+        
         admin.is_active = not admin.is_active
         admin.save()
+        
+        mensaje = f'Usuario {"activado" if admin.is_active else "desactivado"} correctamente'
+        
+        # Si el usuario se desactivó a sí mismo
+        if es_usuario_actual and not admin.is_active:
+            auth_logout(request)
+            mensaje += '. Sesión cerrada automáticamente.'
+        
         return JsonResponse({
             'success': True,
-            'is_active': admin.is_active,
-            'message': 'Estado actualizado correctamente'
+            'message': mensaje,
+            'is_active': admin.is_active
         })
     return JsonResponse({'error': 'Método no permitido'}, status=405)
 

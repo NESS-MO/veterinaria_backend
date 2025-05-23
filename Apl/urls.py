@@ -26,4 +26,5 @@ urlpatterns = [
     path('usuarios/editar/<str:documento>/', views.editar_usuario, name='editar_usuario'),
     path('usuarios/toggle-estado/<str:documento>/', views.toggle_estado_usuario, name='toggle_estado_usuario'),
     path('usuarios/crear/', views.crear_usuario, name='crear_usuario'),
+    path('logout/', views.logout, name='logout'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
