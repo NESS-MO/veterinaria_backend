@@ -20,17 +20,12 @@ urlpatterns = [
     path('obtener-tip-actual/', views.obtener_tip_actual, name='obtener_tip_actual'),
     path('backup/', views.backup, name='backup'),
     path('api/servicios/', views.api_servicios, name='api_servicios'),
-    path('api/servicios/<int:servicio_id>/', views.api_servicios, name='api_servicio_detail'),
-<<<<<<< HEAD
-    path('cambia_contraseña/<str:token>/', views.cambia_con, name='cambia_con'),
-  
-
-
-=======
+    path('api/servi cios/<int:servicio_id>/', views.api_servicios, name='api_servicio_detail'),
     path('usuarios/', views.usuarios, name='usuarios'),
     path('usuarios/eliminar/<str:documento>/', views.eliminar_usuario, name='eliminar_usuario'),
     path('usuarios/editar/<str:documento>/', views.editar_usuario, name='editar_usuario'),
     path('usuarios/toggle-estado/<str:documento>/', views.toggle_estado_usuario, name='toggle_estado_usuario'),
     path('usuarios/crear/', views.crear_usuario, name='crear_usuario'),
->>>>>>> main
+    path('cambia_con/<str:token>/', views.cambia_con, name='cambia_con')
+
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

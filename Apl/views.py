@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from .models import Administrador, Cliente 
+
 from .forms import craeteNewTask
 from datetime import date, timedelta
 from django.contrib import messages
@@ -72,13 +73,14 @@ def logout(request):
 
 def RContrasena(request):
     # Verifica si el metodo HTTP de la peticion es POST
+    
     if request.method == 'POST':
         # Obtiene el email enviado desde el formulario de recuperacion
         email = request.POST.get('correo_electronico')
         
         try:
             # Intenta obtener el usuario cuyo email coincide con el ingresado
-            user = administrador.objects.get(email=email)
+            user = Administrador.objects.get(correo_electronico=email)
         except administrador.DoesNotExist:
             # Si no se encuentra ningun usuario con ese email muestra un mensaje de error
             messages.error(request, "El correo ingresado no está registrado.")
@@ -86,7 +88,7 @@ def RContrasena(request):
             return render(request, '4.1 RecuperarContrasena.html')
         
         # Guarda el email del usuario (se utiliza para enviar el correo de recuperacion)
-        correo_electronico = user.email
+        correo_electronico = user.correo_electronico
 
         # Se crea una instancia de TimestampSigner para generar un token con marca de tiempo
         signer = TimestampSigner()
@@ -129,7 +131,7 @@ def RContrasena(request):
             # Si ocurre alguna excepción al enviar el correo, se muestra un mensaje de error con la descripción
             messages.error(request, f"Error al enviar el correo: {str(e)}")
             # Vuelve a renderizar el formulario de recuperación en caso de error
-            return render(request, 'RecuperarContrasena.html')
+            return render(request, '4.2 RecuperarContrasena.html')
         
     return render(request, "4.1 RecuperarContrasena.html")
 
@@ -147,7 +149,7 @@ def cambia_con(request, token):
         # Si el token es inválido o ha expirado, se muestra un mensaje de error
         messages.error(request, "El enlace de recuperación es inválido o ha expirado.")
         # Se redirige al usuario a la página de recuperación de contraseña para volver a solicitar un nuevo enlace
-        return redirect("4.1 RecuperarContrasena.html")
+        return render(request, "4.1 RecuperarContrasena.html")
     
     # Verifica si el método HTTP es POST, lo que indica que se envió el formulario para cambiar la contraseña
     if request.method == 'POST':
@@ -198,8 +200,6 @@ def ModificarS(request):
 def RegistroC(request):
     return render(request, "registrocitas.html")
 
-<<<<<<< HEAD
-=======
 def usuarios(request):
     return render(request, "GestionUsuarios.html")
 
@@ -207,7 +207,6 @@ def usuarios(request):
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import TipSemana 
->>>>>>> main
 
 
 def gestion_tip(request):

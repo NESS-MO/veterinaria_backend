@@ -1,6 +1,4 @@
-# Create your models here.
 from django.db import models
-from django.contrib.auth.models import User
 from django.core.validators import RegexValidator
 
 class CuentaManager(models.Manager):
@@ -17,32 +15,32 @@ class CuentaManager(models.Manager):
         user.set_password(password)
         user.save(using=self._db)
         return user
-        
-        def create_superuser(self, email, password=None, **extra_fields):
-            extra_fields.setdefault('is_staff', True)
-            extra_fields.setdefault('is_superuser', True)
-            return self.create_cuenta(email, password, **extra_fields)
+
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        return self.create_cuenta(email, password, **extra_fields)
 
 class Correo(models.Model):
     email = models.EmailField(unique=True)
 
     nombres = models.CharField(
-            max_length=100,
-           black=False,
-            null=False,
-            default='',
-         )
+        max_length=100,
+        blank=False,
+        null=False,
+        default='',
+    )
 
     apellidos = models.CharField(
-            max_length=100,
-            black=False,
-            null=False,
-            default='',
-         )
+        max_length=100,
+        blank=False,
+        null=False,
+        default='',
+    )
     
     phone_validator = RegexValidator(
         regex=r'^\+?1?\d{9,15}$',
-        message="El número de teléfono debe ser un número válido con un máximo de 15 dígitos."
+        message="El número de teléfono debe tener hasta 15 dígitos."
     )
     phone = models.CharField(
         validators=[phone_validator],
@@ -51,23 +49,16 @@ class Correo(models.Model):
         null=True,
     )
 
-    security_question = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True,
-    )
-    security_answer = models.CharField(
-        max_length=255,
-        blank=True,
-        null=True,
-    )
-    recovery_email = models.EmailField(blank=True,null=True,)
+    security_question = models.CharField(max_length=255, blank=True, null=True)
+    security_answer = models.CharField(max_length=255, blank=True, null=True)
+    recovery_email = models.EmailField(blank=True, null=True)
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
-        
+
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['']
+    REQUIRED_FIELDS = []
 
     objects = CuentaManager()
+
     def __str__(self):
         return self.email

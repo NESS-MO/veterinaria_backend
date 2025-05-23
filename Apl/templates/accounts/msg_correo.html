@@ -1,0 +1,60 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <!-- Se establece la codificación de caracteres -->
+    <meta charset="UTF-8">
+    <!-- Se configura el viewport para que la página sea responsiva en dispositivos móviles -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Título de la página -->
+    <title>Recuperación de Contraseña</title>
+  </head>
+  <body>
+    <!-- Contenedor principal de la estructura del correo -->
+    <div class="container">
+      <!-- Encabezado del correo -->
+      <div class="header">
+        <!-- Logo del sitio, se carga desde la ruta estática definida en Django -->
+        <img src="{% static 'diseños/imagenes/logo.PNG' %}" alt="logo" class="logo">
+        <!-- Título principal del correo -->
+        <h1>Recuperación de Contraseña</h1>
+      </div>
+      
+      <!-- Sección del contenido del mensaje -->
+      <div class="content">
+        <!-- Saludo personalizado utilizando la variable 'username' -->
+        <p>Hola {{ username }},</p>
+        
+        <!-- Mensaje informativo indicando que se recibió la solicitud -->
+        <p>Hemos recibido una solicitud para restablecer la contraseña de tu cuenta en <strong>{{ site_name }}</strong>.</p>
+        
+        <!-- Instrucción para el usuario: indicar que debe hacer clic en el enlace -->
+        <p>Para establecer una nueva contraseña, haz clic en el siguiente <b> enlace</b>:</p>
+        <!-- Se muestra la URL de restablecimiento de contraseña, pasada como variable 'reset_url' -->
+        <p class="link-text">{{ reset_url }}</p>
+
+        <!-- Alternativamente, se muestra la instrucción para copiar y pegar el enlace en el navegador -->
+        <p>O copia y pega el siguiente enlace en tu navegador:</p>
+        
+        <!-- Nota importante sobre la validez del enlace -->
+        <div class="note">
+          <p><strong>Nota:</strong> Este enlace será válido por 1 hora. Si no solicitaste un cambio de contraseña, puedes ignorar este mensaje.</p>
+        </div>
+        
+        <!-- Se proporciona información adicional para resolver problemas o dudas -->
+        <p>Si tienes problemas o preguntas, no dudes en contactarnos.</p>
+        
+        <!-- Firma del correo, indicando el equipo del sitio -->
+        <p>Saludos,<br>El equipo de {{ site_name }}</p>
+      </div>
+      
+      <!-- Pie de página del correo -->
+      <div class="footer">
+        <!-- Derechos de autor y nombre del sitio -->
+        <p>&copy; 2025 {{ site_name }}. Todos los derechos reservados.</p>
+        <!-- Advertencia indicando que es un correo automático -->
+        <p>Este es un correo electrónico automático, por favor no respondas a este mensaje.</p>
+      </div>
+    </div>
+  </body>
+</html>
