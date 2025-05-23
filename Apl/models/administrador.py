@@ -44,9 +44,6 @@ class Administrador(AbstractBaseUser, PermissionsMixin):
         validators=[EmailValidator(message="Ingrese un correo electrónico válido")]
     )
     telefono = models.CharField(max_length=11, validators=[MinLengthValidator(7)])
-<<<<<<< HEAD
-    contraseña = models.CharField(max_length=250)
-=======
     is_active = models.BooleanField(default=True)
     is_admin = models.BooleanField(default=False)
     is_staff = models.BooleanField(default=False)
@@ -56,7 +53,6 @@ class Administrador(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'documento'
     REQUIRED_FIELDS = ['nombre_completo', 'correo_electronico', 'telefono']
 
->>>>>>> main
     class Meta:
         verbose_name = "Administrador"
         verbose_name_plural = "Administradores"
