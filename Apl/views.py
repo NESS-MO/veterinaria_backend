@@ -1,9 +1,32 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from .models import Administrador, Cliente 
-from django.shortcuts import get_object_or_404
 from .forms import craeteNewTask
 from datetime import date, timedelta
+from django.contrib import messages
+from .models import TipSemana, administrador
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.contrib import messages
+from .models import ImagenGaleria
+from .forms import ImagenGaleriaForm
+
+from django.http import HttpResponseForbidden
+from .models import Servicio
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
+from django.core.signing import TimestampSigner, BadSignature, SignatureExpired
+from django.template.loader import render_to_string
+from django.urls import reverse
+from django.utils.html import strip_tags
+from django.core.mail import EmailMultiAlternatives
+from django.conf import settings
+from django.contrib.auth.hashers import make_password
+
+
+
+
 
 # Create your views here.
 
@@ -47,11 +70,115 @@ def logout(request):
     auth_logout(request)
     return redirect('index')
 
-def RContrasena(requets):
-    return render(requets, "4.1 RecuperarContrasena.html")
+def RContrasena(request):
+    # Verifica si el metodo HTTP de la peticion es POST
+    if request.method == 'POST':
+        # Obtiene el email enviado desde el formulario de recuperacion
+        email = request.POST.get('correo_electronico')
+        
+        try:
+            # Intenta obtener el usuario cuyo email coincide con el ingresado
+            user = administrador.objects.get(email=email)
+        except administrador.DoesNotExist:
+            # Si no se encuentra ningun usuario con ese email muestra un mensaje de error
+            messages.error(request, "El correo ingresado no está registrado.")
+            # Vuelve a renderizar el formulario de recuperacion de contraseña
+            return render(request, '4.1 RecuperarContrasena.html')
+        
+        # Guarda el email del usuario (se utiliza para enviar el correo de recuperacion)
+        correo_electronico = user.email
 
-def RContrasenaDos(requets):
-    return render(requets, "4.2 RecuperarContrasena.html")
+        # Se crea una instancia de TimestampSigner para generar un token con marca de tiempo
+        signer = TimestampSigner()
+        # Se firma el id del usuario (convertido a string) para generar un token único
+        token = signer.sign(str(user.pk))
+        
+        # Se construye la URL absoluta para que el usuario cambie su contraseña
+        # utilizando 'reverse' para obtener la URL definida con el name 'cambia_con'
+        reset_url = request.build_absolute_uri(reverse('cambia_con', args=[token]))
+        
+        # Se renderiza la plantilla del mensaje de correo con los datos necesarios
+        html_message = render_to_string('accounts/msg_correo.html', {
+            'username': user.nombre_completo,  # Se pasa el nombre de usuario, útil para personalizar el mensaje
+            'reset_url': reset_url,       # Se pasa la URL de recuperación para que el usuario la utilice
+            'site_name': 'Veterinaria',  # Nombre del sitio para contextualizar el correo
+        })
+        
+        # Define el asunto del correo de recuperación
+        subject = "Recuperación de contraseña"
+        # Convierte el mensaje HTML a texto plano, útil para clientes de correo que no muestran HTML
+        text_message = strip_tags(html_message)
+        
+        try:
+            # Se prepara el correo usando EmailMultiAlternatives para enviar texto y HTML
+            email = EmailMultiAlternatives(
+                subject=subject,                       # Asunto del correo
+                body=text_message,                     # Versión en texto plano del mensaje
+                from_email=settings.DEFAULT_FROM_EMAIL, # Email remitente definido en las settings
+                to=[correo_electronico]                     # Lista de destinatarios (el email del usuario)
+            )
+            # Establece la codificación del correo a 'utf-8'
+            email.encoding = 'utf-8'
+            # Envía el correo
+            email.send()
+            # Muestra un mensaje de éxito informando que se ha enviado el enlace de recuperación
+            messages.success(request, "Se ha enviado un enlace a tu correo de recuperación para cambiar la contraseña.")
+            # Redirige al usuario a la página de login tras el envío correcto del correo
+            return redirect("login")
+        except Exception as e:
+            # Si ocurre alguna excepción al enviar el correo, se muestra un mensaje de error con la descripción
+            messages.error(request, f"Error al enviar el correo: {str(e)}")
+            # Vuelve a renderizar el formulario de recuperación en caso de error
+            return render(request, 'RecuperarContrasena.html')
+        
+    return render(request, "4.1 RecuperarContrasena.html")
+
+
+def cambia_con(request, token):
+    # Se crea una instancia de TimestampSigner para poder verificar el token
+    signer = TimestampSigner()
+    try:
+        # Se intenta "desfirmar" el token para extraer el id del usuario,
+        # estableciendo una validez máxima de 3600 segundos (1 hora)
+        user_id = signer.unsign(token, max_age=3600)
+        # Se obtiene el usuario correspondiente al id; si no existe, se retorna un error 404
+        usuario = get_object_or_404(administrador, pk=user_id)
+    except (BadSignature, SignatureExpired):
+        # Si el token es inválido o ha expirado, se muestra un mensaje de error
+        messages.error(request, "El enlace de recuperación es inválido o ha expirado.")
+        # Se redirige al usuario a la página de recuperación de contraseña para volver a solicitar un nuevo enlace
+        return redirect("4.1 RecuperarContrasena.html")
+    
+    # Verifica si el método HTTP es POST, lo que indica que se envió el formulario para cambiar la contraseña
+    if request.method == 'POST':
+        # Obtiene la nueva contraseña ingresada en el formulario
+        new_password = request.POST.get('new_password')
+        # Obtiene la confirmación de la nueva contraseña ingresada en el formulario
+        confirm_password = request.POST.get('confirm_password')
+        
+        # Comprueba que ambos campos de contraseña coincidan
+        if new_password != confirm_password:
+            # Si no coinciden, muestra un mensaje de error
+            messages.error(request, "Las contraseñas no coinciden.")
+            # Vuelve a renderizar el formulario para cambiar la contraseña
+            return render(request, 'cambia_contraseña.html')
+        
+        # Si las contraseñas coinciden, se actualiza la contraseña del usuario,
+        # utilizando make_password para encriptarla adecuadamente
+        usuario.password = make_password(new_password)
+        # Se guarda el usuario en la base de datos con la nueva contraseña
+        usuario.save()
+        
+        # Muestra un mensaje de éxito indicando que la contraseña se ha cambiado correctamente
+        messages.success(request, "La contraseña se ha cambiado correctamente.")
+        # Redirige al usuario a la página de login para que pueda iniciar sesión nuevamente
+        return redirect("login")
+    
+    # Si el método es GET, se renderiza el formulario para el cambio de contraseña
+    return render(request, 'cambia_contraseña.html')
+
+
+
 
 def modificar(request):
     return gestion_galeria(request)
@@ -79,8 +206,6 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import TipSemana 
 
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
 
 def gestion_tip(request):
     try:
@@ -127,7 +252,6 @@ def gestion_tip(request):
         return redirect('Tipdelasemana')
 
     return render(request, '5. Modificar-tipdelasemana.html', {'tip': tip})
-from django.shortcuts import get_object_or_404
 
 def eliminar_tip(request, tip_id):
     tip = get_object_or_404(TipSemana, id=tip_id)
@@ -138,7 +262,6 @@ def eliminar_tip(request, tip_id):
     # Redirigir si no es POST
     return redirect('Tipdelasemana')
 
-from django.http import JsonResponse
 
 def obtener_tip_actual(request):
     try:
@@ -156,13 +279,7 @@ def obtener_tip_actual(request):
             'imagen': ''
         })
     
-from django.contrib import messages
-from .models import ImagenGaleria
-from .forms import ImagenGaleriaForm
 
-from django.shortcuts import render, redirect
-from .models import ImagenGaleria
-from .forms import ImagenGaleriaForm
 
 def gestion_galeria(request):
     imagenes = ImagenGaleria.objects.all().order_by('orden')
@@ -208,11 +325,7 @@ def index(request):
     imagenes_galeria = ImagenGaleria.objects.filter(activa=True).order_by('orden')[:9]
     return render(request, "1. Index.html", {'imagenes_galeria': imagenes_galeria})
 
-from django.shortcuts import render 
-from django.http import HttpResponseForbidden
-from .models import Servicio
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+
 
 def servicios(request):
     servicios = Servicio.objects.filter(activo=True).order_by('orden')
@@ -303,8 +416,14 @@ from .forms import AdministradorForm  # Crearemos este formulario después
 from django.http import JsonResponse
 
 def usuarios(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
     administradores = Administrador.objects.all().order_by('nombre_completo')
-    return render(request, "GestionUsuarios.html", {'administradores': administradores})
+    return render(request, "GestionUsuarios.html", {
+        'administradores': administradores,
+        'user': request.user  # Esto ya está incluido automáticamente por Django
+    })
 
 def eliminar_usuario(request, documento):
     if request.method == 'POST':

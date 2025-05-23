@@ -192,11 +192,33 @@
           <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Galería</a></li>
           <li><a href="{% url 'modificarservicio' %}" class="block bg-white/30 hover:bg-white/40 p-2 rounded text-gray-900">Modificar Servicios</a></li>
            <li><a href="{% url 'backup' %}" class="block hover:bg-white/20 p-2 rounded">Copia de seguridad</a></li>
-          <li><a href="{% url 'index' %}" class="block hover:bg-red-500/80 p-2 rounded">Cerrar sesión</a></li>
-      </ul>
+           <li><a href="{% url 'logout' %}" class="block hover:bg-red-500/80 p-2 rounded">Cerrar sesión</a></li>
+        </ul>
+        
+        <div class="absolute bottom-0 left-0 w-full p-4 bg-white/10">
+            <div class="text-center">
+                <p class="font-bold">Usuario:</p>
+                <p>{{ request.user.nombre_completo }}</p>
+            </div>
+        </div>
   </div>
+   <div class="admin-container md:ml-80 p-8"><!-- Breadcrumb -->
+<nav class="text-sm text-gray-600 px-4 md:ml-72 mt-4" aria-label="Breadcrumb">
+  <ol class="flex items-center space-x-2">
+    <li>
+      <a href="{% url 'index' %}" class="text-blue-600 hover:underline flex items-center">
+        <!-- Icono casita -->
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9-9 9 9M4 10v10a1 1 0 001 1h3m10-11v10a1 1 0 01-1 1h-3m-4 0h4" />
+        </svg>
+        Inicio
+      </a>
+    </li>
+    <li><span class="mx-1">/</span></li>
+    <li class="text-gray-500">Modificar servicios</li>
+  </ol>
+</nav>
 
-   <div class="admin-container md:ml-80 p-8">
     <h1 class="text-2xl font-bold mb-6">Administrar Servicios</h1>
 
     <div class="bg-white p-6 rounded-lg shadow-md mb-8">

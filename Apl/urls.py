@@ -11,7 +11,6 @@ urlpatterns = [
     path('login/', views.login, name='login'),
     path('logout/', views.logout, name='logout'),
     path('RecuperarContrasena/', views.RContrasena, name='RContrasena'),
-    path('RecuperarContrasena2/', views.RContrasenaDos, name='RContrasenaDos'),
     path('Galeria/', views.gestion_galeria, name='Galeria'),
     path('Tipdelasemana/', views.gestion_tip, name='Tipdelasemana'),
     path('Gestioncitas/', views.gestion, name='gestioncitas'),
