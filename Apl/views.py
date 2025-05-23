@@ -303,8 +303,14 @@ from .forms import AdministradorForm  # Crearemos este formulario después
 from django.http import JsonResponse
 
 def usuarios(request):
+    if not request.user.is_authenticated:
+        return redirect('login')
+    
     administradores = Administrador.objects.all().order_by('nombre_completo')
-    return render(request, "GestionUsuarios.html", {'administradores': administradores})
+    return render(request, "GestionUsuarios.html", {
+        'administradores': administradores,
+        'user': request.user  # Esto ya está incluido automáticamente por Django
+    })
 
 def eliminar_usuario(request, documento):
     if request.method == 'POST':

@@ -21,8 +21,15 @@
             <li><a href="{% url 'Galeria' %}" class="block bg-white/30 hover:bg-white/40 p-2 rounded text-gray-900">Modificar Galería</a></li>
             <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Servicios</a></li>
              <li><a href="{% url 'backup' %}" class="block hover:bg-white/20 p-2 rounded">Copia de seguridad</a></li>
-            <li><a href="{% url 'index' %}" class="block hover:bg-red-500/80 p-2 rounded">Cerrar sesión</a></li>
+           <li><a href="{% url 'logout' %}" class="block hover:bg-red-500/80 p-2 rounded">Cerrar sesión</a></li>
         </ul>
+        
+        <div class="absolute bottom-0 left-0 w-full p-4 bg-white/10">
+            <div class="text-center">
+                <p class="font-bold">Usuario:</p>
+                <p>{{ request.user.nombre_completo }}</p>
+            </div>
+        </div>
     </div>
     
     <div class="content md:ml-72 p-8 bg-gray-50 min-h-screen mt-16 md:mt-0">
