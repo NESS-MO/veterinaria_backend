@@ -17,7 +17,6 @@ header {
     background: linear-gradient(135deg, #22d3ee, #1e40af);
     padding: 10px 20px;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    flex-wrap: wrap;
 }
 
 .Logotipo {
@@ -37,14 +36,10 @@ header {
     margin-top: 5px;
     text-align: center;
 }
-
 nav {
-    display: block;
-    height: 10%;
     display: flex;
+    align-items: center; /* Alinea todos los elementos dentro de nav */
     gap: 15px;
-    align-items: center;
-    list-style-type: none;
 }
 
 nav a {
