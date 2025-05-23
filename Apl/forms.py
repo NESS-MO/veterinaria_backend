@@ -26,3 +26,31 @@ class ImagenGaleriaForm(forms.ModelForm):
             'class': 'border rounded px-2 py-1 w-full',
             'placeholder': 'Título opcional'
         })
+
+# forms.py
+from django import forms
+from django.contrib.auth.forms import AuthenticationForm
+
+class LoginForm(AuthenticationForm):
+    username = forms.CharField(label="Documento")
+    password = forms.CharField(label="Contraseña", widget=forms.PasswordInput)
+    
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['username'].widget.attrs.update({'class': 'form-control'})
+        self.fields['password'].widget.attrs.update({'class': 'form-control'})
+
+        from django import forms
+from .models import Administrador
+
+class AdministradorForm(forms.ModelForm):
+    class Meta:
+        model = Administrador
+        fields = ['documento', 'nombre_completo', 'correo_electronico', 'telefono', 'is_active']
+        widgets = {
+            'documento': forms.TextInput(attrs={'class': 'form-control'}),
+            'nombre_completo': forms.TextInput(attrs={'class': 'form-control'}),
+            'correo_electronico': forms.EmailInput(attrs={'class': 'form-control'}),
+            'telefono': forms.TextInput(attrs={'class': 'form-control'}),
+            'is_active': forms.CheckboxInput(attrs={'class': 'form-check-input'}),
+        }

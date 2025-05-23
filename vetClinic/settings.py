@@ -131,3 +131,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+# settings.py
+AUTH_USER_MODEL = 'Apl.Administrador'  # Reemplaza 'tu_app' con el nombre de tu aplicación
+
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/gestioncitas/'
+LOGOUT_REDIRECT_URL = '/'

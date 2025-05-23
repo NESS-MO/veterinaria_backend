@@ -1,23 +1,34 @@
 from django.db import models
-
-from Apl.models.cita import Cita
-
-
+from django.core.validators import FileExtensionValidator
 
 class Servicio(models.Model):
-    nombre_servicio = models.CharField(max_length=250)
-    modificacion_servicio = models.CharField(max_length=250, blank=True, null=True)
-    tipo_mascota = models.CharField(max_length=45)
-    cita = models.ForeignKey(
-        Cita,
-        on_delete=models.CASCADE,
-        related_name='servicios'
+    # Para el cuadro inicial
+    nombre = models.CharField(max_length=250, verbose_name="Título del servicio")
+    imagen_cuadro = models.ImageField(
+        upload_to='servicios/cuadros/',
+        verbose_name="Imagen para el cuadro",
+        validators=[FileExtensionValidator(['jpg', 'jpeg', 'png'])]
     )
-
+    
+    # Para la ventana flotante
+    titulo_ventana = models.CharField(max_length=250, verbose_name="Título en ventana")
+    subtitulo_ventana = models.CharField(max_length=250, verbose_name="Subtítulo en ventana")
+    imagen_ventana = models.ImageField(
+        upload_to='servicios/ventanas/',
+        verbose_name="Imagen para la ventana",
+        validators=[FileExtensionValidator(['jpg', 'jpeg', 'png'])]
+    )
+    contenido_ventana = models.TextField(verbose_name="Contenido descriptivo")
+    mostrar_boton_agendar = models.BooleanField(default=True, verbose_name="Mostrar botón agendar en ventana")
+    
+    # Metadata
+    orden = models.PositiveIntegerField(default=0, verbose_name="Orden de visualización")
+    activo = models.BooleanField(default=True, verbose_name="Activo")
+    
     class Meta:
         verbose_name = "Servicio"
         verbose_name_plural = "Servicios"
+        ordering = ['orden']
 
     def __str__(self):
-        return self.nombre_servicio
-    
+        return self.nombre
