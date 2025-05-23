@@ -295,3 +295,140 @@ def api_servicios(request, servicio_id=None):
             return JsonResponse({'error': 'Servicio no encontrado'}, status=404)
     
     return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from .models import Administrador
+from .forms import AdministradorForm  # Crearemos este formulario después
+from django.http import JsonResponse
+
+def usuarios(request):
+    administradores = Administrador.objects.all().order_by('nombre_completo')
+    return render(request, "GestionUsuarios.html", {'administradores': administradores})
+
+def eliminar_usuario(request, documento):
+    if request.method == 'POST':
+        admin = get_object_or_404(Administrador, documento=documento)
+        admin.delete()
+        messages.success(request, 'Usuario eliminado correctamente')
+        return redirect('usuarios')
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+from django.views.decorators.http import require_http_methods
+from django.contrib.auth.hashers import make_password
+
+@require_http_methods(["GET", "POST"])
+def editar_usuario(request, documento):
+    admin = get_object_or_404(Administrador, documento=documento)
+    
+    if request.method == 'POST':
+        try:
+            # Actualizar solo estos campos (no contraseña)
+            admin.nombre_completo = request.POST.get('nombre_completo')
+            admin.correo_electronico = request.POST.get('correo_electronico')
+            admin.telefono = request.POST.get('telefono')
+            admin.is_active = request.POST.get('is_active', False) == 'on'
+            admin.save()
+            
+            return JsonResponse({'success': True})
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    # GET request
+    return JsonResponse({
+        'documento': admin.documento,
+        'nombre_completo': admin.nombre_completo,
+        'correo_electronico': admin.correo_electronico,
+        'telefono': admin.telefono,
+        'is_active': admin.is_active
+    })
+
+def toggle_estado_usuario(request, documento):
+    if request.method == 'POST':
+        admin = get_object_or_404(Administrador, documento=documento)
+        admin.is_active = not admin.is_active
+        admin.save()
+        return JsonResponse({
+            'success': True,
+            'is_active': admin.is_active,
+            'message': 'Estado actualizado correctamente'
+        })
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+from django.http import JsonResponse
+from django.contrib.auth.hashers import make_password
+from .models import Administrador
+import json
+
+def crear_usuario(request):
+    if request.method == 'POST':
+        try:
+            # Para FormData y JSON
+            if request.content_type == 'application/json':
+                data = json.loads(request.body)
+            else:
+                data = request.POST
+            
+            documento = data.get('documento_login')
+            nombre = data.get('nombre_completo')
+            correo = data.get('correo_electronico')
+            telefono = data.get('telefono')
+            password = data.get('password')
+            is_active = data.get('is_active', False) in [True, 'on', 'true']
+
+            # Validaciones básicas
+            if not all([documento, nombre, correo, telefono, password]):
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Todos los campos son obligatorios',
+                    'errors': {
+                        'documento_login': 'Requerido' if not documento else '',
+                        'nombre_completo': 'Requerido' if not nombre else '',
+                        'correo_electronico': 'Requerido' if not correo else '',
+                        'telefono': 'Requerido' if not telefono else '',
+                        'password': 'Requerido' if not password else ''
+                    }
+                }, status=400)
+
+            # Validar duplicados
+            if Administrador.objects.filter(documento=documento).exists():
+                return JsonResponse({
+                    'success': False,
+                    'message': 'El documento ya está registrado',
+                    'errors': {'documento_login': 'Documento ya existe'}
+                }, status=400)
+
+            if Administrador.objects.filter(correo_electronico=correo).exists():
+                return JsonResponse({
+                    'success': False,
+                    'message': 'El correo ya está registrado',
+                    'errors': {'correo_electronico': 'Correo ya existe'}
+                }, status=400)
+
+            # Crear usuario
+            Administrador.objects.create(
+                documento=documento,
+                nombre_completo=nombre,
+                correo_electronico=correo,
+                telefono=telefono,
+                password=make_password(password),
+                is_active=is_active,
+                is_staff=True  # Para acceso al admin
+            )
+
+            return JsonResponse({
+                'success': True,
+                'message': 'Usuario creado exitosamente'
+            })
+
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'Error del servidor: {str(e)}'
+            }, status=500)
+
+    return JsonResponse({
+        'success': False,
+        'message': 'Método no permitido'
+    }, status=405)
