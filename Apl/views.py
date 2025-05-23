@@ -415,15 +415,68 @@ from .models import Administrador
 from .forms import AdministradorForm  # Crearemos este formulario después
 from django.http import JsonResponse
 
+from django.http import JsonResponse
+from django.core.serializers.json import DjangoJSONEncoder
+import json
+
 def usuarios(request):
     if not request.user.is_authenticated:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'error': 'No autenticado'}, status=401)
         return redirect('login')
     
-    administradores = Administrador.objects.all().order_by('nombre_completo')
-    return render(request, "GestionUsuarios.html", {
-        'administradores': administradores,
-        'user': request.user  # Esto ya está incluido automáticamente por Django
-    })
+    try:
+        # Obtener parámetros de filtrado
+        filtros = {
+            'documento': request.GET.get('documento', ''),
+            'nombre': request.GET.get('nombre', ''),
+            'correo': request.GET.get('correo', ''),
+            'telefono': request.GET.get('telefono', ''),
+            'estado': request.GET.get('estado', '')
+        }
+        
+        # Filtrar administradores
+        administradores = Administrador.objects.all()
+        
+        if filtros['documento']:
+            administradores = administradores.filter(documento__icontains=filtros['documento'])
+        if filtros['nombre']:
+            administradores = administradores.filter(nombre_completo__icontains=filtros['nombre'])
+        if filtros['correo']:
+            administradores = administradores.filter(correo_electronico__icontains=filtros['correo'])
+        if filtros['telefono']:
+            administradores = administradores.filter(telefono__icontains=filtros['telefono'])
+        if filtros['estado']:
+            administradores = administradores.filter(is_active=(filtros['estado'].lower() == 'true'))
+        
+        administradores = administradores.order_by('nombre_completo')
+        
+        # Para solicitudes AJAX
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            data = {
+                'administradores': [
+                    {
+                        'documento': admin.documento,
+                        'nombre_completo': admin.nombre_completo,
+                        'correo_electronico': admin.correo_electronico,
+                        'telefono': admin.telefono,
+                        'is_active': admin.is_active
+                    }
+                    for admin in administradores
+                ]
+            }
+            return JsonResponse(data, encoder=DjangoJSONEncoder, safe=False)
+        
+        return render(request, "GestionUsuarios.html", {
+            'administradores': administradores,
+            'user': request.user
+        })
+        
+    except Exception as e:
+        print(f"Error en vista usuarios: {str(e)}")
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'error': str(e)}, status=500)
+        raise
 
 from django.contrib.auth import logout as auth_logout
 
