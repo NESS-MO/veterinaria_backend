@@ -14,11 +14,12 @@
 <body class="bg-gray-100 font-sans">
 
     <!-- Sidebar -->
-    <div class="w-full md:w-72 bg-gradient-to-br from-[#33C0F1] to-[#1E2D93] text-white p-7 md:fixed md:h-full top-0 left-0 z-10 font-sans"> 
+    <div class="w-full md:w-72 bg-gradient-to-br from-[#33C0F1] to-[#1E2D93] text-white p-7 md:fixed md:h-full top-0 left-0 z-10">
         <img class="h-24 mx-auto mb-4" src="{% static 'Images/logo2.png' %}" alt="Logo" />
         <ul class="space-y-4 text-lg">
             <li><a href="{% url 'gestioncitas' %}" class="block bg-white/30 hover:bg-white/40 p-2 rounded text-gray-900">Citas Solicitadas</a></li>
             <li><a href="{% url 'registroc' %}" class="block hover:bg-white/20 p-2 rounded">Registro Citas</a></li>
+            <li><a href="{% url 'usuarios' %}" class="block hover:bg-white/20 p-2 rounded">Gestión de Usuario</a></li>
             <li><a href="{% url 'Tipdelasemana' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Tip de la Semana</a></li>
             <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Galería</a></li>
             <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Servicios</a></li>
@@ -28,6 +29,7 @@
     </div>
 
     <!-- Main Section -->
+<<<<<<< HEAD
     <section class="md:ml-80 mt-6 px-4 md:px-6 pb-10">  <!-- Breadcrumb -->
 <nav class="text-sm text-gray-600 mb-4" aria-label="Breadcrumb">
   <ol class="list-reset flex items-center">
@@ -47,6 +49,10 @@
         <h1 class="text-3xl font-semibold text-[#1E2D93] text-center mb-4">PANEL ADMINISTRACIÓN DE CITAS</h1>
 
 
+=======
+    <section class="md:ml-80 mt-6 px-4 md:px-6 pb-10">
+        <h1 class="text-3xl font-semibold text-[#1E2D93] text-center mb-8">PANEL ADMINISTRACIÓN DE CITAS</h1>
+>>>>>>> main
 
         <button id="toggle-filtros" class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#33C0F1] to-[#1E2D93] text-white rounded-lg mx-auto mb-6 hover:scale-105 transition">
             <i class="fas fa-sliders-h"></i>
@@ -275,3 +281,7 @@
     </script>
 </body>
 </html>
+<<<<<<< HEAD
+=======
+
+>>>>>>> main

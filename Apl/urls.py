@@ -1,3 +1,4 @@
+# urls.py
 from django.urls import path
 from . import views 
 from django.conf import settings
@@ -8,6 +9,7 @@ urlpatterns = [
     path('servicios/', views.servicios, name='servicios'),
     path('Agendar/', views.Agendar, name='agendar'),
     path('login/', views.login, name='login'),
+    path('logout/', views.logout, name='logout'),
     path('RecuperarContrasena/', views.RContrasena, name='RContrasena'),
     path('Galeria/', views.gestion_galeria, name='Galeria'),
     path('Tipdelasemana/', views.gestion_tip, name='Tipdelasemana'),
@@ -19,8 +21,16 @@ urlpatterns = [
     path('backup/', views.backup, name='backup'),
     path('api/servicios/', views.api_servicios, name='api_servicios'),
     path('api/servicios/<int:servicio_id>/', views.api_servicios, name='api_servicio_detail'),
+<<<<<<< HEAD
     path('cambia_contraseña/<str:token>/', views.cambia_con, name='cambia_con'),
   
 
 
+=======
+    path('usuarios/', views.usuarios, name='usuarios'),
+    path('usuarios/eliminar/<str:documento>/', views.eliminar_usuario, name='eliminar_usuario'),
+    path('usuarios/editar/<str:documento>/', views.editar_usuario, name='editar_usuario'),
+    path('usuarios/toggle-estado/<str:documento>/', views.toggle_estado_usuario, name='toggle_estado_usuario'),
+    path('usuarios/crear/', views.crear_usuario, name='crear_usuario'),
+>>>>>>> main
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
