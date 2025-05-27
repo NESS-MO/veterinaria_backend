@@ -1,78 +1,94 @@
-from django.shortcuts import render, redirect
-from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
+from django.http import JsonResponse
 from django.contrib import messages
-from .models import Administrador, Cliente, Mascota 
-from django.shortcuts import get_object_or_404
-from .forms import DatosMascota
-# Create your views here.
+from django.views.decorators.http import require_POST
+from .models import Cliente, Mascota, Cita, TipSemana, ImagenGaleria
+from .models.AdminCitas import CitaRapida
+from .forms import ImagenGaleriaForm, CitaRapidaForm
+
+# --- Vistas principales ---
 
 def index(request): 
-    return render(request, "1. Index.html")
+    imagenes_galeria = ImagenGaleria.objects.filter(activa=True).order_by('orden')[:9]
+    return render(request, "1. Index.html", {'imagenes_galeria': imagenes_galeria})
 
 def servicios(request):
-    return render(request, "2. Servicios.html" )
+    return render(request, "2. Servicios.html")
+
+def gestion_citas(request):
+    citas = Cita.objects.filter(estado='pendiente')
+    return render(request, 'gestioncitas.html', {'citas': citas})
 
 def Agendar(request):
     if request.method == 'POST':
         try:
-            # Procesar cliente
-            cliente = Cliente.objects.create(
-                primer_nombre=request.POST['primer_nombre'],
-                primer_apellido=request.POST['primer_apellido'],
-                tipo_documento=request.POST['tipo_documento'],
-                numero_documento=request.POST['numero_documento'],
-                correo_electronico=request.POST['correo_electronico'],
-                telefono=request.POST['telefono']
+            numero_documento = request.POST['numero_documento']
+            cliente, _ = Cliente.objects.get_or_create(
+                numero_documento=numero_documento,
+                defaults={
+                    'primer_nombre': request.POST['primer_nombre'],
+                    'primer_apellido': request.POST['primer_apellido'],
+                    'tipo_documento': request.POST['tipo_documento'],
+                    'telefono': request.POST['telefono'],
+                    'correo_electronico': request.POST['correo_electronico'],
+                }
             )
-            
-            # Procesar mascota
-            mascota_data = {
-                'mascota': request.POST.get('mascota'),
-                'clase_mascota': request.POST.get('clase-mascota'),
-                'edad_numero': request.POST.get('edad-numero'),
-                'edad_unidad': request.POST.get('edad-unidad'),
-                'raza_mascota': request.POST.get('raza-mascota'),
-                'otra_raza': request.POST.get('otra-raza')
-            }
-            
-            mascota_form = DatosMascota(mascota_data)
-            
-            if mascota_form.is_valid():
-                # Determinar la raza final
-                raza = mascota_form.cleaned_data['otra_raza'] if mascota_form.cleaned_data['raza_mascota'] == 'otro' else mascota_form.cleaned_data['raza_mascota']
-                
-                # Crear la mascota
-                Mascota.objects.create(
-                    nombre_mascota=mascota_form.cleaned_data['mascota'],
-                    especie=mascota_form.cleaned_data['clase_mascota'],
-                    raza=raza,
-                    edad=f"{mascota_form.cleaned_data['edad_numero']} {mascota_form.cleaned_data['edad_unidad']}",
-                    cliente=cliente
-                )
-                
-                messages.success(request, "Cita enviada exitosamente")
-                return redirect('/Confirmacion')
-            else:
-                for field, errors in mascota_form.errors.items():
-                    for error in errors:
-                        messages.error(request, f"{field}: {error}")
-                        
+            nombre_mascota = request.POST['mascota']
+            mascota, _ = Mascota.objects.get_or_create(
+                nombre_mascota=nombre_mascota,
+                cliente=cliente,
+                defaults={
+                    'especie': request.POST['clase-mascota'],
+                    'raza': request.POST.get('otra-raza') or request.POST['raza-mascota'],
+                    'edad': f"{request.POST['edad-numero']} {request.POST['edad-unidad']}",
+                }
+            )
+            servicios = [request.POST['main_service']]
+            if request.POST.get('extra_service') and request.POST['extra_service'] != 'ninguno':
+                servicios.append(request.POST['extra_service'])
+
+            Cita.objects.create(
+                fecha=request.POST['fecha'],
+                horario=request.POST['hora'],
+                extra=", ".join(servicios),
+                cliente=cliente,
+                estado='pendiente'
+            )
+            messages.success(request, "Cita agendada exitosamente")
+            return redirect('agendar')
         except Exception as e:
             messages.error(request, f"Error al registrar: {str(e)}")
-    
-    return render(request, '3. Agendar.html')     
 
-def confirmar(request):
-    return render(request, "Confirmacion.html")
+    citas = Cita.objects.all()
+    return render(request, '3. Agendar.html', {'citas': citas})
+
+def RegistroC(request):
+    if request.method == 'POST':
+        form = CitaRapidaForm(request.POST)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Cita agregada correctamente.")
+            return redirect('registroc')
+        else:
+            messages.error(request, "Por favor corrige los errores del formulario.")
+    else:
+        form = CitaRapidaForm()
+    citas_rapidas = CitaRapida.objects.all()
+    citas_normales = Cita.objects.all()
+    return render(request, 'registrocitas.html', {
+        'citas_rapidas': citas_rapidas,
+        'citas_normales': citas_normales,
+        'form': form
+    })
 
 def login(request):
     return render(request, "4. login.html")
 
-def RContrasena(requets):
-    return render(requets, "4.1 RecuperarContrasena.html")
+def RContrasena(request):
+    return render(request, "4.1 RecuperarContrasena.html")
 
-def RContrasenaDos(requets):
-    return render(requets, "4.2 RecuperarContrasena.html")
+def RContrasenaDos(request):
+    return render(request, "4.2 RecuperarContrasena.html")
 
 def modificar(request):
     return gestion_galeria(request)
@@ -84,20 +100,13 @@ def Tip(request):
     return render(request, "5. Modificar-tipdelasemana.html")
 
 def gestion(request):
-    return render(request, "gestioncitas.html")
+    citas = Cita.objects.select_related('cliente').all()
+    return render(request, 'gestioncitas.html', {'citas': citas})
 
 def ModificarS(request):
     return render(request, "modificarservicios.html")
 
-def RegistroC(request):
-    return render(request, "registrocitas.html")
-
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from .models import TipSemana 
-
-from django.http import JsonResponse
-from django.views.decorators.http import require_POST
+# --- Tip de la semana ---
 
 def gestion_tip(request):
     try:
@@ -144,7 +153,6 @@ def gestion_tip(request):
         return redirect('Tipdelasemana')
 
     return render(request, '5. Modificar-tipdelasemana.html', {'tip': tip})
-from django.shortcuts import get_object_or_404
 
 def eliminar_tip(request, tip_id):
     tip = get_object_or_404(TipSemana, id=tip_id)
@@ -152,10 +160,7 @@ def eliminar_tip(request, tip_id):
         tip.delete()
         messages.success(request, 'Tip eliminado correctamente')
         return redirect('Tipdelasemana')
-    # Redirigir si no es POST
     return redirect('Tipdelasemana')
-
-from django.http import JsonResponse
 
 def obtener_tip_actual(request):
     try:
@@ -172,28 +177,18 @@ def obtener_tip_actual(request):
             'contenido': 'No hay tips disponibles actualmente.',
             'imagen': ''
         })
-    
-from django.contrib import messages
-from .models import ImagenGaleria
-from .forms import ImagenGaleriaForm
 
-from django.shortcuts import render, redirect
-from .models import ImagenGaleria
-from .forms import ImagenGaleriaForm
+# --- Galería ---
 
 def gestion_galeria(request):
     imagenes = ImagenGaleria.objects.all().order_by('orden')
-    
     if request.method == 'POST':
-        # Procesar eliminación de imágenes
         if 'eliminar' in request.POST:
             imagen_id = request.POST.get('eliminar')
             imagen = ImagenGaleria.objects.get(id=imagen_id)
             imagen.delete()
             messages.success(request, 'Imagen eliminada correctamente')
             return redirect('Galeria')
-        
-        # Procesar cambio de estado
         if 'toggle_activa' in request.POST:
             imagen_id = request.POST.get('toggle_activa')
             imagen = ImagenGaleria.objects.get(id=imagen_id)
@@ -201,11 +196,8 @@ def gestion_galeria(request):
             imagen.save()
             messages.success(request, f'Imagen {"activada" if imagen.activa else "ocultada"} correctamente')
             return redirect('Galeria')
-        
-        # Procesar nueva imagen
         form = ImagenGaleriaForm(request.POST, request.FILES)
         if form.is_valid():
-            # Limitar a 9 imágenes máximo
             if ImagenGaleria.objects.count() >= 9:
                 messages.error(request, 'Solo se permiten 9 imágenes en la galería')
             else:
@@ -214,13 +206,82 @@ def gestion_galeria(request):
             return redirect('Galeria')
     else:
         form = ImagenGaleriaForm()
-
     return render(request, '5. modificar-galeria.html', {
         'imagenes': imagenes,
         'form': form,
         'total_imagenes': ImagenGaleria.objects.count()
     })
 
-def index(request):
-    imagenes_galeria = ImagenGaleria.objects.filter(activa=True).order_by('orden')[:9]
-    return render(request, "1. Index.html", {'imagenes_galeria': imagenes_galeria})
+# --- Gestión de citas ---
+
+@require_POST
+def aceptar_cita(request, cita_id):
+    cita = get_object_or_404(Cita, id=cita_id)
+    cita.estado = 'realizada'
+    cita.save()
+    messages.success(request, "Cita aceptada y registrada.")
+    return redirect('gestioncitas')
+
+@require_POST
+def rechazar_cita(request, cita_id):
+    cita = get_object_or_404(Cita, id=cita_id)
+    cita.delete()
+    messages.success(request, "Cita rechazada y eliminada.")
+    return redirect('gestioncitas')
+
+def eliminar_cita(request, cita_id):
+    if request.method == 'POST':
+        cita = get_object_or_404(Cita, id=cita_id)
+        cita.delete()
+        messages.success(request, "Cita eliminada correctamente.")
+    return redirect('registroc')
+
+def cambiar_estado_cita(request, cita_id):
+    if request.method == 'POST':
+        cita = get_object_or_404(Cita, id=cita_id)
+        nuevo_estado = request.POST.get('estado')
+        cita.estado = nuevo_estado
+        cita.save()
+        messages.success(request, "Estado actualizado.")
+    return redirect('registroc')
+
+def editar_observacion_cita(request, cita_id):
+    if request.method == 'POST':
+        cita = get_object_or_404(Cita, id=cita_id)
+        nueva_obs = request.POST.get('observaciones', '')
+        cita.observaciones = nueva_obs
+        cita.save()
+        if nueva_obs:
+            CitaRapida.objects.create(
+                numero_documento=cita.cliente.numero_documento,
+                nombre_cliente=f"{cita.cliente.primer_nombre} {cita.cliente.primer_apellido}",
+                fecha=cita.fecha,
+                hora=cita.horario,
+                servicio=cita.extra,
+                estado=cita.estado,
+                observaciones=nueva_obs
+            )
+        messages.success(request, "Observaciones actualizadas.")
+    return redirect('registroc')
+
+@require_POST
+def editar_estado_observacion_rapida(request, cita_id):
+    cita = get_object_or_404(CitaRapida, id=cita_id)
+    cita.estado = request.POST.get('estado')
+    cita.observaciones = request.POST.get('observaciones')
+    cita.fecha = request.POST.get('fecha')
+    cita.hora = request.POST.get('hora')
+    cita.save()
+    messages.success(request, "Cita actualizada correctamente.")
+    return redirect('registroc')
+
+@require_POST
+def editar_estado_observacion_normal(request, cita_id):
+    cita = get_object_or_404(Cita, id=cita_id)
+    cita.estado = request.POST.get('estado')
+    cita.observaciones = request.POST.get('observaciones')
+    cita.fecha = request.POST.get('fecha')
+    cita.horario = request.POST.get('hora')
+    cita.save()
+    messages.success(request, "Cita actualizada correctamente.")
+    return redirect('registroc')

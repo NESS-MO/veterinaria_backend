@@ -1,8 +1,10 @@
 from ftplib import MAXLINE
 from django import forms 
-from django.core.validators import MinLengthValidator, EmailValidator
-from .models import Cliente, Mascota
+from .models import Cliente
 from .models import ImagenGaleria
+from .models.AdminCitas import CitaRapida
+from django.core.validators import MinValueValidator
+from datetime import date
 
 class ImagenGaleriaForm(forms.ModelForm):
     class Meta:
@@ -173,3 +175,100 @@ class DatosMascota(forms.Form):
             self.add_error('otra_raza', 'Por favor especifique la raza')
         
         return cleaned_data
+    
+class CitaForm(forms.Form):
+    fecha = forms.DateField(
+        widget=forms.DateInput(attrs={
+            'type': 'date',
+            'required': 'required',
+            'id': 'fecha',
+            'class': 'date-input'
+        }),
+        validators=[MinValueValidator(date.today, message="La fecha no puede ser en el pasado")]
+    )
+    
+    hora = forms.TimeField(
+        widget=forms.TimeInput(attrs={
+            'type': 'time',
+            'required': 'required',
+            'id': 'hora'
+        })
+    )
+    
+    main_service = forms.ChoiceField(
+        choices=[
+            ('', 'Seleccione principal*'),
+            ('consulta', 'Consulta'),
+            ('esterilizacion', 'Esterilización'),
+            ('guarderia', 'Guardería'),
+            ('vacunacion', 'Vacunación'),
+            ('profilaxis', 'Profilaxis'),
+            ('cirugias', 'Cirugías')
+        ],
+        widget=forms.Select(attrs={
+            'id': 'main-service',
+            'class': 'service-select',
+            'required': 'required'
+        })
+    )
+    
+    extra_service = forms.ChoiceField(
+        required=False,
+        choices=[
+            ('', 'Servicio extra (opcional)'),
+            ('consulta', 'Consulta'),
+            ('esterilizacion', 'Esterilización'),
+            ('guarderia', 'Guardería'),
+            ('vacunacion', 'Vacunación'),
+            ('profilaxis', 'Profilaxis'),
+            ('cirugias', 'Cirugías'),
+            ('ninguno', 'Ninguno')
+        ],
+        widget=forms.Select(attrs={
+            'id': 'extra-service',
+            'class': 'service-select'
+        })
+    )
+    
+    extra = forms.CharField(
+        required=False,
+        widget=forms.HiddenInput(attrs={
+            'id': 'extra'
+        })
+    )
+
+    def clean(self):
+        cleaned_data = super().clean()
+        main_service = cleaned_data.get('main_service')
+        extra_service = cleaned_data.get('extra_service')
+        
+        if extra_service == 'ninguno':
+            cleaned_data['extra_service'] = ''
+        
+        # Combinar servicios para el campo extra
+        servicios = [main_service]
+        if extra_service and extra_service != 'ninguno':
+            servicios.append(extra_service)
+        
+        cleaned_data['extra'] = ", ".join(servicios)
+        
+        return cleaned_data
+
+class CitaRapidaForm(forms.ModelForm):
+    class Meta:
+        model = CitaRapida
+        fields = [
+            'numero_documento',
+            'nombre_cliente',
+            'fecha',
+            'hora',
+            'servicio',
+            'estado',
+            'observaciones'
+        ]
+        widgets = {
+            'fecha': forms.DateInput(attrs={'type': 'date', 'class': 'border p-2 rounded-md'}),
+            'hora': forms.TimeInput(attrs={'type': 'time', 'class': 'border p-2 rounded-md'}),
+            'estado': forms.Select(attrs={'class': 'border p-2 rounded-md'}),
+            'observaciones': forms.TextInput(attrs={'class': 'border p-2 rounded-md'}),
+        }
