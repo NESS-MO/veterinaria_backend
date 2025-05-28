@@ -23,6 +23,8 @@ from django.utils.html import strip_tags
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 
 
 
@@ -71,67 +73,63 @@ def logout(request):
     return redirect('index')
 
 def RContrasena(request):
-    # Verifica si el metodo HTTP de la peticion es POST
     if request.method == 'POST':
-        # Obtiene el email enviado desde el formulario de recuperacion
         email = request.POST.get('correo_electronico')
+        print(f"Intentando recuperar contraseña para el correo: {email}")  # Debug
         
+        # Validar formato y existencia del correo
         try:
-            # Intenta obtener el usuario cuyo email coincide con el ingresado
-            user = administrador.objects.get(email=email)
-        except administrador.DoesNotExist:
-            # Si no se encuentra ningun usuario con ese email muestra un mensaje de error
-            messages.error(request, "El correo ingresado no está registrado.")
-            # Vuelve a renderizar el formulario de recuperacion de contraseña
-            return render(request, '4.1 RecuperarContrasena.html')
-        
-        # Guarda el email del usuario (se utiliza para enviar el correo de recuperacion)
-        correo_electronico = user.email
-
-        # Se crea una instancia de TimestampSigner para generar un token con marca de tiempo
-        signer = TimestampSigner()
-        # Se firma el id del usuario (convertido a string) para generar un token único
-        token = signer.sign(str(user.pk))
-        
-        # Se construye la URL absoluta para que el usuario cambie su contraseña
-        # utilizando 'reverse' para obtener la URL definida con el name 'cambia_con'
-        reset_url = request.build_absolute_uri(reverse('cambia_con', args=[token]))
-        
-        # Se renderiza la plantilla del mensaje de correo con los datos necesarios
-        html_message = render_to_string('accounts/msg_correo.html', {
-            'username': user.nombre_completo,  # Se pasa el nombre de usuario, útil para personalizar el mensaje
-            'reset_url': reset_url,       # Se pasa la URL de recuperación para que el usuario la utilice
-            'site_name': 'Veterinaria',  # Nombre del sitio para contextualizar el correo
-        })
-        
-        # Define el asunto del correo de recuperación
-        subject = "Recuperación de contraseña"
-        # Convierte el mensaje HTML a texto plano, útil para clientes de correo que no muestran HTML
-        text_message = strip_tags(html_message)
-        
-        try:
-            # Se prepara el correo usando EmailMultiAlternatives para enviar texto y HTML
-            email = EmailMultiAlternatives(
-                subject=subject,                       # Asunto del correo
-                body=text_message,                     # Versión en texto plano del mensaje
-                from_email=settings.DEFAULT_FROM_EMAIL, # Email remitente definido en las settings
-                to=[correo_electronico]                     # Lista de destinatarios (el email del usuario)
+            validate_email(email)
+            user = Administrador.objects.get(correo_electronico=email)
+            print(f"Usuario encontrado: {user.nombre_completo}")  # Debug
+            
+            # Generar token
+            signer = TimestampSigner()
+            token = signer.sign(str(user.pk))
+            reset_url = request.build_absolute_uri(reverse('cambia_con', args=[token]))
+            
+            # Preparar correo
+            html_message = render_to_string('accounts/msg_correo.html', {
+                'username': user.nombre_completo,
+                'reset_url': reset_url,
+                'site_name': 'Veterinaria',
+            })
+            
+            subject = "Recuperación de contraseña"
+            text_message = strip_tags(html_message)
+            
+            # Enviar correo
+            email_message = EmailMultiAlternatives(
+                subject=subject,
+                body=text_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[email]
             )
-            # Establece la codificación del correo a 'utf-8'
-            email.encoding = 'utf-8'
-            # Envía el correo
-            email.send()
-            # Muestra un mensaje de éxito informando que se ha enviado el enlace de recuperación
-            messages.success(request, "Se ha enviado un enlace a tu correo de recuperación para cambiar la contraseña.")
-            # Redirige al usuario a la página de login tras el envío correcto del correo
-            return redirect("login")
+            email_message.attach_alternative(html_message, "text/html")
+            email_message.send()
+            
+            print(f"Correo enviado exitosamente a: {email}")  # Debug
+            messages.success(request, "Se ha enviado un enlace a tu correo para cambiar la contraseña.")
+            return redirect('RContrasenaenviado')
+            
+        except ValidationError:
+            print(f"Formato de correo inválido: {email}")  # Debug
+            return JsonResponse({
+                'success': False,
+                'message': 'El formato del correo electrónico no es válido'
+            }, status=400)
+        except Administrador.DoesNotExist:
+            print(f"Correo no encontrado: {email}")  # Debug
+            return JsonResponse({
+                'success': False,
+                'message': 'El correo no está registrado en el sistema'
+            }, status=404)
         except Exception as e:
-            # Si ocurre alguna excepción al enviar el correo, se muestra un mensaje de error con la descripción
+            print(f"Error al enviar correo: {str(e)}")  # Debug
             messages.error(request, f"Error al enviar el correo: {str(e)}")
-            # Vuelve a renderizar el formulario de recuperación en caso de error
-            return render(request, 'RecuperarContrasena.html')
-        
-    return render(request, "4.1 RecuperarContrasena.html")
+            return render(request, '4.1 RecuperarContrasena.html')
+    
+    return render(request, '4.1 RecuperarContrasena.html')
 
 
 def cambia_con(request, token):
@@ -629,3 +627,6 @@ def crear_usuario(request):
         'success': False,
         'message': 'Método no permitido'
     }, status=405)
+
+def recuperar_contrasena_enviado(request):
+    return render(request, 'recuperarcontrasenaenviado.html')
