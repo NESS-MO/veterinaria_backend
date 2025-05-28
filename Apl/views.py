@@ -64,7 +64,16 @@ def Agendar(request):
 
 def RegistroC(request):
     if request.method == 'POST':
-        form = CitaRapidaForm(request.POST)
+        data = request.POST.copy()
+        valor = data.get('edad_mascota_valor', '')
+        tipo = data.get('edad_mascota_tipo', '')
+        if valor and tipo:
+            edad = f"{valor} {tipo}"
+        else:
+            edad = ""
+        data['edad_mascota'] = edad
+
+        form = CitaRapidaForm(data)
         if form.is_valid():
             form.save()
             messages.success(request, "Cita agregada correctamente.")
@@ -75,10 +84,14 @@ def RegistroC(request):
         form = CitaRapidaForm()
     citas_rapidas = CitaRapida.objects.all()
     citas_normales = Cita.objects.all()
+    rango_edades = range(1, 21)
+    rango_meses = range(0, 12)
     return render(request, 'registrocitas.html', {
+        'rango_edades': rango_edades,
+        'rango_meses': rango_meses,
         'citas_rapidas': citas_rapidas,
         'citas_normales': citas_normales,
-        'form': form
+        'form': form,
     })
 
 def login(request):

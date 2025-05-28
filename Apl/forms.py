@@ -255,11 +255,27 @@ class CitaForm(forms.Form):
         return cleaned_data
 
 class CitaRapidaForm(forms.ModelForm):
+    def clean(self):
+        cleaned_data = super().clean()
+        edad_valor = self.data.get('edad_mascota_valor')
+        edad_tipo = self.data.get('edad_mascota_tipo')
+        if not edad_valor or not edad_tipo:
+            raise forms.ValidationError("Debe ingresar la edad y el tipo (años o meses).")
+        if edad_tipo == 'años' and (int(edad_valor) < 0 or int(edad_valor) > 20):
+            raise forms.ValidationError("La edad en años debe estar entre 0 y 20.")
+        if edad_tipo == 'meses' and (int(edad_valor) < 0 or int(edad_valor) > 11):
+            raise forms.ValidationError("La edad en meses debe estar entre 0 y 11.")
+        # ...otras validaciones...
+        return cleaned_data
+
     class Meta:
         model = CitaRapida
         fields = [
             'numero_documento',
             'nombre_cliente',
+            'nombre_mascota',
+            'edad_mascota',        
+            'raza_mascota',        
             'fecha',
             'hora',
             'servicio',
