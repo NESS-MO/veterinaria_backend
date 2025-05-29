@@ -49,21 +49,27 @@
 
     <!-- Main Section -->
     <section class="md:ml-80 mt-6 px-4 md:px-6 pb-10">  <!-- Breadcrumb -->
-<nav class="text-sm text-gray-600 mb-4" aria-label="Breadcrumb">
-  <ol class="list-reset flex items-center">
-    <li>
-      <a href="{% url 'index' %}" class="text-blue-600 hover:underline flex items-center">
-        <!-- Icono casita -->
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9-9 9 9M4 10v10a1 1 0 001 1h3m10-11v10a1 1 0 01-1 1h-3m-4 0h4" />
-        </svg>
-        Inicio
-      </a>
-    </li>
-    <li><span class="mx-2">/</span></li>
-    <li class="text-gray-500">Citas Solicitadas</li>
-  </ol>
-</nav>
+          <nav class="flex ml-8 mb-9 w-full justify-start">
+        <ol class="inline-flex items-center space-x-1 md:space-x-2">
+            <li class="inline-flex items-center">
+                <a href="{% url 'gestioncitas' %}" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors">
+                    <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M14.707 7.793a1 1 0 0 0-1.414 0L11 10.086V1.5a1 1 0 0 0-2 0v8.586L6.707 7.793a1 1 0 1 0-1.414 1.414l4 4a1 1 0 0 0 1.416 0l4-4a1 1 0 0 0-.002-1.414Z"/>
+                        <path d="M18 12h-2.55l-2.975 2.975a3.5 3.5 0 0 1-4.95 0L4.55 12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/>
+                    </svg>
+                    Administrador
+                </a>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                    </svg>
+                    <span class="ml-1 text-sm font-medium text-gray-700 md:ml-2">Sitas Solicitadas</span>
+                </div>
+            </li>
+        </ol>
+    </nav>
         <h1 class="text-3xl font-semibold text-[#1E2D93] text-center mb-4">PANEL ADMINISTRACIÓN DE CITAS</h1>
 
 
