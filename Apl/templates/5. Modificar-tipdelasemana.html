@@ -9,103 +9,108 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href=" {% static 'css/ModTip.css' %}">
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#33C0F1',
+            secondary: '#1E2D93'
+          }
+        }
+      }
+    }
+  </script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
-<body>
+<body class="bg-gray-50 font-sans">
   <!-- Sidebar -->
-  <div class="w-full md:w-72 bg-gradient-to-br from-[#33C0F1] to-[#1E2D93] text-white p-7 md:fixed md:h-full top-0 left-0 z-10 font-sans"> 
-      <img class="h-24 mx-auto mb-4" src="{% static 'Images/logo2.png' %}" alt="Logo" />
-      <ul class="space-y-4 text-lg">
-        <li><a href="{% url 'gestioncitas' %}" class="block hover:bg-white/20 p-2 rounded">Citas Solicitadas</a></li>
-        <li><a href="{% url 'registroc' %}" class="block hover:bg-white/20 p-2 rounded">Registro Citas</a></li>
-        <li><a href="{% url 'usuarios' %}" class="block hover:bg-white/20 p-2 rounded">Gestión de Usuario</a></li>
-        <li><a href="{% url 'Galeria' %}" class="block bg-white/30 hover:bg-white/40 p-2 rounded text-gray-900">Modificar Tip de la Semana</a></li>
-        <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Galería</a></li>
-        <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Servicios</a></li>
-        <li><a href="{% url 'backup' %}" class="block hover:bg-white/20 p-2 rounded">Copia de seguridad</a></li>
-           <li><a href="{% url 'logout' %}" class="block hover:bg-red-500/80 p-2 rounded">Cerrar sesión</a></li>
-        </ul>
-        
-        <div class="absolute bottom-0 left-0 w-full p-4 bg-white/10">
-            <div class="text-center">
-                <p class="font-bold">Usuario:</p>
-                <p>{{ request.user.nombre_completo }}</p>
-            </div>
-        </div>
+  <div class="fixed top-0 left-0 z-20 w-full md:w-80 h-full bg-gradient-to-br from-primary to-secondary text-white p-5 transform -translate-x-full md:translate-x-0 transition-transform duration-300" id="sidebar">
+    <img class="h-15 mx-auto mb-2" src="{% static 'Images/logo2.png' %}" alt="Logo" />
+    <ul class="space-y-2 text-lg">
+      <li><a href="{% url 'gestioncitas' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Citas Solicitadas</a></li>
+      <li><a href="{% url 'registroc' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Registro Citas</a></li>
+      <li><a href="{% url 'usuarios' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Gestión de Usuario</a></li>
+      <li><a href="{% url 'Tipdelasemana' %}" class="block bg-white/30 hover:bg-white/40 p-2 rounded text-gray-900 transition-colors">Modificar Tip de la Semana</a></li>
+      <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Modificar Galería</a></li>
+      <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Modificar Servicios</a></li>
+      <li><a href="{% url 'backup' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Copia de seguridad</a></li>
+      <li><a href="{% url 'logout' %}" class="block hover:bg-red-500/80 p-2 rounded transition-colors">Cerrar sesión</a></li>
+    </ul>
+    
+    <!-- Información del usuario -->
+    <div class="absolute bottom-0 left-0 w-full p-4 bg-white/10 border-t border-white/20">
+      <div class="text-center">
+        <p class="font-bold">Usuario:</p>
+        <p class="text-sm">{{ request.user.nombre_completo }}</p>
+      </div>
+    </div>
   </div>
-<!-- Breadcrumb -->
-<nav class="text-sm text-gray-600 px-4 md:ml-72 mt-4" aria-label="Breadcrumb">
-  <ol class="flex items-center space-x-2">
-    <li>
-      <a href="{% url 'index' %}" class="text-blue-600 hover:underline flex items-center">
-        <!-- Icono casita -->
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l9-9 9 9M4 10v10a1 1 0 001 1h3m10-11v10a1 1 0 01-1 1h-3m-4 0h4" />
-        </svg>
-        Inicio
-      </a>
-    </li>
-    <li><span class="mx-1">/</span></li>
-    <li class="text-gray-500">Modificar Tip de la Semana</li>
-  </ol>
-</nav>
-  <div class="main-content fade-in">
-    <div class="content-container">
-      <form id="tipForm" method="POST" enctype="multipart/form-data">
-        {% csrf_token %}
-        <h2>Configurar Tip de la Semana</h2>
-        
-        <div class="form-container">
-          <div class="form-group">
-            <div>
-              <label for="tipTitle" class="form-label">Título del Tip</label>
-              <input type="text" id="tipTitle" name="titulo" class="form-input" placeholder="Ingrese un título llamativo" value="{{ tip.titulo|default:'' }}">
-            </div>
 
-            <div>
-              <label class="form-label">Imagen del Tip</label>
-              <div class="image-upload-container" onclick="document.getElementById('imageInput').click()">
-                <input type="file" id="imageInput" name="imagen" accept="image/*" style="display: none;">
-                <label for="imageInput" class="image-upload-label">
-                  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  Haz clic para subir una imagen
-                  <span class="text-xs mt-1">Formatos recomendados: JPG, PNG (Max. 2MB)</span>
-                </label>
-                {% if tip and tip.imagen %}
-                  <img id="previewImage" src="{{ tip.imagen.url }}" alt="Vista previa de la imagen" style="display: block;">
-                {% else %}
-                  <img id="previewImage" alt="Vista previa de la imagen" style="display: none;">
-                {% endif %}
-              </div>
-            </div>
+  <!-- Mobile menu button -->
+  <button class="md:hidden fixed top-4 left-4 z-20 bg-primary text-white p-2 rounded-lg shadow-lg" id="mobileMenuBtn">
+    <i class="fas fa-bars"></i>
+  </button>
 
-            <div>
-              <label for="tipText" class="form-label">Contenido del Tip</label>
-              <textarea id="tipText" name="contenido" class="form-input form-textarea" placeholder="Escribe aquí el contenido detallado del tip...">{{ tip.contenido|default:'' }}</textarea>
-            </div>
-          </div>
+  <!-- Overlay for mobile menu -->
+  <div class="md:hidden fixed inset-0 bg-black/50 z-10 opacity-0 pointer-events-none transition-opacity duration-300" id="overlay"></div>
 
-          <div class="button-container">
-              <button type="submit" class="btn btn-save">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                </svg>
-                {% if tip %}Actualizar Tip{% else %}Guardar Tip{% endif %}
-              </button>
-            {% if tip %}
-            <button type="button" class="btn btn-delete" onclick="deleteTip()">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+  <div class="main-content fade-in md:ml-72 p-4 lg:p-8">
+  <div class="max-w-4xl mx-auto bg-white rounded-lg shadow-md p-6 lg:p-8">
+    <form id="tipForm" method="POST" enctype="multipart/form-data" class="space-y-6">
+      {% csrf_token %}
+      <h2 class="text-2xl font-bold text-gray-800 mb-6">Configurar Tip de la Semana</h2>
+      
+      <div class="space-y-8">
+        <div>
+          <label for="tipTitle" class="block text-lg font-medium text-gray-700 mb-2">Título del Tip</label>
+          <input type="text" id="tipTitle" name="titulo" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Ingrese un título llamativo" value="{{ tip.titulo|default:'' }}">
+        </div>
+
+        <div>
+          <label class="block text-lg font-medium text-gray-700 mb-2">Imagen del Tip</label>
+          <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center cursor-pointer hover:border-blue-500 transition-colors" onclick="document.getElementById('imageInput').click()">
+            <input type="file" id="imageInput" name="imagen" accept="image/*" class="hidden">
+            <div class="flex flex-col items-center justify-center space-y-2">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
               </svg>
-              Eliminar Tip
-            </button>
+              <p class="text-gray-600">Haz clic para subir una imagen</p>
+              <p class="text-sm text-gray-500">Formatos recomendados: JPG, PNG (Max. 2MB)</p>
+            </div>
+            {% if tip and tip.imagen %}
+              <img id="previewImage" src="{{ tip.imagen.url }}" alt="Vista previa de la imagen" class="mt-4 max-h-64 mx-auto rounded-lg shadow-sm">
+            {% else %}
+              <img id="previewImage" alt="Vista previa de la imagen" class="mt-4 max-h-64 mx-auto rounded-lg shadow-sm hidden">
             {% endif %}
           </div>
         </div>
-      </form>
-    </div>
+
+        <div>
+          <label for="tipText" class="block text-lg font-medium text-gray-700 mb-2">Contenido del Tip</label>
+          <textarea id="tipText" name="contenido" rows="6" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all" placeholder="Escribe aquí el contenido detallado del tip...">{{ tip.contenido|default:'' }}</textarea>
+        </div>
+      </div>
+
+      <div class="flex flex-col sm:flex-row justify-end gap-4 pt-6">
+        {% if tip %}
+        <button type="button" onclick="deleteTip()" class="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center justify-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
+          Eliminar Tip
+        </button>
+        {% endif %}
+        <button type="submit" class="px-6 py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors flex items-center justify-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          </svg>
+          {% if tip %}Actualizar Tip{% else %}Guardar Tip{% endif %}
+        </button>
+      </div>
+    </form>
   </div>
+</div>
 
 <script>
 // ===== Variables globales =====
@@ -276,6 +281,43 @@ window.addEventListener('beforeunload', (e) => {
     e.returnValue = 'Tienes cambios sin guardar. ¿Seguro que quieres salir?';
   }
 });
+
+// ===== Control del menú hamburguesa para móviles =====
+document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    
+    // Alternar visibilidad del sidebar
+    sidebar.classList.toggle('-translate-x-full');
+    
+    // Alternar visibilidad del overlay
+    overlay.classList.toggle('opacity-0');
+    overlay.classList.toggle('pointer-events-none');
+});
+
+// Cerrar menú al hacer clic en el overlay
+document.getElementById('overlay').addEventListener('click', function() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    
+    sidebar.classList.add('-translate-x-full');
+    overlay.classList.add('opacity-0');
+    overlay.classList.add('pointer-events-none');
+});
+
+// Cerrar menú al hacer clic en un enlace (para móviles)
+document.querySelectorAll('#sidebar a').forEach(link => {
+    link.addEventListener('click', function() {
+        if (window.innerWidth < 768) { // Solo para móviles
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('opacity-0');
+            overlay.classList.add('pointer-events-none');
+        }
+    });
+});
 </script>
 </body>
-</html>  
+</html>

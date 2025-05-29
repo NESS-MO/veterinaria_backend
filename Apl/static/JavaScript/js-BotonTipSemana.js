@@ -1,7 +1,7 @@
 function addFloatingTipStyles() {
   const style = document.createElement('style');
   style.textContent = `
-    /* Estilos para el botón flotante */
+    /* Estilos para el botón flotante (se mantienen igual) */
     .tip {
       position: fixed;
       bottom: 160px;
@@ -55,7 +55,7 @@ function addFloatingTipStyles() {
       padding: 8px 12px;
     }
 
-    /* Estilos para el fondo oscuro */
+    /* Estilos para el fondo oscuro (se mantienen igual) */
     #fondo-oscuro {
       display: none;
       position: fixed;
@@ -68,40 +68,41 @@ function addFloatingTipStyles() {
       z-index: 999;
     }
 
-    /* Estilos mejorados para la ventana TIP */
+    /* NUEVOS ESTILOS COMPACTOS SOLO PARA LA VENTANA EN MÓVILES */
     .ventana-tip {
       position: fixed;
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
-      width: 90%;
-      max-width: 650px;
+      width: 95%;
+      max-width: 300px;
       background: white;
-      border-radius: 20px;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+      border-radius: 12px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
       z-index: 1000;
       display: none;
       overflow: hidden;
-      animation: aparecer 0.4s ease-out forwards;
+      animation: aparecer 0.3s ease-out forwards;
       border: 1px solid #e0e0e0;
       font-family: 'Open Sans', sans-serif;
+      max-height: 80vh;
+      overflow-y: auto;
     }
 
     @keyframes aparecer {
-      from { opacity: 0; transform: translate(-50%, -45%); }
+      from { opacity: 0; transform: translate(-50%, -48%); }
       to { opacity: 1; transform: translate(-50%, -50%); }
     }
 
     .contenedor-tip {
       display: flex;
       flex-direction: column;
-      height: 100%;
     }
 
     .cabecera-tip {
-    background: linear-gradient(135deg, #2563eb, #0891b2);
+      background: linear-gradient(135deg, #2563eb, #0891b2);
       color: white;
-      padding: 15px 20px;
+      padding: 12px 15px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -109,14 +110,14 @@ function addFloatingTipStyles() {
 
     .titulo-tip {
       margin: 0;
-      font-size: 1.5rem;
+      font-size: 1rem;
       font-weight: 600;
       text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
     }
 
     .salir {
-      width: 24px;
-      height: 24px;
+      width: 18px;
+      height: 18px;
       cursor: pointer;
       transition: transform 0.2s;
       filter: brightness(0) invert(1);
@@ -128,22 +129,15 @@ function addFloatingTipStyles() {
 
     .cuerpo-tip {
       display: flex;
-      padding: 20px;
-      gap: 20px;
+      padding: 15px;
+      gap: 12px;
       flex-direction: column;
-    }
-
-    @media (min-width: 768px) {
-      .cuerpo-tip {
-        flex-direction: row;
-      }
     }
 
     .imagen-tip {
       position: relative;
-      flex: 1;
-      min-height: 200px;
-      border-radius: 15px;
+      min-height: 120px;
+      border-radius: 8px;
       overflow: hidden;
       display: flex;
       align-items: center;
@@ -152,75 +146,148 @@ function addFloatingTipStyles() {
     }
 
     .gif-tip {
-      max-width: 100%;
-      max-height: 250px;
+      width: 100%;
+      height: auto;
+      max-height: 140px;
       object-fit: contain;
-      border-radius: 10px;
-      z-index: 2;
+      border-radius: 6px;
     }
 
     .decoracion-tip {
       position: absolute;
-      width: 150px;
-      height: 150px;
+      width: 80px;
+      height: 80px;
       background: #2563eb;
       opacity: 0.1;
       border-radius: 50%;
-      top: -30px;
-      right: -30px;
+      top: -15px;
+      right: -15px;
     }
 
     .contenido-texto-tip {
-      flex: 2;
       display: flex;
       flex-direction: column;
     }
 
     .subtitulo-tip {
       color: #2c3e50;
-      font-size: 1.3rem;
+      font-size: 0.95rem;
       margin-top: 0;
-      margin-bottom: 15px;
+      margin-bottom: 8px;
       font-weight: 600;
     }
 
     .texto-tip {
       color: #555;
-      line-height: 1.6;
-      margin-bottom: 20px;
-      font-size: 0.95rem;
+      line-height: 1.5;
+      margin-bottom: 12px;
+      font-size: 0.85rem;
     }
 
     .pie-tip {
       background: #f5f7fa;
-      padding: 10px 20px;
+      padding: 8px 15px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 8px;
       border-top: 1px solid #e0e0e0;
     }
 
     .logo-tip {
-      height: 30px;
+      height: 20px;
       width: auto;
     }
 
     .pie-tip span {
       color: #666;
-      font-size: 0.8rem;
+      font-size: 0.7rem;
       font-style: italic;
+    }
+
+    /* Estilos para tablets (se mantiene el diseño original con ajustes) */
+    @media (min-width: 768px) {
+      .ventana-tip {
+        max-width: 500px;
+        border-radius: 15px;
+      }
+      
+      .cabecera-tip {
+        padding: 15px 20px;
+      }
+      
+      .titulo-tip {
+        font-size: 1.3rem;
+      }
+      
+      .salir {
+        width: 20px;
+        height: 20px;
+      }
+      
+      .cuerpo-tip {
+        padding: 20px;
+        gap: 15px;
+      }
+      
+      .imagen-tip {
+        min-height: 180px;
+        border-radius: 12px;
+      }
+      
+      .gif-tip {
+        max-height: 200px;
+      }
+      
+      .subtitulo-tip {
+        font-size: 1.1rem;
+        margin-bottom: 12px;
+      }
+      
+      .texto-tip {
+        font-size: 0.9rem;
+        margin-bottom: 15px;
+      }
+      
+      .pie-tip {
+        padding: 10px 20px;
+      }
+      
+      .logo-tip {
+        height: 25px;
+      }
+      
+      .pie-tip span {
+        font-size: 0.75rem;
+      }
+    }
+
+    /* Estilos para desktop (diseño original completo) */
+    @media (min-width: 992px) {
+      .ventana-tip {
+        max-width: 650px;
+        border-radius: 20px;
+      }
+      
+      .imagen-tip {
+        min-height: 200px;
+      }
+      
+      .gif-tip {
+        max-height: 250px;
+      }
     }
   `;
   document.head.appendChild(style);
 }
 
+// El resto del código permanece exactamente igual
 function createFloatingTipElements() {
   // Fondo oscuro
   const fondoOscuro = document.createElement('div');
   fondoOscuro.id = 'fondo-oscuro';
   fondoOscuro.style.display = 'none';
   
-  // Botón flotante
+  // Botón flotante (sin cambios)
   const tipButton = document.createElement('div');
   tipButton.className = 'tip';
   tipButton.innerHTML = `
@@ -228,7 +295,7 @@ function createFloatingTipElements() {
     <span class="tooltip-text">¡TIP DE LA SEMANA!</span>
   `;
   
-  // Ventana mejorada
+  // Ventana tip (sin cambios en el HTML, solo estilos CSS)
   const tipWindow = document.createElement('div');
   tipWindow.className = 'ventana-tip';
   tipWindow.id = 'tipv';
@@ -264,50 +331,37 @@ function createFloatingTipElements() {
   document.body.appendChild(tipButton);
   document.body.appendChild(tipWindow);
 
-  // Event listeners
+  // Event listeners (sin cambios)
   tipButton.addEventListener('click', function() {
-    console.log("Botón tip clickeado");
     tipb();
   });
 
   fondoOscuro.addEventListener('click', function() {
-    console.log("Fondo oscuro clickeado");
     salirfo();
   });
   
-  // Event listener para el botón de salir
   tipWindow.querySelector('.salir').addEventListener('click', function(e) {
-    console.log("Botón 'salir' dentro de la ventana clickeado");
     e.stopPropagation();
     salir();
   });
 }
 
+// Las funciones restantes permanecen exactamente igual
 function tipb() {
-  console.log("Función tipb() llamada");
   document.getElementById("fondo-oscuro").style.display = "block";
   document.getElementById("tipv").style.display = "block";
-  console.log("Ventana tip mostrada");
-  console.log("Fondo oscuro mostrado");
 }
 
 function salir() {
-  console.log("Función salir() llamada");
   document.getElementById("tipv").style.display = "none";
   document.getElementById("fondo-oscuro").style.display = "none";
-  console.log("Ventana tip oculta");
-  console.log("Fondo oscuro oculto");
 }
 
 function salirfo() {
-  console.log("Función salirfo() llamada");
   document.getElementById("tipv").style.display = "none";
   document.getElementById("fondo-oscuro").style.display = "none";
-  console.log("Ventana tip oculta");
-  console.log("Fondo oscuro oculto");
 }
 
-// Inicialización cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
   addFloatingTipStyles();
   createFloatingTipElements();
@@ -329,7 +383,6 @@ function updateTipContent() {
   }
 }
 
-// Llamar a la función después de crear los elementos
 document.addEventListener("DOMContentLoaded", function () {
   updateTipContent();
 });

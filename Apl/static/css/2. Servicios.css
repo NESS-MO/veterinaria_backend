@@ -1,64 +1,3 @@
-body {
-    background-color: #f4f4f4;
-    font-family: 'Open Sans', sans-serif;
-    margin: 0;
-    padding: 0;
-    color: #333;
-}
-
-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: linear-gradient(135deg, #22d3ee, #1e40af);
-    padding: 10px 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    flex-wrap: wrap;
-}
-
-.Logotipo {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.Logotipo img {
-    height: 80px;
-}
-
-.eslogan {
-    font-size: 14px;
-    color: #fff;
-    margin-top: 5px;
-    text-align: center;
-}
-
-nav {
-    display: flex;
-    gap: 15px;
-    align-items: center;
-}
-
-nav a {
-    color: #fff;
-    text-decoration: none;
-    font-weight: 600;
-    padding: 8px 15px;
-    border-radius: 5px;
-    transition: background-color 0.3s, transform 0.3s;
-}
-
-nav a:hover {
-    background-color: rgba(255, 255, 255, 0.2);
-    transform: translateY(-2px);
-}
-
-.perfil {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-}
-
 .servicio{
     text-decoration: none;
 }
@@ -259,34 +198,41 @@ nav a:hover {
     }
 }
 
-@media (max-width: 768px) {
-    header {
-        flex-direction: column;
+/* Añade esto si no está presente */
+.opciones {
+    transition: right 0.3s ease;
+    z-index: 1000;
+}
+
+/* En la versión móvil */
+.opciones a {
+    font-size: 18px;
+    padding: 12px 20px;
+}
+
+@media screen and (max-width: 768px) {
+    .opciones {
+        width: 80%;
+        padding: 20px;
+        background: linear-gradient(135deg, #1e40af, #22d3ee);
+    }
+    
+    .opciones a {
+        font-size: 18px;
+        padding: 12px 20px;
+        width: 100%;
         text-align: center;
     }
-
-    nav {
-        flex-direction: column;
-        gap: 10px;
-        margin-top: 10px;
+    
+    .cerrar {
+        font-size: 28px;
+        top: 15px;
+        right: 15px;
     }
-
-    .sect div {
-        width: 100%;
-        max-width: 100%;
-    }
-
-    .img2 {
-        height: 150px;
-    }
-
-    .sect div p {
-        font-size: 18px;
-    }
-
-    .agendar {
-        width: 100%;
-        padding: 12px;
+    
+    .abrir {
+        font-size: 28px;
+        padding: 5px 10px;
     }
 }
 
@@ -502,25 +448,125 @@ footer {
     color: white;
 }
 
-/* Responsive */
-@media (max-width: 1024px) {
+@media (max-width: 1035px) {
     .servicios-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, 1fr); /* 2 columnas */
+        gap: 25px;
+        padding: 30px 15px;
+    }
+
+    .servicio-card {
+        margin: 10px;
+    }
+    
+    .servicio-imagen-container {
+        height: 220px;
     }
 }
 
-@media (max-width: 640px) {
+/* ------------------------- */
+/* Breakpoints existentes para Servicios (conservados) */
+/* ------------------------- */
+@media (max-width: 768px) {
+    header {
+        flex-direction: row;
+        padding: 10px 15px;
+    }
+    
     .servicios-grid {
-        grid-template-columns: 1fr;
-        padding: 20px;
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+        gap: 20px;
+    }
+
+    .servicio-card{
+        margin: 10px 10px
     }
     
     .servicio-botones {
-        flex-direction: column;
+        flex-direction: row;
+        flex-wrap: wrap;
     }
     
     .btn-consulta, .btn-agendar {
-        width: 100%;
-        justify-content: center;
+        padding: 10px 15px;
+        font-size: 14px;
+    }
+    
+    .detalles {
+        padding: 20px;
+    }
+    
+    .img2 {
+        height: 180px;
+    }
+}
+
+@media (max-width: 480px) {
+    .servicios-grid {
+        grid-template-columns: 1fr;
+        padding: 20px 10px;
+        gap: 15px;
+    }
+    
+    .servicio-card {
+        max-width: 100%;
+    }
+    
+    .servicio-imagen-container {
+        height: 200px;
+    }
+    
+    .servicio-titulo {
+        font-size: 1.1rem;
+    }
+    
+    .servicio-botones {
+        flex-direction: row;
+    }
+    
+    .btn-consulta, .btn-agendar {
+        width: auto;
+        min-width: 110px;
+        padding: 8px 12px;
+    }
+    
+    .detalles {
+        width: 95%;
+        padding: 15px;
+    }
+    
+    .img2 {
+        height: 150px;
+    }
+}
+
+/* ------------------------- */
+/* Header y Footer (conservando 768px como breakpoint) */
+/* ------------------------- */
+@media (max-width: 768px) {
+    header {
+        flex-direction: row;
+        padding: 8px 10px;
+    }
+    
+    .Logotipo img {
+        height: 60px;
+    }
+    
+    .eslogan {
+        font-size: 12px;
+    }
+    
+    .opciones {
+        width: 80%;
+    }
+
+    .footer-container {
+        gap: 25px;
+    }
+    
+    .copyright {
+        padding-top: 20px;
+        margin-top: 20px;
     }
 }

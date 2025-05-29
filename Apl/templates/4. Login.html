@@ -13,35 +13,32 @@
     <link rel="stylesheet" href="{% static 'css/4. Login.css' %}">
     <!-- Agregamos SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <style>
-        .error-message {
-            color: #e53e3e;
-            background-color: #fed7d7;
-            padding: 0.5rem;
-            border-radius: 0.25rem;
-            margin-top: 0.25rem;
-            font-size: 0.875rem;
-            display: none; /* Ocultamos los mensajes de error por defecto */
-        }
-    </style>
+    <link rel="stylesheet" href={% static "css/header.css" %}>
 </head>
 
-<body style="background-repeat: no-repeat; background-size: cover; background-image: url(https://img2.wallspic.com/crops/3/2/0/2/82023/82023-gato-raza_de_perro-cuidado_de_mascotas-refugio_de_animales-veterinario-1366x768.jpg)">
-    <header>
-        <div class="Logotipo">
-            <a href={% url "index" %}>
-                <img src={% static "Images/logo2.png" %} alt="logo DR.PUL">
-            </a>
-            <h3 class="eslogan">COMPROMETIDOS CON LA SALUD ANIMAL</h3>
-        </div>
-        <nav class="opciones" id="menu">
-            <a href="{% url 'index' %}">INICIO</a>
-            <a href="{% url 'index' %}#conocenos">CONÓCENOS</a>
-            <a href="{% url 'servicios' %}">SERVICIOS</a>
-            <a href="{% url 'agendar' %}">AGENDAR CITA</a>
-            <a href="{% url 'login' %}"><img class="perfil" src={% static "Images/perfil.png" %} alt="logo DR.PUL"></a>
-        </nav>
-    </header>
+<body >
+<header>
+    <!--Logo de encabezado-->
+    <div class="Logotipo">
+        <a href="{% url 'index' %}">
+            <img src="{% static 'Images/logo2.png' %}" alt="logo DR.PUL">
+        </a>
+        <h3 class="eslogan">COMPROMETIDOS CON LA SALUD ANIMAL</h3>
+    </div>
+
+    <!--Menú hamburguesa responsivo-->
+    <button class="abrir" id="abrir-menu">☰</button>
+    
+    <!--Opciones de encabezado-->
+    <nav class="opciones" id="menu">
+        <button class="cerrar" id="cerrar-menu">✕</button>
+        <a href="{% url 'index' %}">INICIO</a>
+        <a href="{% url 'index' %}#conocenos">CONÓCENOS</a>
+        <a href="{% url 'servicios' %}">SERVICIOS</a>
+        <a href="{% url 'agendar' %}">AGENDAR CITA</a>
+        <a href="{% url 'login' %}"><img class="perfil" src="{% static 'Images/perfil.png' %}" alt="Perfil"></a>
+    </nav>
+</header>
     <div class="formulario">
         <h1>
             <div class="volver2">
@@ -80,6 +77,8 @@
         </form>
     </div>
 
+    <script src={% static "JavaScript/MenuHamburguesa.js" %}></script>
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('login-form');

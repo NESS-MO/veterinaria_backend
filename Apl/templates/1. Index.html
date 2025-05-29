@@ -15,40 +15,39 @@
     <!-- Widget de Accesibilidad -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href={% static "css/custom.css" %}>
+    <link rel="stylesheet" href={% static "css/header.css" %}>
 </head>
 
 <body>
-    <header>
-        <!--Logo de encabezado-->
-        <div class="Logotipo">
-            <a href={% url "index" %}>
-                <img src={% static "Images/logo2.png" %} alt="logo DR.PUL">
-            </a>
-            <h3 class="eslogan">COMPROMETIDOS CON LA SALUD ANIMAL</h3>
-        </div>
+<header>
+    <!--Logo de encabezado-->
+    <div class="Logotipo">
+        <a href="{% url 'index' %}">
+            <img src="{% static 'Images/logo2.png' %}" alt="logo DR.PUL">
+        </a>
+        <h3 class="eslogan">COMPROMETIDOS CON LA SALUD ANIMAL</h3>
+    </div>
 
-        <!--Menú hamburguesa responsivo-->
-        <button class="abrir" id="abrir-menu">☰</button>
-        
-        <!--Opciones de encabezado-->
-        <nav class="opciones" id="menu">
-            <button class="cerrar" id="cerrar-menu">✕</button>
-            <a href={% url "index"%}>INICIO</a>
-            <a href="#conocenos">CONÓCENOS</a>
-            <a href={% url "servicios" %}>SERVICIOS</a>
-            <a href={% url "agendar" %}>AGENDAR CITA</a>
-            <a href={% url "login"%}><img class="perfil" src={% static "Images/perfil.png" %} alt="logo DR.PUL"></a>
-        </nav>
-    </header>
+    <!--Menú hamburguesa responsivo-->
+    <button class="abrir" id="abrir-menu">☰</button>
+    
+    <!--Opciones de encabezado-->
+    <nav class="opciones" id="menu">
+        <button class="cerrar" id="cerrar-menu">✕</button>
+        <a href="{% url 'index' %}">INICIO</a>
+        <a href="{% url 'index' %}#conocenos">CONÓCENOS</a>
+        <a href="{% url 'servicios' %}">SERVICIOS</a>
+        <a href="{% url 'agendar' %}">AGENDAR CITA</a>
+        <a href="{% url 'login' %}"><img class="perfil" src="{% static 'Images/perfil.png' %}" alt="Perfil"></a>
+    </nav>
+</header>
     
     <!--Fondo inicial-->
     <section class="bienvenida">
         <h1></h1>
         <p></p>
         <!--Logo boton-->
-        <img class="logo1" src={% static "Images/logop1.png" %}>
-        <img class="logo2" src={% static "Images/logop2.png" %}>
-        <a href={% url "agendar" %}><img class="logo3" src={% static "Images/logop3.png" %}></a>
+        <a href={% url "agendar" %}><img class="logo1" src={% static "Images/logop3.png" %}></a>
     </section>
 
 
