@@ -259,6 +259,51 @@ def gestion_tip(request):
             message = 'Nuevo tip creado con éxito'
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            response_data = {
+                'success': True,
+                'message': message,
+                'titulo': tip.titulo,
+                'contenido': tip.contenido,
+                'imagen_url': tip.imagen.url if tip.imagen else ''
+            }
+            return JsonResponse(response_data)
+
+        messages.success(request, message)
+        return redirect('Tipdelasemana')
+
+    return render(request, '5. Modificar-tipdelasemana.html', {'tip': tip})
+    try:
+        tip = TipSemana.objects.latest('fecha_actualizacion')
+    except TipSemana.DoesNotExist:
+        tip = None
+
+    if request.method == 'POST':
+        titulo = request.POST.get('titulo')
+        contenido = request.POST.get('contenido')
+        imagen = request.FILES.get('imagen')
+
+        if not titulo or not contenido:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'error': 'El título y el contenido son obligatorios'}, status=400)
+            messages.error(request, 'El título y el contenido son obligatorios')
+            return redirect('Tipdelasemana')
+
+        if tip:
+            tip.titulo = titulo
+            tip.contenido = contenido
+            if imagen:
+                tip.imagen = imagen
+            tip.save()
+            message = 'Tip actualizado correctamente'
+        else:
+            tip = TipSemana.objects.create(
+                titulo=titulo,
+                contenido=contenido,
+                imagen=imagen
+            )
+            message = 'Nuevo tip creado con éxito'
+
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({
                 'success': True,
                 'message': message,

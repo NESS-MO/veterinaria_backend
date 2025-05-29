@@ -174,49 +174,86 @@ document.getElementById("tipForm").addEventListener("submit", function(e) {
     return;
   }
 
+  // Mostrar spinner o indicador de carga
+  const submitBtn = document.querySelector('button[type="submit"]');
+  const originalBtnText = submitBtn.innerHTML;
+  submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Guardando...';
+  submitBtn.disabled = true;
+
   fetch("{% url 'Tipdelasemana' %}", {
     method: 'POST',
     body: formData,
     headers: {
+      'X-CSRFToken': '{{ csrf_token }}',
       'X-Requested-With': 'XMLHttpRequest'
     }
   })
-  .then(response => response.json())
+  .then(response => {
+    if (!response.ok) {
+      throw new Error('Error en la respuesta del servidor');
+    }
+    return response.json();
+  })
   .then(data => {
     if (data.error) {
       alert(data.error);
       return;
     }
     
-    // Animación de confirmación
-    const saveBtn = document.querySelector('.btn-save');
-    saveBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> ¡Guardado!';
-    saveBtn.style.backgroundColor = '#10B981';
+    // Mostrar mensaje de éxito
+    submitBtn.innerHTML = '<i class="fas fa-check"></i> ¡Guardado!';
+    submitBtn.classList.remove('bg-blue-500', 'hover:bg-blue-600');
+    submitBtn.classList.add('bg-green-500', 'hover:bg-green-600');
     
     setTimeout(() => {
-      saveBtn.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg> Guardar Tip';
-      saveBtn.style.background = 'linear-gradient(135deg, #1E2D93, #33C0F1)';
+      submitBtn.innerHTML = originalBtnText;
+      submitBtn.classList.remove('bg-green-500', 'hover:bg-green-600');
+      submitBtn.classList.add('bg-blue-500', 'hover:bg-blue-600');
+      submitBtn.disabled = false;
     }, 2000);
     
-    // Actualizar localStorage y botón flotante
+    // Actualizar localStorage
     if (data.imagen_url) {
       localStorage.setItem('tipImage', data.imagen_url);
     }
     localStorage.setItem('tipTitle', data.titulo);
     localStorage.setItem('tipText', data.contenido);
     
-    // Notificar a otras pestañas
+    // Notificar a otras pestañas y al botón flotante
     const event = new CustomEvent('tipUpdated', { 
       detail: data 
     });
     document.dispatchEvent(event);
     
     hasChanges = false;
+    
+    // Actualizar la vista previa si se subió una nueva imagen
+    if (data.imagen_url && document.getElementById("previewImage")) {
+      const preview = document.getElementById("previewImage");
+      preview.src = data.imagen_url;
+      preview.style.display = "block";
+    }
   })
   .catch(error => {
     console.error('Error:', error);
-    alert('Error al guardar');
+    alert('Error al guardar: ' + error.message);
+    submitBtn.innerHTML = originalBtnText;
+    submitBtn.disabled = false;
   });
+});
+
+// Escuchar eventos de actualización (para otras pestañas)
+document.addEventListener('tipUpdated', function(e) {
+  // Actualizar el formulario si está abierto
+  if (document.getElementById("tipTitle")) {
+    document.getElementById("tipTitle").value = e.detail.titulo;
+    document.getElementById("tipText").value = e.detail.contenido;
+    if (e.detail.imagen_url && document.getElementById("previewImage")) {
+      const preview = document.getElementById("previewImage");
+      preview.src = e.detail.imagen_url;
+      preview.style.display = "block";
+    }
+  }
 });
 
 // ===== Eliminar Tip =====

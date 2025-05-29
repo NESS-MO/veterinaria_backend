@@ -366,22 +366,68 @@ document.addEventListener('DOMContentLoaded', function() {
   createFloatingTipElements();
 });
 
+// Función para actualizar el contenido del tip
 function updateTipContent() {
-  const tipImage = localStorage.getItem("tipImage");
-  const tipTitle = localStorage.getItem("tipTitle");
-  const tipText = localStorage.getItem("tipText");
+  // Primero intenta obtener los datos del servidor
+  fetch("/obtener-tip-actual/")
+    .then(response => response.json())
+    .then(data => {
+      // Actualiza el localStorage con los datos del servidor
+      localStorage.setItem('tipTitle', data.titulo);
+      localStorage.setItem('tipText', data.contenido);
+      if (data.imagen) {
+        localStorage.setItem('tipImage', data.imagen);
+      }
+      
+      // Actualiza la interfaz
+      updateTipUI(data);
+    })
+    .catch(error => {
+      console.error('Error al obtener el tip:', error);
+      // Si falla, usa los datos del localStorage
+      const tipImage = localStorage.getItem("tipImage");
+      const tipTitle = localStorage.getItem("tipTitle");
+      const tipText = localStorage.getItem("tipText");
+      
+      updateTipUI({
+        titulo: tipTitle || '¡Tip de la Semana!',
+        contenido: tipText || 'No hay tips disponibles actualmente.',
+        imagen: tipImage || ''
+      });
+    });
+}
 
-  if (tipImage) {
-    document.querySelector(".gif-tip").src = tipImage;
+// Función para actualizar la interfaz con los datos del tip
+function updateTipUI(data) {
+  if (data.imagen && document.querySelector(".gif-tip")) {
+    document.querySelector(".gif-tip").src = data.imagen;
   }
-  if (tipTitle) {
-    document.querySelector(".subtitulo-tip").textContent = tipTitle;
+  if (data.titulo && document.querySelector(".subtitulo-tip")) {
+    document.querySelector(".subtitulo-tip").textContent = data.titulo;
   }
-  if (tipText) {
-    document.querySelector(".texto-tip").textContent = tipText;
+  if (data.contenido && document.querySelector(".texto-tip")) {
+    document.querySelector(".texto-tip").textContent = data.contenido;
   }
 }
 
-document.addEventListener("DOMContentLoaded", function () {
+// Escuchar eventos de actualización
+document.addEventListener('tipUpdated', function(e) {
+  // Actualizar localStorage
+  localStorage.setItem('tipTitle', e.detail.titulo);
+  localStorage.setItem('tipText', e.detail.contenido);
+  if (e.detail.imagen_url) {
+    localStorage.setItem('tipImage', e.detail.imagen_url);
+  }
+  
+  // Actualizar la interfaz
+  updateTipUI({
+    titulo: e.detail.titulo,
+    contenido: e.detail.contenido,
+    imagen: e.detail.imagen_url
+  });
+});
+
+// Actualizar el contenido al cargar la página
+document.addEventListener("DOMContentLoaded", function() {
   updateTipContent();
 });
