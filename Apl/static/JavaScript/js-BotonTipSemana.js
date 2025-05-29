@@ -55,8 +55,7 @@ function addFloatingTipStyles() {
       padding: 8px 12px;
     }
 
-    /* Estilos para el fondo oscuro (se mantienen igual) */
-    #fondo-oscuro {
+    #fondo-oscuro-tip {  
       display: none;
       position: fixed;
       top: 0;
@@ -284,7 +283,7 @@ function addFloatingTipStyles() {
 function createFloatingTipElements() {
   // Fondo oscuro
   const fondoOscuro = document.createElement('div');
-  fondoOscuro.id = 'fondo-oscuro';
+  fondoOscuro.id = 'fondo-oscuro-tip';  // Cambiado a ID único
   fondoOscuro.style.display = 'none';
   
   // Botón flotante (sin cambios)
@@ -348,18 +347,18 @@ function createFloatingTipElements() {
 
 // Las funciones restantes permanecen exactamente igual
 function tipb() {
-  document.getElementById("fondo-oscuro").style.display = "block";
+  document.getElementById("fondo-oscuro-tip").style.display = "block"; // Actualizado
   document.getElementById("tipv").style.display = "block";
 }
 
 function salir() {
   document.getElementById("tipv").style.display = "none";
-  document.getElementById("fondo-oscuro").style.display = "none";
+  document.getElementById("fondo-oscuro-tip").style.display = "none"; // Actualizado
 }
 
 function salirfo() {
   document.getElementById("tipv").style.display = "none";
-  document.getElementById("fondo-oscuro").style.display = "none";
+  document.getElementById("fondo-oscuro-tip").style.display = "none"; // Actualizado
 }
 
 document.addEventListener('DOMContentLoaded', function() {

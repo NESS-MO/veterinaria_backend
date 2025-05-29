@@ -49,6 +49,8 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.shortcuts import render, redirect
 from .forms import LoginForm
 
+from django.http import JsonResponse
+
 def login(request):
     if request.method == 'POST':
         form = LoginForm(request, data=request.POST)
@@ -56,14 +58,31 @@ def login(request):
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
             user = authenticate(request, username=username, password=password)
+            
             if user is not None:
                 auth_login(request, user)
+                # Para solicitudes AJAX (spinner)
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': True,
+                        'redirect_url': reverse('gestioncitas')
+                    })
                 return redirect('gestioncitas')
             else:
                 form.add_error(None, "Documento o contraseña incorrectos")
+        
+        # Manejo de errores para AJAX
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            errors = form.errors.as_json()
+            return JsonResponse({
+                'success': False,
+                'errors': errors,
+                'message': 'Error de autenticación'
+            }, status=400)
     else:
         form = LoginForm()
     
+    # Respuesta normal para GET
     return render(request, "4. login.html", {'form': form})
 
 def logout(request):

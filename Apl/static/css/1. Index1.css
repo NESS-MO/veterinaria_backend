@@ -214,7 +214,7 @@
 
 .tarjeta img {
     width: 100%;
-    height: 260px;
+    height: 350px;
     object-fit: cover;
     border-radius: 12px;
     margin-bottom: 15px;
@@ -393,7 +393,7 @@
 
 .f-mapa {
     padding: 40px 20px;
-    background-color: #ffffff;
+    background-color: #f3f3f3;
     text-align: center;
 }
 
@@ -706,7 +706,7 @@ footer {
 /* Sección Nuestro Trabajo */
 .seccion-trabajo {
     padding: 60px 20px;
-    background-color: #f4f4f4; /* Mismo color que la sección Conócenos */
+    background-color: #ffffff; /* Mismo color que la sección Conócenos */
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -918,3 +918,4 @@ footer {
         font-size: 20px;
     }
 }
+

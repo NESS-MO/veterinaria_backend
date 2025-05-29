@@ -60,7 +60,7 @@
         {% endfor %}
     </div>
 
-    <div id="fondo-oscuro" class="fondo-oscuro"></div>  
+    <div id="fondo-oscuro-servicios" class="fondo-oscuro"></div>
 
     {% for servicio in servicios %}
     <!--Ventana {{ servicio.nombre }}-->
@@ -131,22 +131,19 @@
     </footer>
 
     <script>
-    // Función para mostrar el detalle del servicio
     function mostrarDetalleServicio(servicioSlug) {
-        document.getElementById('fondo-oscuro').style.display = 'block';
+        document.getElementById('fondo-oscuro-servicios').style.display = 'block';
         document.getElementById(servicioSlug + 'D').style.display = 'block';
     }
 
-    // Función para cerrar el detalle del servicio
     function cerrarDetalleServicio() {
-        document.getElementById('fondo-oscuro').style.display = 'none';
+        document.getElementById('fondo-oscuro-servicios').style.display = 'none';
         document.querySelectorAll('.detalles').forEach(detalle => {
             detalle.style.display = 'none';
         });
     }
 
-    // Cerrar al hacer clic en el fondo oscuro
-    document.getElementById('fondo-oscuro').addEventListener('click', cerrarDetalleServicio);
+    document.getElementById('fondo-oscuro-servicios').addEventListener('click', cerrarDetalleServicio);
 
     // Menú hamburguesa
     document.addEventListener('DOMContentLoaded', function() {

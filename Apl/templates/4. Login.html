@@ -76,48 +76,92 @@
             <input type="submit" value="Iniciar">
         </form>
     </div>
+</body>
+
+<!-- Añade esto justo antes del cierre del body (antes de los scripts) -->
+<div class="loader" id="loader">
+    <div class="spinner"></div>
+</div>
 
     <script src={% static "JavaScript/MenuHamburguesa.js" %}></script>
     
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('login-form');
-            const formErrors = document.getElementById('form-errors');
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('login-form');
+        const formErrors = document.getElementById('form-errors');
+        const loader = document.getElementById('loader');
+        
+        // Verificar si hay errores al cargar la página
+        if (formErrors && formErrors.textContent.trim() !== '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de autenticación',
+                text: 'Documento o contraseña incorrecta, Intente nuevamente.',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'Entendido'
+            });
+        }
+
+        // Manejar el envío del formulario
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
             
-            // Verificar si hay errores al cargar la página
-            if (formErrors && formErrors.textContent.trim() !== '') {
+            // Validación básica del lado del cliente
+            const username = document.getElementById('id_username').value.trim();
+            const password = document.getElementById('id_password').value.trim();
+            
+            if (!username || !password) {
                 Swal.fire({
                     icon: 'error',
-                    title: 'Error de autenticación',
-                    text: 'Documento o contraseña incorrecta, Intente nuevamente.',
+                    title: 'Campos incompletos',
+                    text: 'Por favor ingresa tu documento y contraseña',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'Entendido'
+                });
+                return;
+            }
+            
+            // Mostrar el spinner de carga
+            loader.style.display = 'flex';
+            
+            try {
+                const response = await fetch(this.action, {
+                    method: 'POST',
+                    body: new FormData(this),
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest' // Identificar como AJAX
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    // Redirigir después de éxito
+                    window.location.href = data.redirect_url;
+                } else {
+                    // Ocultar spinner y mostrar error
+                    loader.style.display = 'none';
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error de autenticación',
+                        text: data.message || 'Documento o contraseña incorrecta',
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'Entendido'
+                    });
+                }
+            } catch (error) {
+                loader.style.display = 'none';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Ocurrió un error al procesar la solicitud',
                     confirmButtonColor: '#3085d6',
                     confirmButtonText: 'Entendido'
                 });
             }
-
-            // Manejar el envío del formulario
-            form.addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Validación básica del lado del cliente
-                const username = document.getElementById('id_username').value.trim();
-                const password = document.getElementById('id_password').value.trim();
-                
-                if (!username || !password) {
-                    Swal.fire({
-                        icon: 'error',
-                        title: 'Campos incompletos',
-                        text: 'Por favor ingresa tu documento y contraseña',
-                        confirmButtonColor: '#3085d6',
-                        confirmButtonText: 'Entendido'
-                    });
-                    return;
-                }
-                
-                // Si todo está bien, enviar el formulario
-                this.submit();
-            });
         });
-    </script>
-</body>
+    });
+</script>
+
+
 </html>
