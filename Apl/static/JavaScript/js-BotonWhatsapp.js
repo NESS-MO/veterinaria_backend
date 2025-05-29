@@ -18,6 +18,8 @@ function createWhatsAppButton() {
         height: auto;
         transition: transform 0.3s ease;
         order: 2;
+        border-radius: 50%;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
       }
   
       .whatsapp-logo:hover img {
