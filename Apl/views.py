@@ -49,6 +49,8 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.shortcuts import render, redirect
 from .forms import LoginForm
 
+from django.http import JsonResponse
+
 def login(request):
     if request.method == 'POST':
         form = LoginForm(request, data=request.POST)
@@ -56,14 +58,31 @@ def login(request):
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
             user = authenticate(request, username=username, password=password)
+            
             if user is not None:
                 auth_login(request, user)
+                # Para solicitudes AJAX (spinner)
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': True,
+                        'redirect_url': reverse('gestioncitas')
+                    })
                 return redirect('gestioncitas')
             else:
                 form.add_error(None, "Documento o contraseña incorrectos")
+        
+        # Manejo de errores para AJAX
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            errors = form.errors.as_json()
+            return JsonResponse({
+                'success': False,
+                'errors': errors,
+                'message': 'Error de autenticación'
+            }, status=400)
     else:
         form = LoginForm()
     
+    # Respuesta normal para GET
     return render(request, "4. login.html", {'form': form})
 
 def logout(request):
@@ -338,6 +357,43 @@ def modificar_servicio(request):
 
 @csrf_exempt
 def api_servicios(request, servicio_id=None):
+    if request.method == 'POST':
+        try:
+            data = request.POST
+            files = request.FILES
+            
+            if 'servicio_id' in data and data['servicio_id']:
+                # Actualizar servicio existente
+                servicio = Servicio.objects.get(id=data['servicio_id'])
+                servicio.nombre = data.get('nombre', servicio.nombre)
+                
+                servicio.titulo_ventana = data.get('titulo_ventana', servicio.titulo_ventana)
+                servicio.subtitulo_ventana = data.get('subtitulo_ventana', servicio.subtitulo_ventana)
+                servicio.contenido_ventana = data.get('contenido_ventana', servicio.contenido_ventana)
+                servicio.mostrar_boton_agendar = data.get('mostrar_boton_agendar', 'off') == 'on'
+                
+                if 'imagen_cuadro' in files:
+                    servicio.imagen_cuadro = files['imagen_cuadro']
+                if 'imagen_ventana' in files:
+                    servicio.imagen_ventana = files['imagen_ventana']
+                
+                servicio.save()
+            else:
+                # Crear nuevo servicio - ELIMINA mostrar_boton_consulta ya que siempre será True
+                servicio = Servicio.objects.create(
+                    nombre=data['nombre'],
+                    imagen_cuadro=files['imagen_cuadro'],
+                    titulo_ventana=data['titulo_ventana'],
+                    subtitulo_ventana=data['subtitulo_ventana'],
+                    imagen_ventana=files['imagen_ventana'],
+                    contenido_ventana=data['contenido_ventana'],
+                    mostrar_boton_agendar=data.get('mostrar_boton_agendar', 'off') == 'on',
+                    orden=Servicio.objects.count() + 1
+                )
+            
+            return JsonResponse({'success': True, 'id': servicio.id})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
     if request.method == 'GET':
         if servicio_id:
             servicio = get_object_or_404(Servicio, id=servicio_id)

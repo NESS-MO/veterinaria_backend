@@ -12,30 +12,31 @@
     <link rel="icon" href={% static "Images/Logo.png" %}/>
     <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href={% static "css/2. Servicios.css" %}>
+    <link rel="stylesheet" href={% static "css/header.css" %}>
 </head>
 <body>
-    <header>
-        <!--Logo de encabezado-->
-        <div class="Logotipo">
-            <a href={% url "index" %}>
-                <img src={% static "Images/logo2.png"%} alt="logo DR.PUL">
-            </a>
-            <h3 class="eslogan">COMPROMETIDOS CON LA SALUD ANIMAL</h3>
-        </div>
+<header>
+    <!--Logo de encabezado-->
+    <div class="Logotipo">
+        <a href="{% url 'index' %}">
+            <img src="{% static 'Images/logo2.png' %}" alt="logo DR.PUL">
+        </a>
+        <h3 class="eslogan">COMPROMETIDOS CON LA SALUD ANIMAL</h3>
+    </div>
+
+    <!--Menú hamburguesa responsivo-->
+    <button class="abrir" id="abrir-menu">☰</button>
     
-        <!--Menú hamburguesa responsivo-->
-        <button class="abrir" id="abrir-menu">☰</button>
-    
-        <!--Opciones de encabezado-->
-        <nav class="opciones" id="menu">
-            <button class="cerrar" id="cerrar-menu">✕</button>
-            <a href="{% url "index" %}">INICIO</a>
-            <a href="{% url "index" %}#conocenos">CONÓCENOS</a>
-            <a href="{% url "servicios" %}">SERVICIOS</a>
-            <a href="{% url "agendar" %}">AGENDAR CITA</a>
-            <a href="{% url "login" %}"><img class="perfil" src={% static "Images/perfil.png" %} alt="logo DR.PUL"></a>
-        </nav>
-    </header>
+    <!--Opciones de encabezado-->
+    <nav class="opciones" id="menu">
+        <button class="cerrar" id="cerrar-menu">✕</button>
+        <a href="{% url 'index' %}">INICIO</a>
+        <a href="{% url 'index' %}#conocenos">CONÓCENOS</a>
+        <a href="{% url 'servicios' %}">SERVICIOS</a>
+        <a href="{% url 'agendar' %}">AGENDAR CITA</a>
+        <a href="{% url 'login' %}"><img class="perfil" src="{% static 'Images/perfil.png' %}" alt="Perfil"></a>
+    </nav>
+</header>
 
     <div class="servicios-grid">
         {% for servicio in servicios %}
@@ -59,7 +60,7 @@
         {% endfor %}
     </div>
 
-    <div id="fondo-oscuro" class="fondo-oscuro"></div>  
+    <div id="fondo-oscuro-servicios" class="fondo-oscuro"></div>
 
     {% for servicio in servicios %}
     <!--Ventana {{ servicio.nombre }}-->
@@ -130,22 +131,19 @@
     </footer>
 
     <script>
-    // Función para mostrar el detalle del servicio
     function mostrarDetalleServicio(servicioSlug) {
-        document.getElementById('fondo-oscuro').style.display = 'block';
+        document.getElementById('fondo-oscuro-servicios').style.display = 'block';
         document.getElementById(servicioSlug + 'D').style.display = 'block';
     }
 
-    // Función para cerrar el detalle del servicio
     function cerrarDetalleServicio() {
-        document.getElementById('fondo-oscuro').style.display = 'none';
+        document.getElementById('fondo-oscuro-servicios').style.display = 'none';
         document.querySelectorAll('.detalles').forEach(detalle => {
             detalle.style.display = 'none';
         });
     }
 
-    // Cerrar al hacer clic en el fondo oscuro
-    document.getElementById('fondo-oscuro').addEventListener('click', cerrarDetalleServicio);
+    document.getElementById('fondo-oscuro-servicios').addEventListener('click', cerrarDetalleServicio);
 
     // Menú hamburguesa
     document.addEventListener('DOMContentLoaded', function() {

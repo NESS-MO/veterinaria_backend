@@ -8,322 +8,288 @@
     <link rel="icon" href="{% static 'Images/logo.png' %}"/>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/GestionCitas.css' %}">
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        .table-container {
-            margin-left: 19rem;
-            padding: 2rem;
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#33C0F1',
+                        secondary: '#1E2D93'
+                    }
+                }
+            }
         }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
-        }
-        th, td {
-            padding: 30px;
-            text-align: center;
-            border-bottom: 1px solid #ddd;
-        }
-        td {
-            font-size:18px;
-        }
-        th {
-            background-color: #f8f9fa;
-            font-weight: 700;
-            color:black;
-            font-size:16px;
-        }
-        tr:hover {
-            background-color: #f5f5f5;
-        }
-        .action-buttons button {
-            margin-right: 5px;
-            padding: 5px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 100;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(0,0,0,0.4);
-        }
-        .modal-content {
-            background-color: #fefefe;
-            margin: 5% auto;
-            padding: 25px;
-            border: 1px solid #888;
-            width: 50%;
-            max-width: 600px;
-            border-radius: 8px;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-        }
-        .close {
-            color: #aaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .close:hover {
-            color: black;
-        }
-        .password-toggle {
-            cursor: pointer;
-            position: absolute;
-            right: 10px;
-            top: 50%;
-            transform: translateY(-50%);
-        }
-        .form-group {
-            margin-bottom: 1.5rem;
-            position: relative;
-        }
-        .error-message {
-            color: #e53e3e;
-            font-size: 0.875rem;
-            margin-top: 0.25rem;
-        }
-        #passwordFields {
-            transition: all 0.3s ease;
-        }
-        .hidden {
-            display: none !important;
-        }
-        .user-info {
-            padding: 1rem;
-            background: rgba(255, 255, 255, 0.1);
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            left: 0;
-        }
-        .user-info p {
-            margin: 0.25rem 0;
-            text-align: center;
-        }
-        /* Estilos para los filtros */
-        #filtrosContainer {
-            transition: all 0.3s ease;
-        }
-        .highlight {
-            background-color: #f0f7ff;
-        }
-    </style>
+    </script>
 </head>
-<body>
+<body class="bg-gray-50 font-sans">
     <!-- Sidebar -->
-    <div class="w-full md:w-72 bg-gradient-to-br from-[#33C0F1] to-[#1E2D93] text-white p-7 md:fixed md:h-full top-0 left-0 z-10 font-sans"> 
-        <img class="h-24 mx-auto mb-4" src="{% static 'Images/logo2.png' %}" alt="Logo" />
-        <ul class="space-y-4 text-lg">
-            <li><a href="{% url 'gestioncitas' %}" class="block hover:bg-white/20 p-2 rounded">Citas Solicitadas</a></li>
-            <li><a href="{% url 'registroc' %}" class="block hover:bg-white/20 p-2 rounded">Registro Citas</a></li>
-            <li><a href="{% url 'usuarios' %}" class="block bg-white/30 hover:bg-white/40 p-2 rounded text-gray-900">Gestión de Usuario</a></li>
-            <li><a href="{% url 'Tipdelasemana' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Tip de la Semana</a></li>
-            <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Galería</a></li>
-            <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Servicios</a></li>
-            <li><a href="{% url 'backup' %}" class="block hover:bg-white/20 p-2 rounded">Copia de seguridad</a></li>
-            <li><a href="{% url 'logout' %}" class="block hover:bg-red-500/80 p-2 rounded">Cerrar sesión</a></li>
+  <div class="fixed top-0 left-0 z-20 w-full md:w-80 h-full bg-gradient-to-br from-primary to-secondary text-white p-5 transform -translate-x-full md:translate-x-0 transition-transform duration-300" id="sidebar">
+    <img class="h-15 mx-auto mb-2" src="{% static 'Images/logo2.png' %}" alt="Logo" />
+    <ul class="space-y-2 text-lg">
+            <li><a href="{% url 'gestioncitas' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Citas Solicitadas</a></li>
+            <li><a href="{% url 'registroc' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Registro Citas</a></li>
+            <li><a href="{% url 'usuarios' %}" class="block bg-white/30 hover:bg-white/40 p-2 rounded text-gray-900 transition-colors">Gestión de Usuario</a></li>
+            <li><a href="{% url 'Tipdelasemana' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Modificar Tip de la Semana</a></li>
+            <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Modificar Galería</a></li>
+            <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Modificar Servicios</a></li>
+            <li><a href="{% url 'backup' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Copia de seguridad</a></li>
+            <li><a href="{% url 'logout' %}" class="block hover:bg-red-500/80 p-2 rounded transition-colors">Cerrar sesión</a></li>
         </ul>
         
         <!-- Información del usuario -->
-        <div class="user-info">
+        <div class="absolute bottom-0 left-0 w-full p-4 bg-white/10 border-t border-white/20">
             <div class="text-center">
                 <p class="font-bold">Usuario:</p>
-                <p>{{ request.user.nombre_completo }}</p>
+                <p class="text-sm">{{ request.user.nombre_completo }}</p>
             </div>
         </div>
     </div>
 
+    
+
+    <!-- Mobile menu button -->
+    <button class="md:hidden fixed top-4 left-4 z-20 bg-primary text-white p-2 rounded-lg shadow-lg" id="mobileMenuBtn">
+    <i class="fas fa-bars"></i>
+    </button>
+
+    <!-- Overlay for mobile menu -->
+    <div class="md:hidden fixed inset-0 bg-black/50 z-10 opacity-0 pointer-events-none transition-opacity duration-300" id="overlay"></div>
+
+
+    
     <!-- Contenido principal -->
-    <div class="table-container">
-        <h1 class="text-2xl font-bold mb-6">Gestión de Usuarios Administradores</h1>
+    <div class="md:ml-72 p-6 lg:p-8 min-h-screen">
+    <nav class="flex mb-6 w-full justify-center md:justify-start">
+        <ol class="flex items-center bg-gray-50/50 px-4 py-2 rounded-lg md:bg-transparent md:px-0">
+            <li class="inline-flex items-center">
+                <a href="{% url 'gestioncitas' %}" class="flex items-center text-sm text-gray-500 hover:text-blue-600 transition-colors">
+                    <svg class="flex-shrink-0 w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M14.707 7.793a1 1 0 0 0-1.414 0L11 10.086V1.5a1 1 0 0 0-2 0v8.586L6.707 7.793a1 1 0 1 0-1.414 1.414l4 4a1 1 0 0 0 1.416 0l4-4a1 1 0 0 0-.002-1.414Z"/>
+                        <path d="M18 12h-2.55l-2.975 2.975a3.5 3.5 0 0 1-4.95 0L4.55 12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/>
+                    </svg>
+                    <span class="ml-2 text-sm font-medium">Administrador</span>
+                </a>
+            </li>
+            <li class="flex items-center">
+                <svg class="mx-2 text-gray-300 w-3 h-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                </svg>
+                <span class="text-sm font-medium text-gray-800">Gestión de Usuarios</span>
+            </li>
+        </ol>
+    </nav>
+    <h1 class="text-2xl lg:text-3xl font-bold mb-6 text-gray-800 text-center">Gestión de Usuarios Administradores</h1>
+    
+    <div class="mb-6">
+        <!-- Contenedor para centrar el botón de filtrar -->
+    <div class="flex justify-center mb-6">
+        <button id="btnMostrarFiltros" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md transition-colors inline-flex items-center gap-2">
+            <i class="fas fa-filter"></i> 
+            <span>Filtrar</span>
+        </button>
+    </div>
         
-        <!-- Botón de filtros y campos de filtrado -->
-        <div class="mb-6">
-            <button id="btnMostrarFiltros" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 mb-4">
-                <i class="fas fa-filter"></i> Filtrar
-            </button>
-            
-            <div id="filtrosContainer" class="hidden bg-white p-4 rounded-lg shadow-md mb-4">
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Documento</label>
-                        <input type="text" id="filtroDocumento" placeholder="Buscar por documento..."
-                            class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-                        <input type="text" id="filtroNombre" placeholder="Buscar por nombre..."
-                            class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Correo</label>
-                        <input type="text" id="filtroCorreo" placeholder="Buscar por correo..."
-                            class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
-                        <input type="text" id="filtroTelefono" placeholder="Buscar por teléfono..."
-                            class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                    </div>
-                    <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-                        <select id="filtroEstado" class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                            <option value="">Todos</option>
-                            <option value="true">Activo</option>
-                            <option value="false">Inactivo</option>
-                        </select>
-                    </div>
-                    <div class="flex items-end">
-                        <button id="btnLimpiarFiltros" class="bg-gray-300 text-gray-700 px-4 py-2 rounded hover:bg-gray-400">
-                            <i class="fas fa-times"></i> Limpiar
-                        </button>
-                    </div>
+        <div id="filtrosContainer" class="hidden bg-white p-4 lg:p-6 rounded-lg shadow-md mb-4 transition-all duration-300 ease-in-out">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Documento</label>
+                    <input type="text" id="filtroDocumento" placeholder="Buscar por documento..."
+                        class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                    <input type="text" id="filtroNombre" placeholder="Buscar por nombre..."
+                        class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Correo</label>
+                    <input type="text" id="filtroCorreo" placeholder="Buscar por correo..."
+                        class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                    <input type="text" id="filtroTelefono" placeholder="Buscar por teléfono..."
+                        class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                    <select id="filtroEstado" class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                        <option value="">Todos</option>
+                        <option value="true">Activo</option>
+                        <option value="false">Inactivo</option>
+                    </select>
+                </div>
+                <div class="flex items-end">
+                    <button id="btnLimpiarFiltros" class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-lg transition-colors inline-flex items-center gap-2">
+                        <i class="fas fa-times"></i> 
+                        <span>Limpiar</span>
+                    </button>
                 </div>
             </div>
         </div>
-        
-        <!-- Tabla de usuarios -->
-        <table>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden mx-auto max-w-6xl mt-6">
+    <div class="overflow-x-auto">
+        <table class="w-full border-collapse text-center">
             <thead>
-                <tr>
-                    <th>Documento</th>
-                    <th>Nombre Completo</th>
-                    <th>Correo Electrónico</th>
-                    <th>Teléfono</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
+                <tr class="bg-gray-50">
+                    <th class="px-4 py-6 text-sm font-bold text-gray-900 border-b border-gray-200">Documento</th>
+                    <th class="px-4 py-6 text-sm font-bold text-gray-900 border-b border-gray-200">Nombre Completo</th>
+                    <th class="px-4 py-6 text-sm font-bold text-gray-900 border-b border-gray-200">Correo Electrónico</th>
+                    <th class="px-4 py-6 text-sm font-bold text-gray-900 border-b border-gray-200">Teléfono</th>
+                    <th class="px-4 py-6 text-sm font-bold text-gray-900 border-b border-gray-200">Estado</th>
+                    <th class="px-4 py-6 text-sm font-bold text-gray-900 border-b border-gray-200">Acciones</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="tablaCuerpo">
                 {% for admin in administradores %}
-                <tr>
-                    <td>{{ admin.documento }}</td>
-                    <td>{{ admin.nombre_completo }}</td>
-                    <td>{{ admin.correo_electronico }}</td>
-                    <td>{{ admin.telefono }}</td>
-                    <td>
+                <tr class="hover:bg-gray-50 transition-colors">
+                    <td class="px-4 py-6 text-lg border-b border-gray-100">{{ admin.documento }}</td>
+                    <td class="px-4 py-6 text-lg border-b border-gray-100">{{ admin.nombre_completo }}</td>
+                    <td class="px-4 py-6 text-lg border-b border-gray-100">{{ admin.correo_electronico }}</td>
+                    <td class="px-4 py-6 text-lg border-b border-gray-100">{{ admin.telefono }}</td>
+                    <td class="px-4 py-6 border-b border-gray-100">
                         {% if admin.is_active %}
-                            <span class="text-green-600">Activo</span>
+                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Activo</span>
                         {% else %}
-                            <span class="text-red-600">Inactivo</span>
+                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Inactivo</span>
                         {% endif %}
                     </td>
-                    <td class="action-buttons">
-                        <button class="btn-editar bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600" data-documento="{{ admin.documento }}">
-                            <i class="fas fa-edit"></i> Editar
-                        </button>
-                        <button class="btn-eliminar bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" data-documento="{{ admin.documento }}">
-                            <i class="fas fa-trash-alt"></i> Eliminar
-                        </button>
-                        <button class="toggle-estado bg-{{ admin.is_active|yesno:'yellow,green' }}-500 text-white px-3 py-1 rounded hover:bg-{{ admin.is_active|yesno:'yellow,green' }}-600" data-documento="{{ admin.documento }}">
-                            <i class="fas fa-{{ admin.is_active|yesno:'ban,check' }}"></i> {{ admin.is_active|yesno:'Desactivar,Activar' }}
-                        </button>
+                    <td class="border-b border-gray-100">
+                        <div class="flex flex-wrap justify-center gap-2">
+                            <button class="btn-editar bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md transition-colors inline-flex items-center gap-1 text-sm" data-documento="{{ admin.documento }}">
+                                <i class="fas fa-edit"></i> 
+                                <span class="hidden sm:inline">Editar</span>
+                            </button>
+                            <button class="btn-eliminar bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md transition-colors inline-flex items-center gap-1 text-sm" data-documento="{{ admin.documento }}">
+                                <i class="fas fa-trash-alt"></i> 
+                                <span class="hidden sm:inline">Eliminar</span>
+                            </button>
+                            <button class="toggle-estado bg-{{ admin.is_active|yesno:'yellow,green' }}-500 hover:bg-{{ admin.is_active|yesno:'yellow,green' }}-600 text-white px-3 py-1 rounded-md transition-colors inline-flex items-center gap-1 text-sm" data-documento="{{ admin.documento }}">
+                                <i class="fas fa-{{ admin.is_active|yesno:'ban,check' }}"></i> 
+                                <span class="hidden sm:inline">{{ admin.is_active|yesno:'Desactivar,Activar' }}</span>
+                            </button>
+                        </div>
                     </td>
                 </tr>
                 {% empty %}
                 <tr>
-                    <td colspan="6" class="text-center py-4">No hay usuarios registrados</td>
+                    <td colspan="6" class="px-4 py-8 text-center text-gray-500">No hay usuarios registrados</td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
-
-        <!-- Botón para agregar nuevo usuario -->
-        <div class="mt-6">
-            <button id="btnNuevoUsuario" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-                <i class="fas fa-plus-circle"></i> Agregar Nuevo Administrador
-            </button>
-        </div>
     </div>
+</div>
+
+
+    <div class="mt-6 text-center">
+        <button id="btnNuevoUsuario" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg shadow-md transition-colors inline-flex items-center gap-2">
+            <i class="fas fa-plus-circle"></i> 
+            <span>Agregar Nuevo Administrador</span>
+        </button>
+    </div>
+</div>
+
 
     <!-- Modal para crear/editar usuario -->
-    <div id="usuarioModal" class="modal">
-        <div class="modal-content">
-            <span class="close" onclick="cerrarModal()">&times;</span>
-            <h2 id="modalTitle" class="text-xl font-bold mb-4">Nuevo Administrador</h2>
-            <form id="usuarioForm" method="POST" class="space-y-4">
-                {% csrf_token %}
-                <input type="hidden" name="documento" id="inputDocumento">
-                
-                <div class="form-group">
-                    <label for="inputNombre" class="block text-sm font-medium text-gray-700">Nombre Completo *</label>
-                    <input type="text" name="nombre_completo" id="inputNombre" required
-                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                        pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" title="Solo letras y espacios">
-                    <div id="nombreError" class="error-message"></div>
+    <div id="usuarioModal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-black/50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-lg shadow-xl w-full max-w-2xl mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="p-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h2 id="modalTitle" class="text-xl font-bold text-gray-900">Nuevo Administrador</h2>
+                    <button onclick="cerrarModal()" class="text-gray-400 hover:text-gray-600 transition-colors">
+                        <i class="fas fa-times text-2xl"></i>
+                    </button>
                 </div>
                 
-                <div class="form-group">
-                    <label for="inputCorreo" class="block text-sm font-medium text-gray-700">Correo Electrónico *</label>
-                    <input type="email" name="correo_electronico" id="inputCorreo" required
-                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                        pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" title="Ingrese un correo válido">
-                    <div id="correoError" class="error-message"></div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="inputTelefono" class="block text-sm font-medium text-gray-700">Teléfono *</label>
-                    <input type="tel" name="telefono" id="inputTelefono" required
-                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                        pattern="[0-9]{7,10}" title="Mínimo 7, máximo 10 números" maxlength="10">
-                    <div id="telefonoError" class="error-message"></div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="inputDocumentoLogin" class="block text-sm font-medium text-gray-700">Documento (para inicio de sesión) *</label>
-                    <input type="text" name="documento_login" id="inputDocumentoLogin" required
-                        class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-                        pattern="[0-9]{7,10}" title="Solo números (7-10 dígitos)" maxlength="10">
-                    <div id="documentoError" class="error-message"></div>
-                </div>
-                
-                <!-- Campos de contraseña (solo visibles en creación) -->
-                <div id="passwordFields">
-                    <div class="form-group relative">
-                        <label for="inputPassword" class="block text-sm font-medium text-gray-700">Contraseña *</label>
-                        <input type="password" name="password" id="inputPassword" required
-                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                        <i class="fas fa-eye password-toggle" onclick="togglePassword('inputPassword')"></i>
-                        <div id="passwordError" class="error-message"></div>
+                <form id="usuarioForm" method="POST" class="space-y-6">
+                    {% csrf_token %}
+                    <input type="hidden" name="documento" id="inputDocumento">
+                    
+                    <div class="form-group">
+                        <label for="inputNombre" class="block text-sm font-medium text-gray-700 mb-2">Nombre Completo *</label>
+                        <input type="text" name="nombre_completo" id="inputNombre" required
+                            class="w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            pattern="[A-Za-záéíóúÁÉÍÓÚñÑ\s]+" title="Solo letras y espacios">
+                        <div id="nombreError" class="text-red-500 text-sm mt-1"></div>
                     </div>
                     
-                    <div class="form-group relative">
-                        <label for="inputConfirmPassword" class="block text-sm font-medium text-gray-700">Confirmar Contraseña *</label>
-                        <input type="password" name="confirm_password" id="inputConfirmPassword" required
-                            class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500">
-                        <i class="fas fa-eye password-toggle" onclick="togglePassword('inputConfirmPassword')"></i>
-                        <div id="confirmPasswordError" class="error-message"></div>
+                    <div class="form-group">
+                        <label for="inputCorreo" class="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico *</label>
+                        <input type="email" name="correo_electronico" id="inputCorreo" required
+                            class="w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            pattern="[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$" title="Ingrese un correo válido">
+                        <div id="correoError" class="text-red-500 text-sm mt-1"></div>
                     </div>
-                </div>
-                
-                <div class="flex items-center">
-                    <input type="checkbox" name="is_active" id="inputActivo" checked
-                        class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
-                    <label for="inputActivo" class="ml-2 block text-sm text-gray-900">Usuario activo</label>
-                </div>
-                
-                <div class="flex justify-end space-x-3 pt-4">
-                    <button type="button" onclick="cerrarModal()"
-                        class="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400">
-                        Cancelar
-                    </button>
-                    <button type="submit" id="submitButton"
-                        class="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">
-                        Crear
-                    </button>
-                </div>
-            </form>
+                    
+                    <div class="form-group">
+                        <label for="inputTelefono" class="block text-sm font-medium text-gray-700 mb-2">Teléfono *</label>
+                        <input type="tel" name="telefono" id="inputTelefono" required
+                            class="w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            pattern="[0-9]{7,10}" title="Mínimo 7, máximo 10 números" maxlength="10">
+                        <div id="telefonoError" class="text-red-500 text-sm mt-1"></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="inputDocumentoLogin" class="block text-sm font-medium text-gray-700 mb-2">Documento (para inicio de sesión) *</label>
+                        <input type="text" name="documento_login" id="inputDocumentoLogin" required
+                            class="w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            pattern="[0-9]{7,10}" title="Solo números (7-10 dígitos)" maxlength="10">
+                        <div id="documentoError" class="text-red-500 text-sm mt-1"></div>
+                    </div>
+                    
+                    <!-- Campos de contraseña (solo visibles en creación) -->
+                    <div id="passwordFields" class="space-y-6">
+                        <div class="form-group relative">
+                            <label for="inputPassword" class="block text-sm font-medium text-gray-700 mb-2">Contraseña *</label>
+                            <div class="relative">
+                                <input type="password" name="password" id="inputPassword" required
+                                    class="w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                                <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700" onclick="togglePassword('inputPassword')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div id="passwordError" class="text-red-500 text-sm mt-1"></div>
+                        </div>
+                        
+                        <div class="form-group relative">
+                            <label for="inputConfirmPassword" class="block text-sm font-medium text-gray-700 mb-2">Confirmar Contraseña *</label>
+                            <div class="relative">
+                                <input type="password" name="confirm_password" id="inputConfirmPassword" required
+                                    class="w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                                <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700" onclick="togglePassword('inputConfirmPassword')">
+                                    <i class="fas fa-eye"></i>
+                                </button>
+                            </div>
+                            <div id="confirmPasswordError" class="text-red-500 text-sm mt-1"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center">
+                        <input type="checkbox" name="is_active" id="inputActivo" checked
+                            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded">
+                        <label for="inputActivo" class="ml-2 block text-sm text-gray-900">Usuario activo</label>
+                    </div>
+                    
+                    <div class="flex flex-col sm:flex-row justify-end gap-3 pt-6 border-t border-gray-200">
+                        <button type="button" onclick="cerrarModal()"
+                            class="px-6 py-3 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 transition-colors order-2 sm:order-1">
+                            Cancelar
+                        </button>
+                        <button type="submit" id="submitButton"
+                            class="px-6 py-3 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors order-1 sm:order-2">
+                            Crear
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
+
+    <script src="{% static 'JavaScript/GestionUsuarios.js' %}"></script>
 
     <!-- JavaScript Completo -->
     <script>
@@ -438,7 +404,7 @@
                 };
 
                 // Mostrar carga
-                const tbody = document.querySelector('tbody');
+                const tbody = document.getElementById('tablaCuerpo');
                 tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Buscando usuarios...</td></tr>';
 
                 // Construir URL con parámetros
@@ -477,32 +443,25 @@
                 console.error('Error en aplicarFiltros:', error);
                 
                 // Mostrar mensaje de error en la tabla
-                document.querySelector('tbody').innerHTML = `
+                document.getElementById('tablaCuerpo').innerHTML = `
                     <tr>
                         <td colspan="6" class="text-center py-4 text-red-500">
                             Error: ${error.message}
                         </td>
                     </tr>
                 `;
-                
-                // Mostrar alerta con más detalles
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error al filtrar',
-                    html: `No se pudieron cargar los datos.<br><small>${error.message}</small>`,
-                    confirmButtonText: 'Entendido'
-                });
             }
         }
 
+
         function actualizarTabla(administradores) {
-            const tbody = document.querySelector('tbody');
+            const tbody = document.getElementById('tablaCuerpo');
             tbody.innerHTML = '';
             
             if (!administradores || administradores.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="6" class="text-center py-4">
+                        <td colspan="6" class="px-4 py-8 text-center text-gray-500">
                             No se encontraron usuarios con los filtros aplicados
                         </td>
                     </tr>
@@ -512,24 +471,32 @@
             
             administradores.forEach(admin => {
                 const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50 transition-colors';
                 row.innerHTML = `
-                    <td>${admin.documento}</td>
-                    <td>${admin.nombre_completo}</td>
-                    <td>${admin.correo_electronico}</td>
-                    <td>${admin.telefono}</td>
-                    <td>
-                        ${admin.is_active ? '<span class="text-green-600">Activo</span>' : '<span class="text-red-600">Inactivo</span>'}
+                    <td class="px-4 py-6 text-lg border-b border-gray-100">${admin.documento}</td>
+                    <td class="px-4 py-6 text-lg border-b border-gray-100">${admin.nombre_completo}</td>
+                    <td class="px-4 py-6 text-lg border-b border-gray-100">${admin.correo_electronico}</td>
+                    <td class="px-4 py-6 text-lg border-b border-gray-100">${admin.telefono}</td>
+                    <td class="px-4 py-6 border-b border-gray-100">
+                        ${admin.is_active ? 
+                            '<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Activo</span>' : 
+                            '<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Inactivo</span>'}
                     </td>
-                    <td class="action-buttons">
-                        <button class="btn-editar bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600" data-documento="${admin.documento}">
-                            <i class="fas fa-edit"></i> Editar
-                        </button>
-                        <button class="btn-eliminar bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600" data-documento="${admin.documento}">
-                            <i class="fas fa-trash-alt"></i> Eliminar
-                        </button>
-                        <button class="toggle-estado bg-${admin.is_active ? 'yellow' : 'green'}-500 text-white px-3 py-1 rounded hover:bg-${admin.is_active ? 'yellow' : 'green'}-600" data-documento="${admin.documento}">
-                            <i class="fas fa-${admin.is_active ? 'ban' : 'check'}"></i> ${admin.is_active ? 'Desactivar' : 'Activar'}
-                        </button>
+                    <td class="px-4 py-6 border-b border-gray-100">
+                        <div class="flex flex-wrap justify-center gap-2">
+                            <button class="btn-editar bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md transition-colors inline-flex items-center gap-1 text-sm" data-documento="${admin.documento}">
+                                <i class="fas fa-edit"></i> 
+                                <span class="hidden sm:inline">Editar</span>
+                            </button>
+                            <button class="btn-eliminar bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md transition-colors inline-flex items-center gap-1 text-sm" data-documento="${admin.documento}">
+                                <i class="fas fa-trash-alt"></i> 
+                                <span class="hidden sm:inline">Eliminar</span>
+                            </button>
+                            <button class="toggle-estado bg-${admin.is_active ? 'yellow' : 'green'}-500 hover:bg-${admin.is_active ? 'yellow' : 'green'}-600 text-white px-3 py-1 rounded-md transition-colors inline-flex items-center gap-1 text-sm" data-documento="${admin.documento}">
+                                <i class="fas fa-${admin.is_active ? 'ban' : 'check'}"></i> 
+                                <span class="hidden sm:inline">${admin.is_active ? 'Desactivar' : 'Activar'}</span>
+                            </button>
+                        </div>
                     </td>
                 `;
                 tbody.appendChild(row);
@@ -970,6 +937,43 @@
                 }
             });
         });
+
+        // Control del menú hamburguesa para móviles
+document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    
+    // Alternar visibilidad del sidebar
+    sidebar.classList.toggle('-translate-x-full');
+    
+    // Alternar visibilidad del overlay
+    overlay.classList.toggle('opacity-0');
+    overlay.classList.toggle('pointer-events-none');
+});
+
+// Cerrar menú al hacer clic en el overlay
+document.getElementById('overlay').addEventListener('click', function() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    
+    sidebar.classList.add('-translate-x-full');
+    overlay.classList.add('opacity-0');
+    overlay.classList.add('pointer-events-none');
+});
+
+// Cerrar menú al hacer clic en un enlace (para móviles)
+document.querySelectorAll('#sidebar a').forEach(link => {
+    link.addEventListener('click', function() {
+        if (window.innerWidth < 768) { // Solo para móviles
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('opacity-0');
+            overlay.classList.add('pointer-events-none');
+        }
+    });
+});
     </script>
 </body>
 </html>
