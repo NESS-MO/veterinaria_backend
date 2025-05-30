@@ -1,0 +1,468 @@
+.container {
+    display: block;
+    width: 80%;
+    max-width: 1200px;
+    background-color: #ffffff;
+    padding: 20px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin: 100px auto;
+    text-align: center;
+}
+
+.calendario-section {
+    padding-left: 20px;
+    margin-bottom: 20px;
+}
+
+.agendar {
+    display: inline-block;
+    background-color: #1e40af;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 5px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: transform 0.3s, background-color 0.3s;
+    margin-top: 20px;
+}
+
+.agendar:hover {
+    background-color: #005bb5;
+    transform: translateY(-2px);
+}
+
+label {
+    margin-bottom: 5px;
+    font-weight: bold;
+}
+
+#calendario {
+    width: 100%;
+    height: 500px;
+}
+
+.volver {
+    margin-right: 10px;
+    margin-bottom: 10px;
+    text-decoration: none;
+    color: #1e40af;
+}
+
+.formulario {
+    padding: 40px 20px;
+    text-align: center;
+}
+
+.formulario .container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.formulario h2 {
+    font-size: 28px;
+    color: #1e40af;
+    margin-bottom: 20px;
+}
+
+.formulario h3{
+    color: #1e40af;
+}
+
+.formulario a {
+    text-decoration: none;
+    color: #ffffff;
+}
+
+.formulario p {
+    font-size: 18px;
+    margin-bottom: 30px;
+    color: #555;
+}
+
+.form-group {
+    margin-bottom: 20px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+}
+
+.form-group label {
+    font-size: 16px;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.form-group input,
+.form-group select {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #1e40af;
+}
+.checkbox-group {
+    display: grid;
+    grid-template-columns: 1fr auto; 
+    gap: 5px 5px; 
+    align-items: center;
+    max-width: 400px;
+}
+
+.checkbox-group label {
+    display: contents; 
+    font-weight: bold;
+}
+
+.checkbox-group input[type="checkbox"] {
+    justify-self: end; 
+    transform: scale(1.2); 
+}
+
+.fondo-oscuro {
+    display: none; 
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5); 
+    z-index: 999.5; 
+}
+
+footer {
+    background: linear-gradient(135deg, #22d3ee, #1e40af);
+    color: #fff;
+    padding: 40px 20px 20px;
+    font-family: 'Open Sans', sans-serif;
+    box-shadow: 0 -4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.footer-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.footer-section {
+    margin-bottom: 20px;
+}
+
+.footer-section h3 {
+    color: #fff;
+    font-size: 1.3rem;
+    margin-bottom: 20px;
+    position: relative;
+    padding-bottom: 10px;
+    font-weight: 600;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.2);
+}
+
+.footer-section h3::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 50px;
+    height: 2px;
+    background-color: rgba(255, 255, 255, 0.5);
+}
+
+.contact-info p, .schedule p {
+    margin: 12px 0;
+    font-size: 1rem;
+    line-height: 1.6;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.contact-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.contact-item i {
+    margin-right: 12px;
+    color: #fff;
+    font-size: 1.2rem;
+    opacity: 0.9;
+}
+
+.quick-links {
+    display: flex;
+    flex-direction: column;
+}
+
+.quick-links a {
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    margin-bottom: 12px;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    padding: 6px 0;
+}
+
+.quick-links a:hover {
+    color: #fff;
+    padding-left: 8px;
+    text-shadow: 0 0 5px rgba(255,255,255,0.5);
+}
+
+.copyright {
+    text-align: center;
+    padding-top: 30px;
+    margin-top: 30px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .footer-container {
+        grid-template-columns: 1fr;
+        gap: 30px;
+    }
+    
+    .footer-section {
+        text-align: center;
+    }
+    
+    .footer-section h3::after {
+        left: 50%;
+        transform: translateX(-50%);
+    }
+    
+    .contact-item {
+        justify-content: center;
+    }
+    
+    .quick-links {
+        align-items: center;
+    }
+} 
+
+@media (max-width: 768px) {
+    header {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    nav {
+        flex-direction: column;
+        gap: 10px;
+        margin-top: 10px;
+    }
+}
+
+.opciones {
+    transition: right 0.3s ease; /* Igual que Index */
+    z-index: 1000; /* Igual que Index */
+}
+
+/* Estilos para el botón de abrir y cerrar */
+.abrir, .cerrar {
+    display: none; /* Ocultar por defecto */
+    background: none;
+    border: none;
+    font-size: 24px;
+    color: #fff;
+    cursor: pointer;
+}
+
+/* ------------------------- */
+/* Mejoras Generales */
+/* ------------------------- */
+.container {
+    width: 90%;
+    margin: 30px auto;
+    padding: 20px;
+}
+
+/* ------------------------- */
+/* Mejoras al Calendario */
+/* ------------------------- */
+#calendario {
+    height: auto;
+    min-height: 400px;
+}
+
+/* ------------------------- */
+/* Mejoras al Formulario */
+/* ------------------------- */
+.formulario .container {
+    padding: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.checkbox-group {
+    grid-template-columns: 1fr 1fr;
+    max-width: 100%;
+}
+
+@media (max-width: 1024px) {
+    .container {
+        width: 95%;
+        margin: 20px auto;
+    }
+    
+    #calendario {
+        min-height: 350px;
+    }
+    
+    .formulario .container {
+        padding: 15px;
+    }
+}
+
+@media (max-width: 768px) {
+    header {
+        flex-direction: row;
+        padding: 10px 15px;
+    }
+    
+    .Logotipo img {
+        height: 60px;
+    }
+    
+    .eslogan {
+        font-size: 12px;
+    }
+    
+    .container {
+        margin: 20px auto;
+        padding: 15px;
+    }
+    
+    #calendario {
+        min-height: 300px;
+    }
+    
+    .form-group label {
+        font-size: 14px;
+    }
+    
+    .form-group input,
+    .form-group select {
+        padding: 8px;
+        font-size: 14px;
+    }
+    
+    .checkbox-group {
+        grid-template-columns: 1fr;
+    }
+    
+    .agendar {
+        padding: 8px 15px;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    header {
+        padding: 8px 10px;
+    }
+    
+    .Logotipo img {
+        height: 50px;
+    }
+    
+    .container {
+        width: 98%;
+        margin: 15px auto;
+        padding: 10px;
+    }
+    
+    #calendario {
+        min-height: 250px;
+    }
+    
+    .formulario h2 {
+        font-size: 24px;
+    }
+    
+    .formulario p {
+        font-size: 16px;
+    }
+    
+    .form-group label {
+        font-size: 13px;
+    }
+    
+    .form-group input,
+    .form-group select {
+        padding: 7px;
+        font-size: 13px;
+    }
+    
+    .agendar {
+        padding: 7px 12px;
+        font-size: 13px;
+    }
+    
+    .opciones {
+        width: 85%;
+    }
+}
+
+/* ------------------------- */
+/* Mejoras al Menú Hamburguesa */
+/* ------------------------- */
+@media screen and (max-width: 768px) {
+    .opciones {
+        width: 80%;
+    }
+    
+    .opciones a {
+        font-size: 16px;
+        padding: 10px 20px;
+    }
+    
+    .cerrar {
+        top: 15px;
+        right: 15px;
+        font-size: 22px;
+    }
+    
+    .abrir {
+        font-size: 22px;
+    }
+}
+
+/* ------------------------- */
+/* Mejoras al Footer */
+/* ------------------------- */
+@media (max-width: 768px) {
+    .footer-container {
+        gap: 25px;
+    }
+    
+    .footer-section h3 {
+        font-size: 1.1rem;
+    }
+    
+    .contact-info p, .schedule p {
+        font-size: 0.9rem;
+    }
+    
+    .quick-links a {
+        font-size: 0.9rem;
+    }
+    
+    .copyright {
+        padding-top: 20px;
+        margin-top: 20px;
+        font-size: 0.8rem;
+    }
+}

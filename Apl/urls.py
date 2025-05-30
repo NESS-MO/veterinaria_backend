@@ -21,7 +21,6 @@ urlpatterns = [
     path('eliminar-tip/<int:tip_id>/', views.eliminar_tip, name='eliminar_tip'),
     path('obtener-tip-actual/', views.obtener_tip_actual, name='obtener_tip_actual'),
     path('backup/', views.backup, name='backup'),
-
     path('api/servicios/', views.api_servicios, name='api_servicios'),
     path('api/servicios/<int:servicio_id>/', views.api_servicios, name='api_servicio_detail'),
     path('usuarios/', views.usuarios, name='usuarios'),
@@ -30,7 +29,6 @@ urlpatterns = [
     path('usuarios/toggle-estado/<str:documento>/', views.toggle_estado_usuario, name='toggle_estado_usuario'),
     path('usuarios/crear/', views.crear_usuario, name='crear_usuario'),
     path('logout/', views.logout, name='logout'),
-    static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
 
     path('aceptar-cita/<int:cita_id>/', views.aceptar_cita, name='aceptar_cita'),
     path('rechazar-cita/<int:cita_id>/', views.rechazar_cita, name='rechazar_cita'),
@@ -43,3 +41,4 @@ urlpatterns = [
     path('Cancelacion/', views.Cancelarcita, name='CancelarCita'),
 ]
 
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

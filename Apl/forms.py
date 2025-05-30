@@ -1,5 +1,9 @@
 from ftplib import MAXLINE
-from django import forms 
+from django import forms
+from django.core.validators import MinValueValidator
+from datetime import date
+
+from Apl.models.cliente import Cliente 
 
 class craeteNewTask(forms.Form):
     nombre = forms.CharField(label="nombre de la persona", max_length=250)
