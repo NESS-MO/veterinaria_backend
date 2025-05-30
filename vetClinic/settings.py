@@ -150,3 +150,6 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'cortes.jimenez.0810@gmail.com'
 EMAIL_HOST_PASSWORD = 'daugfdxxitkqyoyv'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+EMAIL_HOST_USER = 'luisalejandrorojasrincon@gmail.com'#
+EMAIL_HOST_PASSWORD = 'hgkerfhnxadqfvca'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
