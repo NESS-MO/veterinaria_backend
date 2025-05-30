@@ -153,7 +153,7 @@
     </div>
 
     <script>
-        document.getElementById('recovery-form').addEventListener('submit', function(e) {
+        document.getElementById('recovery-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const correo = document.getElementById('correo').value;
             const submitBtn = document.getElementById('submitBtn');
@@ -162,25 +162,23 @@
             submitBtn.disabled = true;
             submitBtn.value = 'Enviando...';
 
-            fetch("{% url 'RContrasenaenviado' %}", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                    'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
-                },
-                body: new URLSearchParams({
-                    'correo_electronico': correo
-                })
-            })
-            .then(response => {
-                if (response.redirected) {
-                    window.location.href = response.url;
+            try {
+                const resp = await fetch("{% url 'RContrasenaenviado' %}", {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    },
+                    body: new URLSearchParams({
+                        'correo_electronico': correo
+                    })
+                });
+                if(resp.redirected) {
+                    window.location.href = resp.url;
                     return;
                 }
-                return response.json();
-            })
-            .then(data => {
-                if (data && data.success === false) {
+                const data = await resp.json();
+                if(data && data.success === false) {
                     Swal.fire({
                         icon: 'error',
                         title: 'Error',
@@ -189,20 +187,17 @@
                 } else {
                     window.location.href = "{% url 'RContrasenaenviado' %}";
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
+            } catch(e) {
+                console.error('Error:', e);
                 Swal.fire({
                     icon: 'error',
                     title: 'Error',
                     text: 'Hubo un problema al procesar tu solicitud'
                 });
-            })
-            .finally(() => {
-                // Re-habilitar botón
+            } finally {
                 submitBtn.disabled = false;
                 submitBtn.value = 'Enviar correo';
-            });
+            }
         });
     </script>
 </body>

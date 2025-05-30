@@ -12,6 +12,7 @@ urlpatterns = [
     path('logout/', views.logout, name='logout'),
     path('RecuperarContrasena/', views.RContrasena, name='recuperar_contrasena'),
     path('recuperarcontrasenaenviado/', views.RContrasena, name='RContrasenaenviado'),
+    path('cambia_contraseña/<str:token>/', views.cambia_con, name='cambia_con'),
     path('Galeria/', views.gestion_galeria, name='Galeria'),
     path('Tipdelasemana/', views.gestion_tip, name='Tipdelasemana'),
     path('Gestioncitas/', views.gestion, name='gestioncitas'),
