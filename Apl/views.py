@@ -50,6 +50,8 @@ from django.contrib.auth import authenticate, login as auth_login, logout as aut
 from django.shortcuts import render, redirect
 from .forms import LoginForm
 
+from django.http import JsonResponse
+
 def login(request):
     if request.method == 'POST':
         form = LoginForm(request, data=request.POST)
@@ -57,14 +59,31 @@ def login(request):
             username = form.cleaned_data.get('username')
             password = form.cleaned_data.get('password')
             user = authenticate(request, username=username, password=password)
+            
             if user is not None:
                 auth_login(request, user)
+                # Para solicitudes AJAX (spinner)
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse({
+                        'success': True,
+                        'redirect_url': reverse('gestioncitas')
+                    })
                 return redirect('gestioncitas')
             else:
                 form.add_error(None, "Documento o contraseña incorrectos")
+        
+        # Manejo de errores para AJAX
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            errors = form.errors.as_json()
+            return JsonResponse({
+                'success': False,
+                'errors': errors,
+                'message': 'Error de autenticación'
+            }, status=400)
     else:
         form = LoginForm()
     
+    # Respuesta normal para GET
     return render(request, "4. login.html", {'form': form})
 
 def logout(request):
@@ -242,6 +261,51 @@ def gestion_tip(request):
             message = 'Nuevo tip creado con éxito'
 
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            response_data = {
+                'success': True,
+                'message': message,
+                'titulo': tip.titulo,
+                'contenido': tip.contenido,
+                'imagen_url': tip.imagen.url if tip.imagen else ''
+            }
+            return JsonResponse(response_data)
+
+        messages.success(request, message)
+        return redirect('Tipdelasemana')
+
+    return render(request, '5. Modificar-tipdelasemana.html', {'tip': tip})
+    try:
+        tip = TipSemana.objects.latest('fecha_actualizacion')
+    except TipSemana.DoesNotExist:
+        tip = None
+
+    if request.method == 'POST':
+        titulo = request.POST.get('titulo')
+        contenido = request.POST.get('contenido')
+        imagen = request.FILES.get('imagen')
+
+        if not titulo or not contenido:
+            if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return JsonResponse({'error': 'El título y el contenido son obligatorios'}, status=400)
+            messages.error(request, 'El título y el contenido son obligatorios')
+            return redirect('Tipdelasemana')
+
+        if tip:
+            tip.titulo = titulo
+            tip.contenido = contenido
+            if imagen:
+                tip.imagen = imagen
+            tip.save()
+            message = 'Tip actualizado correctamente'
+        else:
+            tip = TipSemana.objects.create(
+                titulo=titulo,
+                contenido=contenido,
+                imagen=imagen
+            )
+            message = 'Nuevo tip creado con éxito'
+
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             return JsonResponse({
                 'success': True,
                 'message': message,
@@ -340,6 +404,43 @@ def modificar_servicio(request):
 
 @csrf_exempt
 def api_servicios(request, servicio_id=None):
+    if request.method == 'POST':
+        try:
+            data = request.POST
+            files = request.FILES
+            
+            if 'servicio_id' in data and data['servicio_id']:
+                # Actualizar servicio existente
+                servicio = Servicio.objects.get(id=data['servicio_id'])
+                servicio.nombre = data.get('nombre', servicio.nombre)
+                
+                servicio.titulo_ventana = data.get('titulo_ventana', servicio.titulo_ventana)
+                servicio.subtitulo_ventana = data.get('subtitulo_ventana', servicio.subtitulo_ventana)
+                servicio.contenido_ventana = data.get('contenido_ventana', servicio.contenido_ventana)
+                servicio.mostrar_boton_agendar = data.get('mostrar_boton_agendar', 'off') == 'on'
+                
+                if 'imagen_cuadro' in files:
+                    servicio.imagen_cuadro = files['imagen_cuadro']
+                if 'imagen_ventana' in files:
+                    servicio.imagen_ventana = files['imagen_ventana']
+                
+                servicio.save()
+            else:
+                # Crear nuevo servicio - ELIMINA mostrar_boton_consulta ya que siempre será True
+                servicio = Servicio.objects.create(
+                    nombre=data['nombre'],
+                    imagen_cuadro=files['imagen_cuadro'],
+                    titulo_ventana=data['titulo_ventana'],
+                    subtitulo_ventana=data['subtitulo_ventana'],
+                    imagen_ventana=files['imagen_ventana'],
+                    contenido_ventana=data['contenido_ventana'],
+                    mostrar_boton_agendar=data.get('mostrar_boton_agendar', 'off') == 'on',
+                    orden=Servicio.objects.count() + 1
+                )
+            
+            return JsonResponse({'success': True, 'id': servicio.id})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
     if request.method == 'GET':
         if servicio_id:
             servicio = get_object_or_404(Servicio, id=servicio_id)
@@ -417,16 +518,88 @@ from .models import Administrador
 from .forms import AdministradorForm  # Crearemos este formulario después
 from django.http import JsonResponse
 
+from django.http import JsonResponse
+from django.core.serializers.json import DjangoJSONEncoder
+import json
+
 def usuarios(request):
-    administradores = Administrador.objects.all().order_by('nombre_completo')
-    return render(request, "GestionUsuarios.html", {'administradores': administradores})
+    if not request.user.is_authenticated:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'error': 'No autenticado'}, status=401)
+        return redirect('login')
+    
+    try:
+        # Obtener parámetros de filtrado
+        filtros = {
+            'documento': request.GET.get('documento', ''),
+            'nombre': request.GET.get('nombre', ''),
+            'correo': request.GET.get('correo', ''),
+            'telefono': request.GET.get('telefono', ''),
+            'estado': request.GET.get('estado', '')
+        }
+        
+        # Filtrar administradores
+        administradores = Administrador.objects.all()
+        
+        if filtros['documento']:
+            administradores = administradores.filter(documento__icontains=filtros['documento'])
+        if filtros['nombre']:
+            administradores = administradores.filter(nombre_completo__icontains=filtros['nombre'])
+        if filtros['correo']:
+            administradores = administradores.filter(correo_electronico__icontains=filtros['correo'])
+        if filtros['telefono']:
+            administradores = administradores.filter(telefono__icontains=filtros['telefono'])
+        if filtros['estado']:
+            administradores = administradores.filter(is_active=(filtros['estado'].lower() == 'true'))
+        
+        administradores = administradores.order_by('nombre_completo')
+        
+        # Para solicitudes AJAX
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            data = {
+                'administradores': [
+                    {
+                        'documento': admin.documento,
+                        'nombre_completo': admin.nombre_completo,
+                        'correo_electronico': admin.correo_electronico,
+                        'telefono': admin.telefono,
+                        'is_active': admin.is_active
+                    }
+                    for admin in administradores
+                ]
+            }
+            return JsonResponse(data, encoder=DjangoJSONEncoder, safe=False)
+        
+        return render(request, "GestionUsuarios.html", {
+            'administradores': administradores,
+            'user': request.user
+        })
+        
+    except Exception as e:
+        print(f"Error en vista usuarios: {str(e)}")
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'error': str(e)}, status=500)
+        raise
+
+from django.contrib.auth import logout as auth_logout
 
 def eliminar_usuario(request, documento):
     if request.method == 'POST':
         admin = get_object_or_404(Administrador, documento=documento)
+        es_usuario_actual = (request.user.documento == documento)
         admin.delete()
-        messages.success(request, 'Usuario eliminado correctamente')
-        return redirect('usuarios')
+        
+        if es_usuario_actual:
+            auth_logout(request)
+            return JsonResponse({
+                'success': True, 
+                'message': 'Usuario eliminado correctamente. Sesión cerrada.'
+            })
+            
+        return JsonResponse({
+            'success': True, 
+            'message': 'Usuario eliminado correctamente'
+        })
     return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 from django.views.decorators.http import require_http_methods
@@ -459,15 +632,27 @@ def editar_usuario(request, documento):
         'is_active': admin.is_active
     })
 
+from django.contrib.auth import logout as auth_logout
+
 def toggle_estado_usuario(request, documento):
     if request.method == 'POST':
         admin = get_object_or_404(Administrador, documento=documento)
+        es_usuario_actual = (request.user.documento == documento)
+        
         admin.is_active = not admin.is_active
         admin.save()
+        
+        mensaje = f'Usuario {"activado" if admin.is_active else "desactivado"} correctamente'
+        
+        # Si el usuario se desactivó a sí mismo
+        if es_usuario_actual and not admin.is_active:
+            auth_logout(request)
+            mensaje += '. Sesión cerrada automáticamente.'
+        
         return JsonResponse({
             'success': True,
-            'is_active': admin.is_active,
-            'message': 'Estado actualizado correctamente'
+            'message': mensaje,
+            'is_active': admin.is_active
         })
     return JsonResponse({'error': 'Método no permitido'}, status=405)
 

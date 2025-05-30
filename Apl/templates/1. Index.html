@@ -15,40 +15,39 @@
     <!-- Widget de Accesibilidad -->
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <link rel="stylesheet" href={% static "css/custom.css" %}>
+    <link rel="stylesheet" href={% static "css/header.css" %}>
 </head>
 
 <body>
-    <header>
-        <!--Logo de encabezado-->
-        <div class="Logotipo">
-            <a href={% url "index" %}>
-                <img src={% static "Images/logo2.png" %} alt="logo DR.PUL">
-            </a>
-            <h3 class="eslogan">COMPROMETIDOS CON LA SALUD ANIMAL</h3>
-        </div>
+<header>
+    <!--Logo de encabezado-->
+    <div class="Logotipo">
+        <a href="{% url 'index' %}">
+            <img src="{% static 'Images/logo2.png' %}" alt="logo DR.PUL">
+        </a>
+        <h3 class="eslogan">COMPROMETIDOS CON LA SALUD ANIMAL</h3>
+    </div>
 
-        <!--Menú hamburguesa responsivo-->
-        <button class="abrir" id="abrir-menu">☰</button>
-        
-        <!--Opciones de encabezado-->
-        <nav class="opciones" id="menu">
-            <button class="cerrar" id="cerrar-menu">✕</button>
-            <a href={% url "index"%}>INICIO</a>
-            <a href="#conocenos">CONÓCENOS</a>
-            <a href={% url "servicios" %}>SERVICIOS</a>
-            <a href={% url "agendar" %}>AGENDAR CITA</a>
-            <a href={% url "login"%}><img class="perfil" src={% static "Images/perfil.png" %} alt="logo DR.PUL"></a>
-        </nav>
-    </header>
+    <!--Menú hamburguesa responsivo-->
+    <button class="abrir" id="abrir-menu">☰</button>
+    
+    <!--Opciones de encabezado-->
+    <nav class="opciones" id="menu">
+        <button class="cerrar" id="cerrar-menu">✕</button>
+        <a href="{% url 'index' %}">INICIO</a>
+        <a href="{% url 'index' %}#conocenos">CONÓCENOS</a>
+        <a href="{% url 'servicios' %}">SERVICIOS</a>
+        <a href="{% url 'agendar' %}">AGENDAR CITA</a>
+        <a href="{% url 'login' %}"><img class="perfil" src="{% static 'Images/perfil.png' %}" alt="Perfil"></a>
+    </nav>
+</header>
     
     <!--Fondo inicial-->
     <section class="bienvenida">
         <h1></h1>
         <p></p>
         <!--Logo boton-->
-        <img class="logo1" src={% static "Images/logop1.png" %}>
-        <img class="logo2" src={% static "Images/logop2.png" %}>
-        <a href={% url "agendar" %}><img class="logo3" src={% static "Images/logop3.png" %}></a>
+        <a href={% url "agendar" %}><img class="logo1" src={% static "Images/logop3.png" %}></a>
     </section>
 
 
@@ -109,19 +108,20 @@
     <div class="tarjetas-equipo">
         <div class="tarjeta">
             <img src={% static "Images/ava1.jpg" %} alt="Dr. Juan Pérez">
-            <h3>Dr. Juan Pérez</h3>
-            <div class="especialidad">Medicina Interna y Diagnóstico</div>
-            <p>Con más de 10 años de experiencia, el Dr. Pérez ha sido fundamental en el diagnóstico de enfermedades complejas en mascotas.</p>
+            <h3>Dr. Dimas Andres Pulido Diaz </h3>
+            <div class="especialidad">Universidad Nacional de Chile</div>
+            <p>Medico veterinario zootecniata</p>
+            <p>Especialista en cirugía de tejidos blandos en pequeñas especies.</p>
         </div>
         <div class="tarjeta">
             <img src={% static "Images/ava2.jpg" %} alt="Dra. Laura Gómez">
-            <h3>Dra. Laura Gómez</h3>
-            <div class="especialidad">Cirugía Veterinaria</div>
-            <p>Especialista en cirugía de tejidos blandos y ortopedia, comprometida con la recuperación integral de cada paciente.</p>
+            <h3>Milena Rodríguez Salamanca </h3>
+            <p>Administradora de Empresas</p>
+            <p>Magister  en alta gerencia de mercadotecnia</p>
+            <p>Especialista en gerencia  de talento humano</p>
         </div>
     </div>
-</section>
-
+</section>  
 
 
     <!-- Galería Nuestro Trabajo -->

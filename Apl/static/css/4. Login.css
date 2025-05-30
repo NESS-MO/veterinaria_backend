@@ -1,67 +1,27 @@
         body {
-            margin: 0;
-            padding: 0;
-            font-family: arial;
+            background-image: url(https://img2.wallspic.com/crops/3/2/0/2/82023/82023-gato-raza_de_perro-cuidado_de_mascotas-refugio_de_animales-veterinario-1366x768.jpg);
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-position: center center;
+            background-attachment: fixed;
         }
         
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background: linear-gradient(135deg, #22d3ee, #1e40af);
+        /* Ajustes responsivos para la imagen de fondo */
+        @media (max-width: 768px) {
+            body {
+                background-position: 60% center;
+            }
+        }
 
-            padding: 10px 20px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            flex-wrap: wrap;
-        }
-        
-        .Logotipo {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        
-        .Logotipo img {
-            height: 80px;
-            max-width: 100%;
-        }
-        
-        .eslogan {
-            font-size: 14px;
-            color: #fff;
-            margin-top: 5px;
-            text-align: center;
-        }
-        
-        nav {
-            display: flex;
-            gap: 15px;
-            align-items: center;
-        }
-        
-        nav a {
-            color: #fff;
-            text-decoration: none;
-            font-weight: 600;
-            padding: 8px 15px;
-            border-radius: 5px;
-            transition: background-color 0.3s, transform 0.3s;
-        }
-        
-        nav a:hover {
-            background-color: rgba(255, 255, 255, 0.2);
-            transform: translateY(-2px);
-        }
-        
-        .perfil {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
+        @media (max-width: 480px) {
+            body {
+                background-position: 70% center;
+            }
         }
         
         .formulario{
             position: absolute;
-            top: 55%;
+            top: 60%;
             left: 50%;
             transform: translate(-50%, -50%);
             width: 400px;
@@ -193,5 +153,33 @@
             background-color: #1e69af; 
             transform: translateY(-3px);
         }
-        
-        
+
+        /* Spinner de carga */
+.loader {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    justify-content: center;
+    align-items: center;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #f3f3f3;
+    border-top: 5px solid #1e40af;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+      
