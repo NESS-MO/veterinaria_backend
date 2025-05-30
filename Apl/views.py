@@ -24,6 +24,8 @@ from django.utils.html import strip_tags
 from django.core.mail import EmailMultiAlternatives
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 
 
 
@@ -94,8 +96,58 @@ def RContrasena(request):
     # Verifica si el metodo HTTP de la peticion es POST
     
     if request.method == 'POST':
-        # Obtiene el email enviado desde el formulario de recuperacion
         email = request.POST.get('correo_electronico')
+        print(f"Intentando recuperar contraseña para el correo: {email}")  # Debug
+        
+        # Validar formato y existencia del correo
+        try:
+            validate_email(email)
+            user = Administrador.objects.get(correo_electronico=email)
+            print(f"Usuario encontrado: {user.nombre_completo}")  # Debug
+            
+            # Generar token
+
+            
+            signer = TimestampSigner()
+            token = signer.sign(str(user.pk))
+            reset_url = request.build_absolute_uri(reverse('cambia_con', args=[token]))
+            
+            # Preparar correo
+            html_message = render_to_string('accounts/msg_correo.html', {
+                'username': user.nombre_completo,
+                'reset_url': reset_url,
+                'site_name': 'Veterinaria',
+            })
+            
+            subject = "Recuperación de contraseña"
+            text_message = strip_tags(html_message)
+            
+            # Enviar correo
+            email_message = EmailMultiAlternatives(
+                subject=subject,
+                body=text_message,
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                to=[email]
+            )
+            email_message.attach_alternative(html_message, "text/html")
+            email_message.send()
+            
+            print(f"Correo enviado exitosamente a: {email}")  # Debug
+            messages.success(request, "Se ha enviado un enlace a tu correo para cambiar la contraseña.")
+            return redirect('RContrasenaenviado')
+            
+        except ValidationError:
+            print(f"Formato de correo inválido: {email}")  # Debug
+            return JsonResponse({
+                'success': False,
+                'message': 'El formato del correo electrónico no es válido'
+            }, status=400)
+        except Administrador.DoesNotExist:
+            print(f"Correo no encontrado: {email}")  # Debug
+            return JsonResponse({
+                'success': False,
+                'message': 'El correo no está registrado en el sistema'
+            }, status=404)
         
         try:
             # Intenta obtener el usuario cuyo email coincide con el ingresado
@@ -147,10 +199,13 @@ def RContrasena(request):
             # Redirige al usuario a la página de login tras el envío correcto del correo
             return redirect("login")
         except Exception as e:
-            # Si ocurre alguna excepción al enviar el correo, se muestra un mensaje de error con la descripción
+            print(f"Error al enviar correo: {str(e)}")  # Debug
             messages.error(request, f"Error al enviar el correo: {str(e)}")
+            return render(request, '4.1 RecuperarContrasena.html')
+    
+    return render(request, '4.1 RecuperarContrasena.html')
             # Vuelve a renderizar el formulario de recuperación en caso de error
-            return render(request, '4.2 RecuperarContrasena.html')
+    return render(request, '4.2 RecuperarContrasena.html')
         
     return render(request, "4.1 RecuperarContrasena.html")
 
@@ -732,3 +787,6 @@ def crear_usuario(request):
         'success': False,
         'message': 'Método no permitido'
     }, status=405)
+
+def recuperar_contrasena_enviado(request):
+    return render(request, 'recuperarcontrasenaenviado.html')

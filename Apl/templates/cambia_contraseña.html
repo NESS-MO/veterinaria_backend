@@ -8,6 +8,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <!-- Título de la página -->
     <title>Cambiar Contraseña</title>
+    <!-- Enlace al archivo CSS -->
+    <link rel="stylesheet" href="{% static 'css/cambia_contraseña.css' %}">
   </head>
   <body>
     <!-- Contenedor principal de la página -->
@@ -47,7 +49,7 @@
         <!-- Botón para enviar el formulario y proceder al cambio de contraseña -->
         <button type="submit">Cambiar Contraseña</button>
         <!-- Enlace para volver a la página de inicio de sesión -->
-        <a href="{% url '4. Login' %}" class="back-link">Volver al inicio de sesión</a>
+        <a href="{% url 'login' %}" class="back-link">Volver al inicio de sesión</a>
       </form>
     </div>
     
