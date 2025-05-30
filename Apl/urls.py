@@ -27,4 +27,5 @@ urlpatterns = [
     path('editar-observacion-cita/<int:cita_id>/', views.editar_observacion_cita, name='editar_observacion_cita'),
     path('editar_estado_observacion_rapida/<int:cita_id>/', views.editar_estado_observacion_rapida, name='editar_estado_observacion_rapida'),
     path('editar_estado_observacion_normal/<int:cita_id>/', views.editar_estado_observacion_normal, name='editar_estado_observacion_normal'),
+    path('Cancelacion/', views.Cancelarcita, name='CancelarCita'),
 ]

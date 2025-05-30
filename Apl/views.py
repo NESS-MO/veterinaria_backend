@@ -5,6 +5,8 @@ from django.views.decorators.http import require_POST
 from .models import Cliente, Mascota, Cita, TipSemana, ImagenGaleria
 from .models.AdminCitas import CitaRapida
 from .forms import ImagenGaleriaForm, CitaRapidaForm
+from django.core.mail import send_mail
+from django.db.models import Q
 
 # --- Vistas principales ---
 
@@ -83,16 +85,16 @@ def RegistroC(request):
     else:
         form = CitaRapidaForm()
     citas_rapidas = CitaRapida.objects.all()
-    citas_normales = Cita.objects.all()
     rango_edades = range(1, 21)
     rango_meses = range(0, 12)
     return render(request, 'registrocitas.html', {
         'rango_edades': rango_edades,
         'rango_meses': rango_meses,
         'citas_rapidas': citas_rapidas,
-        'citas_normales': citas_normales,
         'form': form,
     })
+def Cancelarcita(request):
+    return render(request, "Cancelarcita.html")
 
 def login(request):
     return render(request, "4. login.html")
@@ -230,14 +232,29 @@ def gestion_galeria(request):
 @require_POST
 def aceptar_cita(request, cita_id):
     cita = get_object_or_404(Cita, id=cita_id)
-    cita.estado = 'realizada'
-    cita.save()
-    messages.success(request, "Cita aceptada y registrada.")
+    mascota = cita.cliente.mascotas.first() if cita.cliente.mascotas.exists() else None
+    observaciones = cita.observaciones if cita.observaciones is not None else ""
+    CitaRapida.objects.create(
+        numero_documento=cita.cliente.numero_documento,
+        nombre_cliente=f"{cita.cliente.primer_nombre} {cita.cliente.primer_apellido}",
+        nombre_mascota=mascota.nombre_mascota if mascota else "",
+        edad_mascota=mascota.edad if mascota else "",
+        raza_mascota=f"{mascota.especie} - {mascota.raza}" if mascota else "",
+        fecha=cita.fecha,
+        hora=cita.horario,
+        servicio=cita.extra,
+        estado='Pendiente',
+        observaciones=observaciones
+    )
+    enviar_correo_cita(cita.cliente, "aceptada")  # <--- Aquí envías el correo
+    cita.delete()
+    messages.success(request, "Cita aceptada y registrada en el historial.")
     return redirect('gestioncitas')
 
 @require_POST
 def rechazar_cita(request, cita_id):
     cita = get_object_or_404(Cita, id=cita_id)
+    enviar_correo_cita(cita.cliente, "rechazada")  # <--- Aquí envías el correo
     cita.delete()
     messages.success(request, "Cita rechazada y eliminada.")
     return redirect('gestioncitas')
@@ -298,3 +315,13 @@ def editar_estado_observacion_normal(request, cita_id):
     cita.save()
     messages.success(request, "Cita actualizada correctamente.")
     return redirect('registroc')
+
+def enviar_correo_cita(cliente, estado):
+    asunto = "Estado de tu cita en la Veterinaria"
+    if estado == "aceptada":
+        mensaje = f"Hola {cliente.primer_nombre}, tu cita ha sido ACEPTADA. ¡Te esperamos!"
+    else:
+        mensaje = f"Hola {cliente.primer_nombre}, lamentamos informarte que tu cita fue RECHAZADA."
+    destinatario = [cliente.correo_electronico]
+    send_mail(asunto, mensaje, None, destinatario)
+
