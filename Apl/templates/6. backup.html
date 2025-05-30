@@ -10,30 +10,76 @@
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#33C0F1',
+            secondary: '#1E2D93'
+          }
+        }
+      }
+    }
+  </script> 
 <body class="font-sans bg-gradient-to-tr from-[#e0f7ff] to-white text-[#333] min-h-screen">
+    <!-- Breadcrumb -->
 
-  <!-- Encabezado móvil -->
-  <div class="mobile-header md:hidden flex items-center justify-between bg-[#1E2D93] text-white p-4">
-    <h1 class="text-lg font-bold">Copia de Seguridad</h1>
-    <button class="hamburger" id="menu-toggle"><i class="fas fa-bars"></i></button>
-  </div>
+
+  <!-- Mobile menu button -->
+  <button class="md:hidden fixed top-4 left-4 z-30 bg-primary text-white p-2 rounded-lg shadow-lg" id="mobileMenuBtn">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Overlay for mobile menu -->
+  <div class="md:hidden fixed inset-0 bg-black/50 z-20 opacity-0 pointer-events-none transition-opacity duration-300" id="overlay"></div>
 
   <!-- Sidebar -->
-  <div id="sidebar" class="w-72 md:w-72 bg-gradient-to-br from-[#33C0F1] to-[#1E2D93] text-white p-7 md:fixed md:h-full top-0 left-0 z-10 transform md:translate-x-0 -translate-x-full transition-transform duration-300 ease-in-out">
-    <img class="h-24 mx-auto mb-4" src="{% static 'Images/logo2.png' %}" alt="Logo" />
-    <ul class="space-y-4 text-lg">
-      <li><a href="{% url 'gestioncitas' %}" class="block hover:bg-white/20 p-2 rounded">Citas Solicitadas</a></li>
-      <li><a href="{% url 'registroc' %}" class="block hover:bg-white/20 p-2 rounded">Registro Citas</a></li>
-      <li><a href="{% url 'Tipdelasemana' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Tip de la Semana</a></li>
-      <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Galería</a></li>
-      <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Servicios</a></li>
-      <li><a href="{% url 'backup' %}" class="block hover:bg-white/20 p-2 rounded">Copia de seguridad</a></li>
-      <li><a href="{% url 'index' %}" class="block hover:bg-red-500/80 p-2 rounded">Cerrar sesión</a></li>
+  <div class="fixed top-0 left-0 z-20 w-full md:w-80 h-full bg-gradient-to-br from-primary to-secondary text-white p-5 transform -translate-x-full md:translate-x-0 transition-transform duration-300" id="sidebar">
+    <img class="h-15 mx-auto mb-2" src="{% static 'Images/logo2.png' %}" alt="Logo" />
+    <ul class="space-y-2 text-lg">
+      <li><a href="{% url 'gestioncitas' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Citas Solicitadas</a></li>
+      <li><a href="{% url 'registroc' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Registro Citas</a></li>
+      <li><a href="{% url 'usuarios' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Gestión de Usuario</a></li>
+      <li><a href="{% url 'Tipdelasemana' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Modificar Tip de la Semana</a></li>
+      <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Modificar Galería</a></li>
+      <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Modificar Servicios</a></li>
+      <li><a href="{% url 'backup' %}" class="block bg-white/30 hover:bg-white/40 p-2 rounded text-gray-900 transition-colors">Copia de seguridad</a></li>
+      <li><a href="{% url 'logout' %}" class="block hover:bg-red-500/80 p-2 rounded transition-colors">Cerrar sesión</a></li>
     </ul>
+    
+    <!-- Información del usuario -->
+    <div class="absolute bottom-0 left-0 w-full p-4 bg-white/10 border-t border-white/20">
+      <div class="text-center">
+        <p class="font-bold">Usuario:</p>
+        <p class="text-sm">{{ request.user.nombre_completo }}</p>
+      </div>
+    </div>
   </div>
 
   <!-- Contenido principal -->
   <section class="md:ml-72 p-6">
+      <nav class="flex ml-8 mb-9 w-full justify-start">
+        <ol class="inline-flex items-center space-x-1 md:space-x-2">
+            <li class="inline-flex items-center">
+                <a href="{% url 'gestioncitas' %}" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors">
+                    <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M14.707 7.793a1 1 0 0 0-1.414 0L11 10.086V1.5a1 1 0 0 0-2 0v8.586L6.707 7.793a1 1 0 1 0-1.414 1.414l4 4a1 1 0 0 0 1.416 0l4-4a1 1 0 0 0-.002-1.414Z"/>
+                        <path d="M18 12h-2.55l-2.975 2.975a3.5 3.5 0 0 1-4.95 0L4.55 12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/>
+                    </svg>
+                    Administrador
+                </a>
+            </li>
+            <li>
+                <div class="flex items-center">
+                    <svg class="w-5 h-5 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+                    </svg>
+                    <span class="ml-1 text-sm font-medium text-gray-700 md:ml-2">Copias de seguridad</span>
+                </div>
+            </li>
+        </ol>
+    </nav>
     <div class="container mx-auto max-w-4xl">
       <h1 class="text-3xl font-bold text-[#1E2D93] mb-6">Copia de Seguridad</h1>
 
@@ -67,16 +113,40 @@
     </div>
   </section>
 
-  <!-- Script para abrir/cerrar sidebar en móvil -->
-  <script>
-    const toggleBtn = document.getElementById('menu-toggle');
-    const sidebar = document.getElementById('sidebar');
+    <script src={% static "JavaScript/sienna.js" %}></script>
+    <script src={% static "JavaScript/custom.js" %}></script>
 
-    toggleBtn.addEventListener('click', () => {
-      sidebar.classList.toggle('translate-x-0');
+  <!-- Script para el menú móvil -->
+  <script>
+    // Elementos del DOM
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+
+    // Alternar menú móvil
+    mobileMenuBtn.addEventListener('click', function() {
       sidebar.classList.toggle('-translate-x-full');
+      overlay.classList.toggle('opacity-0');
+      overlay.classList.toggle('pointer-events-none');
+    });
+
+    // Cerrar menú al hacer clic en el overlay
+    overlay.addEventListener('click', function() {
+      sidebar.classList.add('-translate-x-full');
+      overlay.classList.add('opacity-0');
+      overlay.classList.add('pointer-events-none');
+    });
+
+    // Cerrar menú al hacer clic en un enlace (para móviles)
+    document.querySelectorAll('#sidebar a').forEach(link => {
+      link.addEventListener('click', function() {
+        if (window.innerWidth < 768) { // Solo para móviles
+          sidebar.classList.add('-translate-x-full');
+          overlay.classList.add('opacity-0');
+          overlay.classList.add('pointer-events-none');
+        }
+      });
     });
   </script>
-
 </body>
 </html>
