@@ -10,9 +10,7 @@ urlpatterns = [
     path('Agendar/', views.Agendar, name='agendar'),
     path('login/', views.login, name='login'),
     path('logout/', views.logout, name='logout'),
-    path('RecuperarContrasena/', views.RContrasena, name='recuperar_contrasena'),
-    path('recuperarcontrasenaenviado/', views.RContrasena, name='RContrasenaenviado'),
-    path('cambia_contraseña/<str:token>/', views.cambia_con, name='cambia_con'),
+    path('RecuperarContrasena/', views.RContrasena, name='RContrasena'),
     path('Galeria/', views.gestion_galeria, name='Galeria'),
     path('Tipdelasemana/', views.gestion_tip, name='Tipdelasemana'),
     path('Gestioncitas/', views.gestion, name='gestioncitas'),
@@ -28,17 +26,5 @@ urlpatterns = [
     path('usuarios/editar/<str:documento>/', views.editar_usuario, name='editar_usuario'),
     path('usuarios/toggle-estado/<str:documento>/', views.toggle_estado_usuario, name='toggle_estado_usuario'),
     path('usuarios/crear/', views.crear_usuario, name='crear_usuario'),
-
-    path('cambia_con/<str:token>/', views.cambia_con, name='cambia_con'),
     path('logout/', views.logout, name='logout'),
-
-    path('aceptar-cita/<int:cita_id>/', views.aceptar_cita, name='aceptar_cita'),
-    path('rechazar-cita/<int:cita_id>/', views.rechazar_cita, name='rechazar_cita'),
-    path('eliminar-cita/<int:cita_id>/', views.eliminar_cita, name='eliminar_cita'),
-    path('cambiar-estado-cita/<int:cita_id>/', views.cambiar_estado_cita, name='cambiar_estado_cita'),
-    #allala
-    path('editar-observacion-cita/<int:cita_id>/', views.editar_observacion_cita, name='editar_observacion_cita'),
-    path('editar_estado_observacion_rapida/<int:cita_id>/', views.editar_estado_observacion_rapida, name='editar_estado_observacion_rapida'),
-    path('editar_estado_observacion_normal/<int:cita_id>/', views.editar_estado_observacion_normal, name='editar_estado_observacion_normal'),
-    path('Cancelacion/', views.Cancelarcita, name='CancelarCita'),
-]
+] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

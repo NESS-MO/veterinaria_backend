@@ -9,7 +9,7 @@ class Mascota(models.Model):
     cliente = models.ForeignKey(
         Cliente,
         on_delete=models.CASCADE,
-        related_name='mascotas'#
+        related_name='mascotas'
     )
 
     class Meta:

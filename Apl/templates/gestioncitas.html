@@ -48,8 +48,10 @@
     </div>
 
     <!-- Main Section -->
+<<<<<<< HEAD
     <section class="md:ml-80 mt-6 px-4 md:px-6 pb-10">
         <h1 class="text-3xl font-semibold text-[#1E2D93] text-center mb-8">PANEL ADMINISTRACIÓN DE CITAS</h1>
+=======
     <section class="md:ml-80 mt-6 px-4 md:px-6 pb-10">  <!-- Breadcrumb -->
           <nav class="flex ml-8 mb-9 w-full justify-start">
         <ol class="inline-flex items-center space-x-1 md:space-x-2">
@@ -74,6 +76,8 @@
     </nav>
         <h1 class="text-3xl font-semibold text-[#1E2D93] text-center mb-4">PANEL ADMINISTRACIÓN DE CITAS</h1>
 
+
+>>>>>>> 1113e339be3096a06919d1f70760e955722c6249
 
         <button id="toggle-filtros" class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#33C0F1] to-[#1E2D93] text-white rounded-lg mx-auto mb-6 hover:scale-105 transition">
             <i class="fas fa-sliders-h"></i>
@@ -136,57 +140,6 @@
                     <!-- Contenido generado dinámicamente -->
                 </tbody>
             </table>
-
-        <div class="tabla-responsive">
-        <table id="tabla-citas" class="min-w-full bg-white border border-gray-200 text-xs md:text-base">
-            <thead>
-                <tr class="bg-gray-100 text-gray-700">
-                    <th class="p-3 text-left">Nombre</th>
-                    <th class="p-3 text-left">Correo</th>
-                    <th class="p-3 text-left">Teléfono</th>
-                    <th class="p-3 text-left">Mascota</th>
-                    <th class="p-3 text-left">Fecha</th>
-                    <th class="p-3 text-left">Hora</th>
-                    <th class="p-3 text-left">Servicios</th>
-                    <th class="p-3 text-left">Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for cita in citas %}
-                <tr>
-                    <td>{{ cita.cliente.primer_nombre }} {{ cita.cliente.primer_apellido }}</td>
-                    <td>{{ cita.cliente.correo_electronico }}</td>
-                    <td>{{ cita.cliente.telefono }}</td>
-                    <td>
-                        {% if cita.cliente.mascotas.all %}
-                            {{ cita.mascota.nombre_mascota }}
-                        {% else %}
-                            Sin mascota
-                        {% endif %}
-                        <!---hoala-!-->
-                    </td>
-                    <td>{{ cita.fecha }}</td>
-                    <td>{{ cita.horario }}</td>
-                    <td>{{ cita.extra }}</td>
-                    <td>
-                        <form action="{% url 'aceptar_cita' cita.id %}" method="post" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="bg-green-500 text-white px-2 py-1 rounded">Aceptar</button>
-                        </form>
-                        <form action="{% url 'rechazar_cita' cita.id %}" method="post" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="bg-red-500 text-white px-2 py-1 rounded">Rechazar</button>
-                        </form>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="8">No hay citas agendadas.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-
         </div>
     </section>
 
@@ -221,47 +174,6 @@
         const filtroFecha = document.getElementById('filtro-fecha');
         const filtroHora = document.getElementById('filtro-hora');
         const filtroServicio = document.getElementById('filtro-servicio');
-
-        // Selecciona todos los inputs de filtro
-        const filtros = {
-            nombre: document.getElementById('filtro-nombre'),
-            correo: document.getElementById('filtro-correo'),
-            telefono: document.getElementById('filtro-telefono'),
-            mascota: document.getElementById('filtro-mascota'),
-            fecha: document.getElementById('filtro-fecha'),
-            hora: document.getElementById('filtro-hora'),
-            servicio: document.getElementById('filtro-servicio')
-        };
-
-        const tabla = document.getElementById('tabla-citas').getElementsByTagName('tbody')[0];
-        const filas = tabla.getElementsByTagName('tr');
-
-        function filtrarTabla() {
-            for (let fila of filas) {
-                // Si es la fila de "No hay citas agendadas", siempre mostrar
-                if (fila.querySelector('td[colspan]')) {
-                    fila.style.display = '';
-                    continue;
-                }
-                let mostrar = true;
-                // Filtra por cada campo
-                if (filtros.nombre.value && !fila.cells[0].textContent.toLowerCase().includes(filtros.nombre.value.toLowerCase())) mostrar = false;
-                if (filtros.correo.value && !fila.cells[1].textContent.toLowerCase().includes(filtros.correo.value.toLowerCase())) mostrar = false;
-                if (filtros.telefono.value && !fila.cells[2].textContent.toLowerCase().includes(filtros.telefono.value.toLowerCase())) mostrar = false;
-                if (filtros.mascota.value && !fila.cells[3].textContent.toLowerCase().includes(filtros.mascota.value.toLowerCase())) mostrar = false;
-                if (filtros.fecha.value && !fila.cells[4].textContent.includes(filtros.fecha.value)) mostrar = false;
-                if (filtros.hora.value && !fila.cells[5].textContent.includes(filtros.hora.value)) mostrar = false;
-                if (filtros.servicio.value && !fila.cells[6].textContent.toLowerCase().includes(filtros.servicio.value.toLowerCase())) mostrar = false;
-                fila.style.display = mostrar ? '' : 'none';
-            }
-        }
-
-        // Asigna el evento a cada input
-        Object.values(filtros).forEach(input => {
-            input.addEventListener('input', filtrarTabla);
-        });
-
-        // Botón limpiar
         const btnLimpiar = document.getElementById('btn-limpiar');
 
         let citas = JSON.parse(localStorage.getItem('citas')) || [];
