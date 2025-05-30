@@ -11,7 +11,7 @@ class CitaRapida(models.Model):
     servicio = models.CharField(max_length=100)
     estado = models.CharField(max_length=20, choices=[
         ('Completada', 'Completada'),
-        ('Pendiente', 'Pendiente'),
+        ('Pendiente', 'Pendiente'),#
         ('Cancelada', 'Cancelada')
     ])
     observaciones = models.CharField(max_length=250, blank=True)

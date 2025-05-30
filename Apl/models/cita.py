@@ -10,7 +10,7 @@ class Cita(models.Model):
         ('Pendiente', 'Pendiente'),
         ('Cancelada', 'Cancelada')
     ]
-
+#
     fecha = models.DateField()
     estado = models.CharField(
         max_length=20,

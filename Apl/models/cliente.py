@@ -8,7 +8,7 @@ class Cliente(models.Model):
         ('CC', 'Cédula de Ciudadanía'),
         ('TI', 'Tarjeta de Identidad')
     ]
-
+#
     tipo_documento = models.CharField(
         max_length=2,
         choices=TIPO_DOCUMENTO_CHOICES,
