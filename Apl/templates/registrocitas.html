@@ -43,6 +43,7 @@
         </div>
     </div>
 
+
     <!-- Main Content -->
     <div class="flex-1 md:ml-72 p-6 fade-in">
         <nav class="flex ml-8 mb-9 w-full justify-start">
@@ -62,6 +63,194 @@
                         <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
                     </svg>
                     <span class="ml-1 text-sm font-medium text-gray-700 md:ml-2">Registro citas</span>
+
+      <!-- Formulario para nuevas citas -->
+      <form method="post" class="mb-6 bg-white p-4 rounded shadow" id="form-cita">
+        {% csrf_token %}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="flex flex-col">
+            <label for="numero_documento" class="text-xs font-semibold mb-1 text-gray-700">Documento</label>
+            <input type="text" name="numero_documento" id="numero_documento" placeholder="Documento" required
+              pattern="[0-9]{6,15}" maxlength="15"
+              class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm transition-all" />
+            <span id="error-numero_documento" class="text-xs text-red-500 mt-1 hidden">Solo números, mínimo 6 dígitos</span>
+          </div>
+
+          <div class="flex flex-col">
+            <label for="nombre_cliente" class="text-xs font-semibold mb-1 text-gray-700">Cliente</label>
+            <input type="text" name="nombre_cliente" id="nombre_cliente" placeholder="Nombre" required
+              pattern="[A-Za-záéíóúÁÉÍÓÚñÑ ]{2,50}"
+              class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm transition-all" />
+            <span id="error-nombre_cliente" class="text-xs text-red-500 mt-1 hidden">Solo letras y espacios, mínimo 2 caracteres</span>
+          </div>
+
+          <div class="flex flex-col">
+            <label for="nombre_mascota" class="text-xs font-semibold mb-1 text-gray-700">Mascota</label>
+            <input type="text" name="nombre_mascota" id="nombre_mascota" placeholder="Nombre mascota" required
+              pattern="[A-Za-záéíóúÁÉÍÓÚñÑ ]{2,30}"
+              class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm transition-all" />
+            <span id="error-nombre_mascota" class="text-xs text-red-500 mt-1 hidden">Solo letras y espacios, mínimo 2 caracteres</span>
+          </div>
+
+          <div class="flex flex-col">
+            <label for="edad_mascota" class="text-xs font-semibold mb-1 text-gray-700">Edad</label>
+            <div class="flex gap-2">
+              <input type="number" min="0" max="20" name="edad_mascota_valor" id="edad_mascota_valor"
+                class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm w-1/2 transition-all" placeholder="Edad" required />
+              <select name="edad_mascota_tipo" id="edad_mascota_tipo"
+                class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm w-1/2 transition-all" required>
+                <option value="" disabled selected>Tipo</option>
+                <option value="años">Años</option>
+                <option value="meses">Meses</option>
+              </select>
+            </div>
+            <span id="error-edad_mascota" class="text-xs text-red-500 mt-1 hidden">Edad inválida (0-20 años o 0-11 meses)</span>
+          </div>
+
+          <div class="flex flex-col">
+            <label for="raza_mascota" class="text-xs font-semibold mb-1 text-gray-700">Especie y Raza</label>
+            <input type="text" name="raza_mascota" id="raza_mascota" placeholder="Raza" required
+              pattern="[A-Za-záéíóúÁÉÍÓÚñÑ ]{2,30}"
+              class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm transition-all" />
+            <span id="error-raza_mascota" class="text-xs text-red-500 mt-1 hidden">Solo letras y espacios, mínimo 2 caracteres</span>
+          </div>
+
+          <div class="flex flex-col">
+            <label for="fecha" class="text-xs font-semibold mb-1 text-gray-700">Fecha</label>
+            <input type="date" name="fecha" id="fecha" required
+              min="{{ today|date:'Y-m-d' }}"
+              class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm transition-all" />
+            <span id="error-fecha" class="text-xs text-red-500 mt-1 hidden">Debe seleccionar una fecha</span>
+          </div>
+
+          <div class="flex flex-col">
+            <label for="hora" class="text-xs font-semibold mb-1 text-gray-700">Hora</label>
+            <input type="time" name="hora" id="hora"
+              min="06:00" max="18:00" step="1200"
+              class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm transition-all" required />
+            <span id="error-hora" class="text-xs text-red-500 mt-1 hidden">Debe seleccionar una hora</span>
+          </div>
+
+          <div class="flex flex-col">
+            <label for="servicio" class="text-xs font-semibold mb-1 text-gray-700">Servicio</label>
+            <select name="servicio" id="servicio" required
+              class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm transition-all">
+              <option value="" disabled selected>Seleccione un servicio</option>
+              <option value="Consulta">Consulta</option>
+              <option value="Esterilización Canina y Felina">Esterilización Canina y Felina</option>
+              <option value="Guardería">Guardería</option>
+              <option value="Vacunación">Vacunación</option>
+              <option value="Profilaxis">Profilaxis</option>
+              <option value="Hospitalización">Hospitalización</option>
+              <option value="Cirugías">Cirugías</option>
+              <option value="Asistencia Médica">Asistencia Médica</option>
+            </select>
+            <span id="error-servicio" class="text-xs text-red-500 mt-1 hidden">Debe seleccionar un servicio</span>
+          </div>
+
+          <div class="flex flex-col">
+            <label for="estado" class="text-xs font-semibold mb-1 text-gray-700">Estado</label>
+            <select name="estado" id="estado" required
+              class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm transition-all">
+              <option value="Pendiente" selected>Pendiente</option>
+              <option value="Completada">Completada</option>
+              <option value="Cancelada">Cancelada</option>
+              <option value="Realizada">Realizada</option>
+            </select>
+            <span id="error-estado" class="text-xs text-red-500 mt-1 hidden">Debe seleccionar un estado</span>
+          </div>
+
+          <div class="flex flex-col md:col-span-2">
+            <label for="observaciones" class="text-xs font-semibold mb-1 text-gray-700">Observaciones</label>
+            <input type="text" name="observaciones" id="observaciones" placeholder="Observaciones"
+              maxlength="250"
+              class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm transition-all" />
+            <span id="error-observaciones" class="text-xs text-red-500 mt-1 hidden">Máximo 250 caracteres</span>
+          </div>
+          <div class="flex items-end">
+            <button type="submit"
+              class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 active:scale-95 transition font-semibold">
+              Agregar Cita
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Mensaje de error Django -->
+      {% if form.errors %}
+        <div class="text-red-500 text-xs">
+          {{ form.errors }}
+        </div>
+      {% endif %}
+
+      <!-- Filtros -->
+      <div class="mb-4">
+        <div class="flex flex-wrap gap-2 mb-2">
+          <input type="text" id="filtro-documento" placeholder="Filtrar Documento" class="border p-1 rounded text-xs flex-1 min-w-[150px]" />
+          <input type="text" id="filtro-cliente" placeholder="Filtrar Cliente" class="border p-1 rounded text-xs flex-1 min-w-[150px]" />
+          <input type="date" id="filtro-fecha" class="border p-1 rounded text-xs flex-1 min-w-[130px]" />
+          <input type="time" id="filtro-hora" class="border p-1 rounded text-xs flex-1 min-w-[110px]" />
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <input type="text" id="filtro-servicio" placeholder="Filtrar Servicio" class="border p-1 rounded text-xs flex-1 min-w-[150px]" />
+          <select id="filtro-estado" class="border p-1 rounded text-xs flex-1 min-w-[140px]">
+            <option value="">Todos los estados</option>
+            <option value="completada">Completada</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="cancelada">Cancelada</option>
+          </select>
+          <input type="text" id="filtro-observaciones" placeholder="Filtrar Observaciones" class="border p-1 rounded text-xs flex-1 min-w-[150px]" />
+          <button id="btn-limpiar-filtros" class="bg-gray-200 px-2 rounded text-xs">Limpiar</button>
+        </div>
+      </div>
+
+      <!-- Tabla de citas -->
+      <div class="overflow-x-auto">
+        <table class="min-w-full border border-gray-200 text-sm" id="tabla-citas">
+          <thead class="bg-gray-100 text-gray-700 font-semibold">
+            <tr>
+              <th class="px-4 py-2 text-left">Documento</th>
+              <th class="px-4 py-2 text-left">Cliente</th>
+              <th class="px-4 py-2 text-left">Mascota</th>
+              <th class="px-4 py-2 text-left">Edad</th>
+              <th class="px-4 py-2 text-left">Raza</th>
+              <th class="px-4 py-2 text-left">Fecha</th>
+              <th class="px-4 py-2 text-left">Hora</th>
+              <th class="px-4 py-2 text-left">Servicio</th>
+              <th class="px-4 py-2 text-left">Estado</th>
+              <th class="px-4 py-2 text-left">Observaciones</th>
+            </tr>
+          </thead>
+          <tbody id="cuerpo-tabla" class="divide-y divide-gray-200 text-gray-700">
+            {% for cita in citas_rapidas %}
+            <tr>
+              <td>{{ cita.numero_documento }}</td>
+              <td>{{ cita.nombre_cliente }}</td>
+              <td>{{ cita.nombre_mascota }}</td>
+              <td>{{ cita.edad_mascota }}</td>
+              <td>{{ cita.raza_mascota }}</td>
+              <td>
+                <form method="post" action="{% url 'editar_estado_observacion_rapida' cita.id %}">
+                  {% csrf_token %}
+                  <input type="date" name="fecha" value="{{ cita.fecha|date:'Y-m-d' }}" class="border rounded p-1 text-xs w-full" required />
+              </td>
+              <td>
+                  <input type="time" name="hora" value="{{ cita.hora|time:'H:i' }}"
+                    min="06:00" max="18:00" step="1200"
+                    class="border rounded p-1 text-xs w-full" required />
+              </td>
+              <td>{{ cita.servicio }}</td>
+              <td>
+                <select name="estado" class="border rounded p-1 text-xs w-full">
+                  <option value="Completada" {% if cita.estado == "Completada" %}selected{% endif %}>Completada</option>
+                  <option value="Pendiente" {% if cita.estado == "Pendiente" %}selected{% endif %}>Pendiente</option>
+                  <option value="Cancelada" {% if cita.estado == "Cancelada" %}selected{% endif %}>Cancelada</option>
+                </select>
+              </td>
+              <td>
+                <div class="flex gap-2 items-center">
+                  <input type="text" name="observaciones" value="{{ cita.observaciones }}" class="border rounded p-1 text-xs w-full" />
+                  <button type="submit" class="bg-blue-500 text-white px-2 py-1 rounded text-xs ml-2">Guardar</button>
                 </div>
             </li>
         </ol>
@@ -175,6 +364,146 @@
 
       mensajeExito.classList.remove("hidden");
       setTimeout(() => mensajeExito.classList.add("hidden"), 2500);
+
+      document.getElementById('btn-limpiar-filtros').addEventListener('click', function(){
+        Object.values(filtros).forEach(input => input.value = '');
+        filtrarTabla();
+      });
+    });
+
+    // Validación de hora en intervalos de 20 minutos
+    document.querySelectorAll('input[type="time"]').forEach(input => {
+      input.addEventListener('change', function() {
+        const value = this.value;
+        if (!value) return;
+        const [h, m] = value.split(':').map(Number);
+        if (h < 6 || h > 18 || ![0, 20, 40].includes(m)) {
+          alert('Seleccione una hora entre 6:00 y 18:00, en intervalos de 20 minutos (00, 20, 40).');
+          this.value = '';
+        }
+      });
+    });
+
+    // Validaciones en tiempo real para el formulario
+    function mostrarError(input, errorId, mensaje) {
+      input.classList.add('border-red-500');
+      document.getElementById(errorId).textContent = mensaje;
+      document.getElementById(errorId).classList.remove('hidden');
+    }
+    function ocultarError(input, errorId) {
+      input.classList.remove('border-red-500');
+      document.getElementById(errorId).classList.add('hidden');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Documento
+      const doc = document.getElementById('numero_documento');
+      doc.addEventListener('input', function() {
+        if (!/^[0-9]{6,15}$/.test(doc.value)) {
+          mostrarError(doc, 'error-numero_documento', 'Solo números, mínimo 6 dígitos');
+        } else {
+          ocultarError(doc, 'error-numero_documento');
+        }
+      });
+
+      // Cliente
+      const cliente = document.getElementById('nombre_cliente');
+      cliente.addEventListener('input', function() {
+        if (!/^[A-Za-záéíóúÁÉÍÓÚñÑ ]{2,50}$/.test(cliente.value)) {
+          mostrarError(cliente, 'error-nombre_cliente', 'Solo letras y espacios, mínimo 2 caracteres');
+        } else {
+          ocultarError(cliente, 'error-nombre_cliente');
+        }
+      });
+
+      // Mascota
+      const mascota = document.getElementById('nombre_mascota');
+      mascota.addEventListener('input', function() {
+        if (!/^[A-Za-záéíóúÁÉÍÓÚñÑ ]{2,30}$/.test(mascota.value)) {
+          mostrarError(mascota, 'error-nombre_mascota', 'Solo letras y espacios, mínimo 2 caracteres');
+        } else {
+          ocultarError(mascota, 'error-nombre_mascota');
+        }
+      });
+
+      // Edad
+      const edadValor = document.getElementById('edad_mascota_valor');
+      const edadTipo = document.getElementById('edad_mascota_tipo');
+      function validarEdad() {
+        if (!edadValor.value || !edadTipo.value) {
+          mostrarError(edadValor, 'error-edad_mascota', 'Edad inválida (0-20 años o 0-11 meses)');
+          mostrarError(edadTipo, 'error-edad_mascota', 'Edad inválida (0-20 años o 0-11 meses)');
+        } else if (edadTipo.value === 'años' && (edadValor.value < 0 || edadValor.value > 20)) {
+          mostrarError(edadValor, 'error-edad_mascota', 'Edad en años debe estar entre 0 y 20');
+        } else if (edadTipo.value === 'meses' && (edadValor.value < 0 || edadValor.value > 11)) {
+          mostrarError(edadValor, 'error-edad_mascota', 'Edad en meses debe estar entre 0 y 11');
+        } else {
+          ocultarError(edadValor, 'error-edad_mascota');
+          ocultarError(edadTipo, 'error-edad_mascota');
+        }
+      }
+      edadValor.addEventListener('input', validarEdad);
+      edadTipo.addEventListener('change', validarEdad);
+
+      // Raza
+      const raza = document.getElementById('raza_mascota');
+      raza.addEventListener('input', function() {
+        if (!/^[A-Za-záéíóúÁÉÍÓÚñÑ ]{2,30}$/.test(raza.value)) {
+          mostrarError(raza, 'error-raza_mascota', 'Solo letras y espacios, mínimo 2 caracteres');
+        } else {
+          ocultarError(raza, 'error-raza_mascota');
+        }
+      });
+
+      // Fecha
+      const fecha = document.getElementById('fecha');
+      fecha.addEventListener('input', function() {
+        if (!fecha.value) {
+          mostrarError(fecha, 'error-fecha', 'Debe seleccionar una fecha');
+        } else {
+          ocultarError(fecha, 'error-fecha');
+        }
+      });
+
+      // Hora
+      const hora = document.getElementById('hora');
+      hora.addEventListener('input', function() {
+        if (!hora.value) {
+          mostrarError(hora, 'error-hora', 'Debe seleccionar una hora');
+        } else {
+          ocultarError(hora, 'error-hora');
+        }
+      });
+
+      // Servicio
+      const servicio = document.getElementById('servicio');
+      servicio.addEventListener('change', function() {
+        if (!servicio.value) {
+          mostrarError(servicio, 'error-servicio', 'Debe seleccionar un servicio');
+        } else {
+          ocultarError(servicio, 'error-servicio');
+        }
+      });
+
+      // Estado
+      const estado = document.getElementById('estado');
+      estado.addEventListener('change', function() {
+        if (!estado.value) {
+          mostrarError(estado, 'error-estado', 'Debe seleccionar un estado');
+        } else {
+          ocultarError(estado, 'error-estado');
+        }
+      });
+
+      // Observaciones
+      const obs = document.getElementById('observaciones');
+      obs.addEventListener('input', function() {
+        if (obs.value.length > 250) {
+          mostrarError(obs, 'error-observaciones', 'Máximo 250 caracteres');
+        } else {
+          ocultarError(obs, 'error-observaciones');
+        }
+      });
     });
   </script>
 </body>

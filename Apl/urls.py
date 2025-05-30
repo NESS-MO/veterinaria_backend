@@ -21,6 +21,7 @@ urlpatterns = [
     path('eliminar-tip/<int:tip_id>/', views.eliminar_tip, name='eliminar_tip'),
     path('obtener-tip-actual/', views.obtener_tip_actual, name='obtener_tip_actual'),
     path('backup/', views.backup, name='backup'),
+
     path('api/servicios/', views.api_servicios, name='api_servicios'),
     path('api/servicios/<int:servicio_id>/', views.api_servicios, name='api_servicio_detail'),
     path('usuarios/', views.usuarios, name='usuarios'),
@@ -29,4 +30,16 @@ urlpatterns = [
     path('usuarios/toggle-estado/<str:documento>/', views.toggle_estado_usuario, name='toggle_estado_usuario'),
     path('usuarios/crear/', views.crear_usuario, name='crear_usuario'),
     path('logout/', views.logout, name='logout'),
-] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+    static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT),
+
+    path('aceptar-cita/<int:cita_id>/', views.aceptar_cita, name='aceptar_cita'),
+    path('rechazar-cita/<int:cita_id>/', views.rechazar_cita, name='rechazar_cita'),
+    path('eliminar-cita/<int:cita_id>/', views.eliminar_cita, name='eliminar_cita'),
+    path('cambiar-estado-cita/<int:cita_id>/', views.cambiar_estado_cita, name='cambiar_estado_cita'),
+    #allala
+    path('editar-observacion-cita/<int:cita_id>/', views.editar_observacion_cita, name='editar_observacion_cita'),
+    path('editar_estado_observacion_rapida/<int:cita_id>/', views.editar_estado_observacion_rapida, name='editar_estado_observacion_rapida'),
+    path('editar_estado_observacion_normal/<int:cita_id>/', views.editar_estado_observacion_normal, name='editar_estado_observacion_normal'),
+    path('Cancelacion/', views.Cancelarcita, name='CancelarCita'),
+]
+
