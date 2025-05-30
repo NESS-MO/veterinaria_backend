@@ -1,101 +1,51 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import JsonResponse
-from django.contrib import messages
-from django.views.decorators.http import require_POST
-from .models import Cliente, Mascota, Cita, TipSemana, ImagenGaleria
-from .models.AdminCitas import CitaRapida
-from .forms import ImagenGaleriaForm, CitaRapidaForm
-from django.core.mail import send_mail
-from django.db.models import Q
+from django.http import HttpResponse, JsonResponse
+from .models import Administrador, Cliente 
 
-# --- Vistas principales ---
+from .forms import craeteNewTask
+from datetime import date, timedelta
+from django.contrib import messages
+from .models import TipSemana, administrador
+from django.http import JsonResponse
+from django.views.decorators.http import require_POST
+from django.contrib import messages
+from .models import ImagenGaleria
+from .forms import ImagenGaleriaForm
+
+from django.http import HttpResponseForbidden
+from .models import Servicio
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+
+from django.core.signing import TimestampSigner, BadSignature, SignatureExpired
+from django.template.loader import render_to_string
+from django.urls import reverse
+from django.utils.html import strip_tags
+from django.core.mail import EmailMultiAlternatives
+from django.conf import settings
+from django.contrib.auth.hashers import make_password
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
+
+
+
+
+
+# Create your views here.
 
 def index(request): 
-    imagenes_galeria = ImagenGaleria.objects.filter(activa=True).order_by('orden')[:9]
-    return render(request, "1. Index.html", {'imagenes_galeria': imagenes_galeria})
+    return render(request, "1. Index.html")
 
 def servicios(request):
-    return render(request, "2. Servicios.html")
-
-def gestion_citas(request):
-    citas = Cita.objects.filter(estado='pendiente')
-    return render(request, 'gestioncitas.html', {'citas': citas})
+    return render(request, "2. Servicios.html" )
 
 def Agendar(request):
-    if request.method == 'POST':
-        try:
-            numero_documento = request.POST['numero_documento']
-            cliente, _ = Cliente.objects.get_or_create(
-                numero_documento=numero_documento,
-                defaults={
-                    'primer_nombre': request.POST['primer_nombre'],
-                    'primer_apellido': request.POST['primer_apellido'],
-                    'tipo_documento': request.POST['tipo_documento'],
-                    'telefono': request.POST['telefono'],
-                    'correo_electronico': request.POST['correo_electronico'],
-                }
-            )
-            nombre_mascota = request.POST['mascota']
-            mascota, _ = Mascota.objects.get_or_create(
-                nombre_mascota=nombre_mascota,
-                cliente=cliente,
-                defaults={
-                    'especie': request.POST['clase-mascota'],
-                    'raza': request.POST.get('otra-raza') or request.POST['raza-mascota'],
-                    'edad': f"{request.POST['edad-numero']} {request.POST['edad-unidad']}",
-                }
-            )
-            servicios = [request.POST['main_service']]
-            if request.POST.get('extra_service') and request.POST['extra_service'] != 'ninguno':
-                servicios.append(request.POST['extra_service'])
-
-            Cita.objects.create(
-                fecha=request.POST['fecha'],
-                horario=request.POST['hora'],
-                extra=", ".join(servicios),
-                cliente=cliente,
-                mascota=mascota,  # <--- Aquí agregas la mascota correcta
-                estado='pendiente'
-            )
-            messages.success(request, "Cita agendada exitosamente")
-            return redirect('agendar')
-        except Exception as e:
-            messages.error(request, f"Error al registrar: {str(e)}")
-
-    citas = Cita.objects.all()
-    return render(request, '3. Agendar.html', {'citas': citas})
-
-def RegistroC(request):
-    if request.method == 'POST':
-        data = request.POST.copy()
-        valor = data.get('edad_mascota_valor', '')
-        tipo = data.get('edad_mascota_tipo', '')
-        if valor and tipo:
-            edad = f"{valor} {tipo}"
-        else:
-            edad = ""
-        data['edad_mascota'] = edad
-
-        form = CitaRapidaForm(data)
-        if form.is_valid():
-            form.save()
-            messages.success(request, "Cita agregada correctamente.")
-            return redirect('registroc')
-        else:
-            messages.error(request, "Por favor corrige los errores del formulario.")
-    else:
-        form = CitaRapidaForm()
-    citas_rapidas = CitaRapida.objects.all()
-    rango_edades = range(1, 21)
-    rango_meses = range(0, 12)
-    return render(request, 'registrocitas.html', {
-        'rango_edades': rango_edades,
-        'rango_meses': rango_meses,
-        'citas_rapidas': citas_rapidas,
-        'form': form,
+    min_date = date.today().strftime('%Y-%m-%d')
+    max_date = (date.today() + timedelta(days=60)).strftime('%Y-%m-%d')
+    return render(request, "3. Agendar.html", {
+        'min_date': min_date,
+        'max_date': max_date
     })
-def Cancelarcita(request):
-    return render(request, "Cancelarcita.html")
 
 # views.py
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
@@ -304,11 +254,7 @@ def cambia_con(request, token):
     return render(request, 'cambia_contraseña.html')
 
 
-def RContrasena(request):
-    return render(request, "4.1 RecuperarContrasena.html")
 
-def RContrasenaDos(request):
-    return render(request, "4.2 RecuperarContrasena.html")
 
 def modificar(request):
     return gestion_galeria(request)
@@ -320,13 +266,22 @@ def Tip(request):
     return render(request, "5. Modificar-tipdelasemana.html")
 
 def gestion(request):
-    citas = Cita.objects.select_related('cliente').all()
-    return render(request, 'gestioncitas.html', {'citas': citas})
+    return render(request, "gestioncitas.html")
 
 def ModificarS(request):
     return render(request, "modificarservicios.html")
 
-# --- Tip de la semana ---
+def RegistroC(request):
+    return render(request, "registrocitas.html")
+
+def usuarios(request):
+    return render(request, "GestionUsuarios.html")
+
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from .models import TipSemana 
+
 
 def gestion_tip(request):
     try:
@@ -425,7 +380,9 @@ def eliminar_tip(request, tip_id):
         tip.delete()
         messages.success(request, 'Tip eliminado correctamente')
         return redirect('Tipdelasemana')
+    # Redirigir si no es POST
     return redirect('Tipdelasemana')
+
 
 def obtener_tip_actual(request):
     try:
@@ -442,18 +399,22 @@ def obtener_tip_actual(request):
             'contenido': 'No hay tips disponibles actualmente.',
             'imagen': ''
         })
+    
 
-# --- Galería ---
 
 def gestion_galeria(request):
     imagenes = ImagenGaleria.objects.all().order_by('orden')
+    
     if request.method == 'POST':
+        # Procesar eliminación de imágenes
         if 'eliminar' in request.POST:
             imagen_id = request.POST.get('eliminar')
             imagen = ImagenGaleria.objects.get(id=imagen_id)
             imagen.delete()
             messages.success(request, 'Imagen eliminada correctamente')
             return redirect('Galeria')
+        
+        # Procesar cambio de estado
         if 'toggle_activa' in request.POST:
             imagen_id = request.POST.get('toggle_activa')
             imagen = ImagenGaleria.objects.get(id=imagen_id)
@@ -461,8 +422,11 @@ def gestion_galeria(request):
             imagen.save()
             messages.success(request, f'Imagen {"activada" if imagen.activa else "ocultada"} correctamente')
             return redirect('Galeria')
+        
+        # Procesar nueva imagen
         form = ImagenGaleriaForm(request.POST, request.FILES)
         if form.is_valid():
+            # Limitar a 9 imágenes máximo
             if ImagenGaleria.objects.count() >= 9:
                 messages.error(request, 'Solo se permiten 9 imágenes en la galería')
             else:
@@ -471,107 +435,358 @@ def gestion_galeria(request):
             return redirect('Galeria')
     else:
         form = ImagenGaleriaForm()
+
     return render(request, '5. modificar-galeria.html', {
         'imagenes': imagenes,
         'form': form,
         'total_imagenes': ImagenGaleria.objects.count()
     })
 
-# --- Gestión de citas ---
+def index(request):
+    imagenes_galeria = ImagenGaleria.objects.filter(activa=True).order_by('orden')[:9]
+    return render(request, "1. Index.html", {'imagenes_galeria': imagenes_galeria})
 
-@require_POST
-def aceptar_cita(request, cita_id):
-    cita = get_object_or_404(Cita, id=cita_id)
-    mascota = cita.mascota  # <-- Usa la mascota de la cita, no la primera del cliente
-    observaciones = cita.observaciones if cita.observaciones is not None else ""
-    CitaRapida.objects.create(
-        numero_documento=cita.cliente.numero_documento,
-        nombre_cliente=f"{cita.cliente.primer_nombre} {cita.cliente.primer_apellido}",
-        nombre_mascota=mascota.nombre_mascota if mascota else "",
-        edad_mascota=mascota.edad if mascota else "",
-        raza_mascota=f"{mascota.especie} - {mascota.raza}" if mascota else "",
-        fecha=cita.fecha,
-        hora=cita.horario,
-        servicio=cita.extra,
-        estado='Pendiente',
-        observaciones=observaciones
-    )
-    enviar_correo_cita(cita.cliente, "aceptada")
-    cita.delete()
-    messages.success(request, "Cita aceptada y registrada en el historial.")
-    return redirect('gestioncitas')
 
-@require_POST
-def rechazar_cita(request, cita_id):
-    cita = get_object_or_404(Cita, id=cita_id)
-    enviar_correo_cita(cita.cliente, "rechazada")  # <--- Aquí envías el correo
-    cita.delete()
-    messages.success(request, "Cita rechazada y eliminada.")
-    return redirect('gestioncitas')
 
-def eliminar_cita(request, cita_id):
+def servicios(request):
+    servicios = Servicio.objects.filter(activo=True).order_by('orden')
+    return render(request, "2. Servicios.html", {'servicios': servicios})
+
+def modificar_servicio(request):
+    
+    servicios = Servicio.objects.all().order_by('orden')
+    return render(request, 'modificarservicios.html', {'servicios': servicios})
+
+@csrf_exempt
+def api_servicios(request, servicio_id=None):
     if request.method == 'POST':
-        cita = get_object_or_404(Cita, id=cita_id)
-        cita.delete()
-        messages.success(request, "Cita eliminada correctamente.")
-    return redirect('registroc')
+        try:
+            data = request.POST
+            files = request.FILES
+            
+            if 'servicio_id' in data and data['servicio_id']:
+                # Actualizar servicio existente
+                servicio = Servicio.objects.get(id=data['servicio_id'])
+                servicio.nombre = data.get('nombre', servicio.nombre)
+                
+                servicio.titulo_ventana = data.get('titulo_ventana', servicio.titulo_ventana)
+                servicio.subtitulo_ventana = data.get('subtitulo_ventana', servicio.subtitulo_ventana)
+                servicio.contenido_ventana = data.get('contenido_ventana', servicio.contenido_ventana)
+                servicio.mostrar_boton_agendar = data.get('mostrar_boton_agendar', 'off') == 'on'
+                
+                if 'imagen_cuadro' in files:
+                    servicio.imagen_cuadro = files['imagen_cuadro']
+                if 'imagen_ventana' in files:
+                    servicio.imagen_ventana = files['imagen_ventana']
+                
+                servicio.save()
+            else:
+                # Crear nuevo servicio - ELIMINA mostrar_boton_consulta ya que siempre será True
+                servicio = Servicio.objects.create(
+                    nombre=data['nombre'],
+                    imagen_cuadro=files['imagen_cuadro'],
+                    titulo_ventana=data['titulo_ventana'],
+                    subtitulo_ventana=data['subtitulo_ventana'],
+                    imagen_ventana=files['imagen_ventana'],
+                    contenido_ventana=data['contenido_ventana'],
+                    mostrar_boton_agendar=data.get('mostrar_boton_agendar', 'off') == 'on',
+                    orden=Servicio.objects.count() + 1
+                )
+            
+            return JsonResponse({'success': True, 'id': servicio.id})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    if request.method == 'GET':
+        if servicio_id:
+            servicio = get_object_or_404(Servicio, id=servicio_id)
+            data = {
+                'id': servicio.id,
+                'nombre': servicio.nombre,
+                'imagen_cuadro': servicio.imagen_cuadro.url if servicio.imagen_cuadro else '',
+                'titulo_ventana': servicio.titulo_ventana,
+                'subtitulo_ventana': servicio.subtitulo_ventana,
+                'imagen_ventana': servicio.imagen_ventana.url if servicio.imagen_ventana else '',
+                'contenido_ventana': servicio.contenido_ventana,
+                'mostrar_boton_agendar': servicio.mostrar_boton_agendar,
+            }
+            return JsonResponse(data)
+        else:
+            servicios = Servicio.objects.all().order_by('orden')
+            data = [{
+                'id': s.id,
+                'nombre': s.nombre,
+                'imagen_cuadro': s.imagen_cuadro.url if s.imagen_cuadro else '',
+            } for s in servicios]
+            return JsonResponse(data, safe=False)
+    
+    elif request.method == 'POST':
+        try:
+            data = request.POST
+            files = request.FILES
+            
+            if 'servicio_id' in data and data['servicio_id']:
+                # Actualizar servicio existente
+                servicio = Servicio.objects.get(id=data['servicio_id'])
+                servicio.nombre = data.get('nombre', servicio.nombre)
+                
+                servicio.titulo_ventana = data.get('titulo_ventana', servicio.titulo_ventana)
+                servicio.subtitulo_ventana = data.get('subtitulo_ventana', servicio.subtitulo_ventana)
+                servicio.contenido_ventana = data.get('contenido_ventana', servicio.contenido_ventana)
+                servicio.mostrar_boton_agendar = data.get('mostrar_boton_agendar', 'off') == 'on'
+                
+                if 'imagen_cuadro' in files:
+                    servicio.imagen_cuadro = files['imagen_cuadro']
+                if 'imagen_ventana' in files:
+                    servicio.imagen_ventana = files['imagen_ventana']
+                
+                servicio.save()
+            else:
+                # Crear nuevo servicio
+                servicio = Servicio.objects.create(
+                    nombre=data['nombre'],
+                    imagen_cuadro=files['imagen_cuadro'],
+                    titulo_ventana=data['titulo_ventana'],
+                    subtitulo_ventana=data['subtitulo_ventana'],
+                    imagen_ventana=files['imagen_ventana'],
+                    contenido_ventana=data['contenido_ventana'],
+                    mostrar_boton_agendar=data.get('mostrar_boton_agendar', 'off') == 'on',
+                    orden=Servicio.objects.count() + 1
+                )
+            
+            return JsonResponse({'success': True, 'id': servicio.id})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    
+    elif request.method == 'DELETE':
+        try:
+            servicio = Servicio.objects.get(id=servicio_id)
+            servicio.delete()
+            return JsonResponse({'success': True})
+        except Servicio.DoesNotExist:
+            return JsonResponse({'error': 'Servicio no encontrado'}, status=404)
+    
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
 
-def cambiar_estado_cita(request, cita_id):
-    if request.method == 'POST':
-        cita = get_object_or_404(Cita, id=cita_id)
-        nuevo_estado = request.POST.get('estado')
-        cita.estado = nuevo_estado
-        cita.save()
-        messages.success(request, "Estado actualizado.")
-    return redirect('registroc')
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from .models import Administrador
+from .forms import AdministradorForm  # Crearemos este formulario después
+from django.http import JsonResponse
 
-def editar_observacion_cita(request, cita_id):
+from django.http import JsonResponse
+from django.core.serializers.json import DjangoJSONEncoder
+import json
+
+def usuarios(request):
+    if not request.user.is_authenticated:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'error': 'No autenticado'}, status=401)
+        return redirect('login')
+    
+    try:
+        # Obtener parámetros de filtrado
+        filtros = {
+            'documento': request.GET.get('documento', ''),
+            'nombre': request.GET.get('nombre', ''),
+            'correo': request.GET.get('correo', ''),
+            'telefono': request.GET.get('telefono', ''),
+            'estado': request.GET.get('estado', '')
+        }
+        
+        # Filtrar administradores
+        administradores = Administrador.objects.all()
+        
+        if filtros['documento']:
+            administradores = administradores.filter(documento__icontains=filtros['documento'])
+        if filtros['nombre']:
+            administradores = administradores.filter(nombre_completo__icontains=filtros['nombre'])
+        if filtros['correo']:
+            administradores = administradores.filter(correo_electronico__icontains=filtros['correo'])
+        if filtros['telefono']:
+            administradores = administradores.filter(telefono__icontains=filtros['telefono'])
+        if filtros['estado']:
+            administradores = administradores.filter(is_active=(filtros['estado'].lower() == 'true'))
+        
+        administradores = administradores.order_by('nombre_completo')
+        
+        # Para solicitudes AJAX
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            data = {
+                'administradores': [
+                    {
+                        'documento': admin.documento,
+                        'nombre_completo': admin.nombre_completo,
+                        'correo_electronico': admin.correo_electronico,
+                        'telefono': admin.telefono,
+                        'is_active': admin.is_active
+                    }
+                    for admin in administradores
+                ]
+            }
+            return JsonResponse(data, encoder=DjangoJSONEncoder, safe=False)
+        
+        return render(request, "GestionUsuarios.html", {
+            'administradores': administradores,
+            'user': request.user
+        })
+        
+    except Exception as e:
+        print(f"Error en vista usuarios: {str(e)}")
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return JsonResponse({'error': str(e)}, status=500)
+        raise
+
+from django.contrib.auth import logout as auth_logout
+
+def eliminar_usuario(request, documento):
     if request.method == 'POST':
-        cita = get_object_or_404(Cita, id=cita_id)
-        nueva_obs = request.POST.get('observaciones', '')
-        cita.observaciones = nueva_obs
-        cita.save()
-        if nueva_obs:
-            CitaRapida.objects.create(
-                numero_documento=cita.cliente.numero_documento,
-                nombre_cliente=f"{cita.cliente.primer_nombre} {cita.cliente.primer_apellido}",
-                fecha=cita.fecha,
-                hora=cita.horario,
-                servicio=cita.extra,
-                estado=cita.estado,
-                observaciones=nueva_obs
+        admin = get_object_or_404(Administrador, documento=documento)
+        es_usuario_actual = (request.user.documento == documento)
+        admin.delete()
+        
+        if es_usuario_actual:
+            auth_logout(request)
+            return JsonResponse({
+                'success': True, 
+                'message': 'Usuario eliminado correctamente. Sesión cerrada.'
+            })
+            
+        return JsonResponse({
+            'success': True, 
+            'message': 'Usuario eliminado correctamente'
+        })
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+from django.views.decorators.http import require_http_methods
+from django.contrib.auth.hashers import make_password
+
+@require_http_methods(["GET", "POST"])
+def editar_usuario(request, documento):
+    admin = get_object_or_404(Administrador, documento=documento)
+    
+    if request.method == 'POST':
+        try:
+            # Actualizar solo estos campos (no contraseña)
+            admin.nombre_completo = request.POST.get('nombre_completo')
+            admin.correo_electronico = request.POST.get('correo_electronico')
+            admin.telefono = request.POST.get('telefono')
+            admin.is_active = request.POST.get('is_active', False) == 'on'
+            admin.save()
+            
+            return JsonResponse({'success': True})
+            
+        except Exception as e:
+            return JsonResponse({'success': False, 'error': str(e)})
+    
+    # GET request
+    return JsonResponse({
+        'documento': admin.documento,
+        'nombre_completo': admin.nombre_completo,
+        'correo_electronico': admin.correo_electronico,
+        'telefono': admin.telefono,
+        'is_active': admin.is_active
+    })
+
+from django.contrib.auth import logout as auth_logout
+
+def toggle_estado_usuario(request, documento):
+    if request.method == 'POST':
+        admin = get_object_or_404(Administrador, documento=documento)
+        es_usuario_actual = (request.user.documento == documento)
+        
+        admin.is_active = not admin.is_active
+        admin.save()
+        
+        mensaje = f'Usuario {"activado" if admin.is_active else "desactivado"} correctamente'
+        
+        # Si el usuario se desactivó a sí mismo
+        if es_usuario_actual and not admin.is_active:
+            auth_logout(request)
+            mensaje += '. Sesión cerrada automáticamente.'
+        
+        return JsonResponse({
+            'success': True,
+            'message': mensaje,
+            'is_active': admin.is_active
+        })
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+from django.http import JsonResponse
+from django.contrib.auth.hashers import make_password
+from .models import Administrador
+import json
+
+def crear_usuario(request):
+    if request.method == 'POST':
+        try:
+            # Para FormData y JSON
+            if request.content_type == 'application/json':
+                data = json.loads(request.body)
+            else:
+                data = request.POST
+            
+            documento = data.get('documento_login')
+            nombre = data.get('nombre_completo')
+            correo = data.get('correo_electronico')
+            telefono = data.get('telefono')
+            password = data.get('password')
+            is_active = data.get('is_active', False) in [True, 'on', 'true']
+
+            # Validaciones básicas
+            if not all([documento, nombre, correo, telefono, password]):
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Todos los campos son obligatorios',
+                    'errors': {
+                        'documento_login': 'Requerido' if not documento else '',
+                        'nombre_completo': 'Requerido' if not nombre else '',
+                        'correo_electronico': 'Requerido' if not correo else '',
+                        'telefono': 'Requerido' if not telefono else '',
+                        'password': 'Requerido' if not password else ''
+                    }
+                }, status=400)
+
+            # Validar duplicados
+            if Administrador.objects.filter(documento=documento).exists():
+                return JsonResponse({
+                    'success': False,
+                    'message': 'El documento ya está registrado',
+                    'errors': {'documento_login': 'Documento ya existe'}
+                }, status=400)
+
+            if Administrador.objects.filter(correo_electronico=correo).exists():
+                return JsonResponse({
+                    'success': False,
+                    'message': 'El correo ya está registrado',
+                    'errors': {'correo_electronico': 'Correo ya existe'}
+                }, status=400)
+
+            # Crear usuario
+            Administrador.objects.create(
+                documento=documento,
+                nombre_completo=nombre,
+                correo_electronico=correo,
+                telefono=telefono,
+                password=make_password(password),
+                is_active=is_active,
+                is_staff=True  # Para acceso al admin
             )
-        messages.success(request, "Observaciones actualizadas.")
-    return redirect('registroc')
 
-@require_POST
-def editar_estado_observacion_rapida(request, cita_id):
-    cita = get_object_or_404(CitaRapida, id=cita_id)
-    cita.estado = request.POST.get('estado')
-    cita.observaciones = request.POST.get('observaciones')
-    cita.fecha = request.POST.get('fecha')
-    cita.hora = request.POST.get('hora')
-    cita.save()
-    messages.success(request, "Cita actualizada correctamente.")
-    return redirect('registroc')
+            return JsonResponse({
+                'success': True,
+                'message': 'Usuario creado exitosamente'
+            })
 
-@require_POST
-def editar_estado_observacion_normal(request, cita_id):
-    cita = get_object_or_404(Cita, id=cita_id)
-    cita.estado = request.POST.get('estado')
-    cita.observaciones = request.POST.get('observaciones')
-    cita.fecha = request.POST.get('fecha')
-    cita.horario = request.POST.get('hora')
-    cita.save()
-    messages.success(request, "Cita actualizada correctamente.")
-    return redirect('registroc')
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'message': f'Error del servidor: {str(e)}'
+            }, status=500)
 
-def enviar_correo_cita(cliente, estado):
-    asunto = "Estado de tu cita en la Veterinaria"
-    if estado == "aceptada":
-        mensaje = f"Hola {cliente.primer_nombre}, tu cita ha sido ACEPTADA. ¡Te esperamos!"
-    else:
-        mensaje = f"Hola {cliente.primer_nombre}, lamentamos informarte que tu cita fue RECHAZADA."
-    destinatario = [cliente.correo_electronico]
-    send_mail(asunto, mensaje, None, destinatario)
+    return JsonResponse({
+        'success': False,
+        'message': 'Método no permitido'
+    }, status=405)
 
+def recuperar_contrasena_enviado(request):
+    return render(request, 'recuperarcontrasenaenviado.html')

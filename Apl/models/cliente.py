@@ -1,5 +1,6 @@
 from django.db import models
 from django.core.validators import MinLengthValidator, EmailValidator
+
 from Apl.models.administrador import Administrador
 
 
@@ -14,15 +15,10 @@ class Cliente(models.Model):
         choices=TIPO_DOCUMENTO_CHOICES,
         default='CC'
     )
-    numero_documento = models.CharField(  # NUEVO CAMPO
-        max_length=20,
-        unique=True,
-        validators=[MinLengthValidator(6)],
-        null=True,
-        blank=True
-    )
-    primer_nombre = models.CharField(max_length=250, null=True)
-    primer_apellido = models.CharField(max_length=250, null=True)
+    primer_nombre = models.CharField(max_length=250)
+    segundo_nombre = models.CharField(max_length=250, blank=True, null=True)
+    primer_apellido = models.CharField(max_length=250)
+    segundo_apellido = models.CharField(max_length=45, blank=True, null=True)
     telefono = models.CharField(max_length=11, validators=[MinLengthValidator(7)])
     correo_electronico = models.CharField(
         max_length=250, 

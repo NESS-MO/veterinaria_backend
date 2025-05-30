@@ -124,7 +124,6 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'Apl/static'), 
     os.path.join(BASE_DIR, 'static'),  # Carpeta 'static' en la raíz del proyecto
 ]
 
@@ -136,7 +135,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-<<<<<<< HEAD
 # settings.py
 AUTH_USER_MODEL = 'Apl.Administrador'  # Reemplaza 'tu_app' con el nombre de tu aplicación
 
@@ -145,19 +143,10 @@ LOGIN_REDIRECT_URL = '/gestioncitas/'
 LOGOUT_REDIRECT_URL = '/'
 
 # Configuración de Email
-=======
-# Email settings
->>>>>>> Alejandro
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
-<<<<<<< HEAD
 EMAIL_HOST_USER = 'cortes.jimenez.0810@gmail.com'
 EMAIL_HOST_PASSWORD = 'daugfdxxitkqyoyv'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
-=======
-EMAIL_HOST_USER = 'luisalejandrorojasrincon@gmail.com'
-EMAIL_HOST_PASSWORD = 'hgkerfhnxadqfvca'
-DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
->>>>>>> Alejandro
