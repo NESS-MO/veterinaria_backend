@@ -84,6 +84,8 @@ def RContrasena(request):
             print(f"Usuario encontrado: {user.nombre_completo}")  # Debug
             
             # Generar token
+
+            
             signer = TimestampSigner()
             token = signer.sign(str(user.pk))
             reset_url = request.build_absolute_uri(reverse('cambia_con', args=[token]))
@@ -139,9 +141,8 @@ def cambia_con(request, token):
         # Se intenta "desfirmar" el token para extraer el id del usuario,
         # estableciendo una validez máxima de 3600 segundos (1 hora)
         user_id = signer.unsign(token, max_age=3600)
-        print(f"Intentando obtener usuario con id: {user_id}")  # Debug
         # Se obtiene el usuario correspondiente al id; si no existe, se retorna un error 404
-        usuario = get_object_or_404(Administrador, pk=user_id)
+        usuario = get_object_or_404(administrador, pk=user_id)
     except (BadSignature, SignatureExpired):
         # Si el token es inválido o ha expirado, se muestra un mensaje de error
         messages.error(request, "El enlace de recuperación es inválido o ha expirado.")
