@@ -1,7 +1,8 @@
+from . import views
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
 from .models import Administrador, Cliente 
-from .forms import craeteNewTask, CitaRapidaForm, CitaRapida
+from .forms import CitaForm,CitaRapidaForm
 from datetime import date, timedelta
 from django.contrib import messages
 from .models import TipSemana, administrador
@@ -643,11 +644,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 import json
 
 def usuarios(request):
-    if not request.user.is_authenticated:
-        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
-            return JsonResponse({'error': 'No autenticado'}, status=401)
-        return redirect('login')
-    
+   
     try:
         # Obtener parámetros de filtrado
         filtros = {
