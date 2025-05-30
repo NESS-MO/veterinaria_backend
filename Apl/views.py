@@ -27,10 +27,6 @@ from django.contrib.auth.hashers import make_password
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 
-
-
-
-
 # Create your views here.
 
 def index(request): 
