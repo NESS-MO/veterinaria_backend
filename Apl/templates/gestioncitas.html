@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Citas - Veterinaria</title>
     <link rel="icon" href="{% static 'Images/logo.png' %}"/>
-    <link rel="icon" href="{% static 'Images/logo.png' %}"/>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="{% static 'css/GestionCitas.css' %}">
@@ -52,74 +51,18 @@
         <img class="h-24 mx-auto mb-4" src="{% static 'Images/logo2.png' %}" alt="Logo" />
         <ul class="space-y-4 text-lg">
             <li><a href="{% url 'gestioncitas' %}" class="block bg-white/30 hover:bg-white/40 p-2 rounded text-gray-900" >Citas Solicitadas</a></li>
-<script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#33C0F1',
-            secondary: '#1E2D93'
-          }
-        }
-      }
-    }
-  </script>
-<body class="bg-gray-100 font-sans">
-
-    <!-- Sidebar -->
-    <div class="fixed top-0 left-0 z-20 w-full md:w-80 h-full bg-gradient-to-br from-primary to-secondary text-white p-5 transform -translate-x-full md:translate-x-0 transition-transform duration-300" id="sidebar">
-    <img class="h-15 mx-auto mb-2" src="{% static 'Images/logo2.png' %}" alt="Logo" />
-    <ul class="space-y-2 text-lg">
-            <li><a href="{% url 'gestioncitas' %}" class="block bg-white/30 hover:bg-white/40 p-2 rounded text-gray-900">Citas Solicitadas</a></li>
             <li><a href="{% url 'registroc' %}" class="block hover:bg-white/20 p-2 rounded">Registro Citas</a></li>
-            <li><a href="{% url 'usuarios' %}" class="block hover:bg-white/20 p-2 rounded">Gestión de Usuario</a></li>
             <li><a href="{% url 'Tipdelasemana' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Tip de la Semana</a></li>
             <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Galería</a></li>
             <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Servicios</a></li>
              <li><a href="{% url 'backup' %}" class="block hover:bg-white/20 p-2 rounded">Copia de seguridad</a></li>
             <li><a href="{% url 'index' %}" class="block hover:bg-red-500/80 p-2 rounded">Cerrar sesión</a></li>
         </ul>
-        
-        <div class="absolute bottom-0 left-0 w-full p-4 bg-white/10">
-            <div class="text-center">
-                <p class="font-bold">Usuario:</p>
-                <p>{{ request.user.nombre_completo }}</p>
-            </div>
-        </div>
     </div>
     <section class="ml-0 md:ml-80 mt-4 p-4 md:p-8 transition-all">
         <h1 class="text-2xl md:text-3xl font-bold mb-4">Panel de Administración de Citas</h1>
 
         <button id="toggle-filtros" class="mb-4 px-4 py-2 bg-blue-500 text-white rounded shadow flex items-center gap-2">
-
-    <!-- Main Section -->
-    <section class="md:ml-80 mt-6 px-4 md:px-6 pb-10">  <!-- Breadcrumb -->
-          <nav class="flex ml-8 mb-9 w-full justify-start">
-        <ol class="inline-flex items-center space-x-1 md:space-x-2">
-            <li class="inline-flex items-center">
-                <a href="{% url 'gestioncitas' %}" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors">
-                    <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M14.707 7.793a1 1 0 0 0-1.414 0L11 10.086V1.5a1 1 0 0 0-2 0v8.586L6.707 7.793a1 1 0 1 0-1.414 1.414l4 4a1 1 0 0 0 1.416 0l4-4a1 1 0 0 0-.002-1.414Z"/>
-                        <path d="M18 12h-2.55l-2.975 2.975a3.5 3.5 0 0 1-4.95 0L4.55 12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/>
-                    </svg>
-                    Administrador
-                </a>
-            </li>
-            <li>
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
-                    </svg>
-                    <span class="ml-1 text-sm font-medium text-gray-700 md:ml-2">Sitas Solicitadas</span>
-                </div>
-            </li>
-        </ol>
-    </nav>
-        <h1 class="text-3xl font-semibold text-[#1E2D93] text-center mb-4">PANEL ADMINISTRACIÓN DE CITAS</h1>
-
-
-
-        <button id="toggle-filtros" class="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#33C0F1] to-[#1E2D93] text-white rounded-lg mx-auto mb-6 hover:scale-105 transition">
             <i class="fas fa-sliders-h"></i>
             <span>Filtros</span>
         </button>
@@ -128,34 +71,30 @@
             <div class="campo">
                 <label for="filtro-nombre">Nombre</label>
                 <input type="text" id="filtro-nombre" placeholder="Nombre">
-        <div id="contenedor-filtros" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 bg-white p-6 rounded-xl shadow transition-all max-h-0 overflow-hidden opacity-0">
-            <div class="flex flex-col">
-                <label class="font-medium text-[#1E2D93] mb-1">Nombre</label>
-                <input type="text" id="filtro-nombre" placeholder="Nombre" class="input-filter">
             </div>
-            <div class="flex flex-col">
-                <label class="font-medium text-[#1E2D93] mb-1">Correo</label>
-                <input type="text" id="filtro-correo" placeholder="Correo" class="input-filter">
+            <div class="campo">
+                <label for="filtro-correo">Correo</label>
+                <input type="text" id="filtro-correo" placeholder="Correo">
             </div>
-            <div class="flex flex-col">
-                <label class="font-medium text-[#1E2D93] mb-1">Teléfono</label>
-                <input type="text" id="filtro-telefono" placeholder="Teléfono" class="input-filter">
+            <div class="campo">
+                <label for="filtro-telefono">Teléfono</label>
+                <input type="text" id="filtro-telefono" placeholder="Teléfono">
             </div>
-            <div class="flex flex-col">
-                <label class="font-medium text-[#1E2D93] mb-1">Mascota</label>
-                <input type="text" id="filtro-mascota" placeholder="Mascota" class="input-filter">
+            <div class="campo">
+                <label for="filtro-mascota">Mascota</label>
+                <input type="text" id="filtro-mascota" placeholder="Mascota">
             </div>
-            <div class="flex flex-col">
-                <label class="font-medium text-[#1E2D93] mb-1">Fecha</label>
-                <input type="date" id="filtro-fecha" class="input-filter">
+            <div class="campo">
+                <label for="filtro-fecha">Fecha</label>
+                <input type="date" id="filtro-fecha">
             </div>
-            <div class="flex flex-col">
-                <label class="font-medium text-[#1E2D93] mb-1">Hora</label>
-                <input type="time" id="filtro-hora" class="input-filter">
+            <div class="campo">
+                <label for="filtro-hora">Hora</label>
+                <input type="time" id="filtro-hora">
             </div>
-            <div class="flex flex-col">
-                <label class="font-medium text-[#1E2D93] mb-1">Servicios</label>
-                <input type="text" id="filtro-servicio" placeholder="Servicios" class="input-filter">
+            <div class="campo">
+                <label for="filtro-servicio">Servicios</label>
+                <input type="text" id="filtro-servicio" placeholder="Servicios">
             </div>
             <div class="campo">
                 <button id="btn-limpiar" type="button">Limpiar</button>
@@ -298,198 +237,6 @@
                 filtrarTabla();
             });
         }
-            <div class="flex items-end">
-                <button id="btn-limpiar" class="bg-gradient-to-r from-[#33C0F1] to-[#1E2D93] text-white px-4 py-2 rounded-lg font-bold">Limpiar</button>
-            </div>
-        </div>
-
-        <div id="loading" class="text-center py-6 hidden">
-            <img src="{% static 'Imagenes/loading.gif' %}" alt="Cargando..." class="mx-auto">
-        </div>
-
-        <div class="overflow-x-auto bg-white shadow-md rounded-xl">
-            <table class="min-w-full divide-y divide-gray-200" id="tabla-citas">
-                <thead class="bg-[#1E2D93] text-white">
-                    <tr>
-                        <th class="px-6 py-3 text-xs font-bold uppercase text-center">Nombre</th>
-                        <th class="px-6 py-3 text-xs font-bold uppercase text-center">Correo</th>
-                        <th class="px-6 py-3 text-xs font-bold uppercase text-center">Teléfono</th>
-                        <th class="px-6 py-3 text-xs font-bold uppercase text-center">Mascota</th>
-                        <th class="px-6 py-3 text-xs font-bold uppercase text-center">Fecha</th>
-                        <th class="px-6 py-3 text-xs font-bold uppercase text-center">Hora</th>
-                        <th class="px-6 py-3 text-xs font-bold uppercase text-center">Servicios</th>
-                        <th class="px-6 py-3 text-xs font-bold uppercase text-center">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody class="divide-y divide-gray-200 text-center">
-                    <!-- Contenido generado dinámicamente -->
-                </tbody>
-            </table>
-        </div>
-    </section>
-
-    <style>
-        .input-filter {
-            padding: 0.5rem 0.75rem;
-            border: 1px solid #ccc;
-            border-radius: 0.75rem;
-            font-size: 1rem;
-            background-color: #f9f9f9;
-        }
-        .mostrar {
-            max-height: 1000px !important;
-            opacity: 1 !important;
-        }
-    </style>
-
-    <script src={% static "JavaScript/sienna.js" %}></script>
-    <script src={% static "JavaScript/custom.js" %}></script>
-
-    <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const loadingElement = document.getElementById('loading');
-        const tablaCitas = document.getElementById('tabla-citas').getElementsByTagName('tbody')[0];
-        const toggleBtn = document.getElementById('toggle-filtros');
-        const contenedorFiltros = document.getElementById('contenedor-filtros');
-
-        const filtroNombre = document.getElementById('filtro-nombre');
-        const filtroCorreo = document.getElementById('filtro-correo');
-        const filtroTelefono = document.getElementById('filtro-telefono');
-        const filtroMascota = document.getElementById('filtro-mascota');
-        const filtroFecha = document.getElementById('filtro-fecha');
-        const filtroHora = document.getElementById('filtro-hora');
-        const filtroServicio = document.getElementById('filtro-servicio');
-        const btnLimpiar = document.getElementById('btn-limpiar');
-
-        let citas = JSON.parse(localStorage.getItem('citas')) || [];
-
-        toggleBtn.addEventListener('click', () => {
-            contenedorFiltros.classList.toggle('mostrar');
-            contenedorFiltros.classList.toggle('max-h-0');
-            contenedorFiltros.classList.toggle('opacity-0');
-            contenedorFiltros.classList.toggle('max-h-[1000px]');
-            contenedorFiltros.classList.toggle('opacity-100');
-        });
-
-        function mostrarCitas() {
-            tablaCitas.innerHTML = '';
-            const nombre = filtroNombre.value.toLowerCase();
-            const correo = filtroCorreo.value.toLowerCase();
-            const telefono = filtroTelefono.value.toLowerCase();
-            const mascota = filtroMascota.value.toLowerCase();
-            const fecha = filtroFecha.value;
-            const hora = filtroHora.value;
-            const servicio = filtroServicio.value.toLowerCase();
-
-            const citasOrdenadas = [...citas].sort((a, b) => {
-                const fechaA = new Date(a.fecha.split('/').reverse().join('-'));
-                const fechaB = new Date(b.fecha.split('/').reverse().join('-'));
-                return fechaB - fechaA;
-            });
-
-            citasOrdenadas.forEach((cita) => {
-                const coincide =
-                    (!nombre || cita.nombre.toLowerCase().includes(nombre)) &&
-                    (!correo || cita.correo.toLowerCase().includes(correo)) &&
-                    (!telefono || cita.telefono.toLowerCase().includes(telefono)) &&
-                    (!mascota || cita.mascota.toLowerCase().includes(mascota)) &&
-                    (!fecha || cita.fecha === fecha) &&
-                    (!hora || cita.hora === hora) &&
-                    (!servicio || cita.servicios.join(',').toLowerCase().includes(servicio));
-
-                if (coincide) {
-                    const row = tablaCitas.insertRow();
-                    const originalIndex = citas.indexOf(cita);
-                    row.innerHTML = `
-                        <td>${cita.nombre}</td>
-                        <td>${cita.correo}</td>
-                        <td>${cita.telefono}</td>
-                        <td>${cita.mascota}</td>
-                        <td><input type="date" value="${cita.fecha}" data-index="${originalIndex}" data-campo="fecha" class="editable-field"></td>
-                        <td><input type="time" value="${cita.hora}" data-index="${originalIndex}" data-campo="hora" class="editable-field"></td>
-                        <td>${cita.servicios.join(', ')}</td>
-                        <td>
-                            <button class="btn-aceptar" data-index="${originalIndex}">
-                                <i class="fas fa-check-circle"></i> Aceptar
-                            </button>
-                            <button class="btn-rechazar" data-index="${originalIndex}">
-                                <i class="fas fa-times-circle"></i> Rechazar
-                            </button>
-                        </td>
-                    `;
-                }
-            });
-
-            loadingElement.style.display = 'none';
-        }
-
-        tablaCitas.addEventListener('click', function (e) {
-            const index = e.target.dataset.index;
-            if (e.target.classList.contains('btn-rechazar')) {
-                Swal.fire({
-                    icon: 'warning',
-                    title: '¿Seguro que deseas rechazar esta cita?',
-                    text: 'Esta acción no se puede deshacer',
-                    showConfirmButton: true,
-                    showCancelButton: true,
-                    confirmButtonText: 'Sí, rechazar',
-                    cancelButtonText: 'Cancelar',
-                    confirmButtonColor: '#dc3545',
-                    cancelButtonColor: '#6c757d'
-                }).then(result => {
-                    if (result.isConfirmed) {
-                        citas.splice(index, 1);
-                        localStorage.setItem('citas', JSON.stringify(citas));
-                        mostrarCitas();
-                        Swal.fire({
-                            icon: 'success',
-                            title: '¡Cita rechazada!',
-                            showConfirmButton: false,
-                            timer: 1500
-                        });
-                    }
-                });
-            } else if (e.target.classList.contains('btn-aceptar')) {
-                const inputs = tablaCitas.querySelectorAll(`input[data-index="${index}"]`);
-                let citaActualizada = {};
-                inputs.forEach(input => {
-                    citaActualizada[input.dataset.campo] = input.value;
-                });
-
-                citas[index] = {
-                    ...citas[index],
-                    fecha: citaActualizada.fecha,
-                    hora: citaActualizada.hora
-                };
-
-                localStorage.setItem('citas', JSON.stringify(citas));
-                Swal.fire({
-                    icon: 'success',
-                    title: '¡Cita actualizada correctamente!',
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-            }
-        });
-
-        [filtroNombre, filtroCorreo, filtroTelefono, filtroMascota, filtroFecha, filtroHora, filtroServicio].forEach(input => {
-            input.addEventListener('input', mostrarCitas);
-        });
-
-        filtroFecha.addEventListener('change', mostrarCitas);
-
-        btnLimpiar.addEventListener('click', () => {
-            filtroNombre.value = '';
-            filtroCorreo.value = '';
-            filtroTelefono.value = '';
-            filtroMascota.value = '';
-            filtroFecha.value = '';
-            filtroHora.value = '';
-            filtroServicio.value = '';
-            mostrarCitas();
-        });
-
-        mostrarCitas();
     });
     </script>
 </body>

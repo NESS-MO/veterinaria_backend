@@ -110,13 +110,15 @@ def RegistroC(request):
     else:
         form = CitaRapidaForm()
     citas_rapidas = CitaRapida.objects.all()
+    citas_normales = Cita.objects.all()  # <-- Agrega esto
     rango_edades = range(1, 21)
     rango_meses = range(0, 12)
     return render(request, 'registrocitas.html', {
         'rango_edades': rango_edades,
         'rango_meses': rango_meses,
         'citas_rapidas': citas_rapidas,
-        'form':form,
+        'citas_normales': citas_normales,  # <-- Y esto
+        'form': form,
 })
 
 # views.py
