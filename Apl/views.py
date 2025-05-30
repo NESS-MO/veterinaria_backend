@@ -48,7 +48,7 @@ def Agendar(request):
             servicios = [request.POST['main_service']]
             if request.POST.get('extra_service') and request.POST['extra_service'] != 'ninguno':
                 servicios.append(request.POST['extra_service'])
-
+#Cambios de alejo
             Cita.objects.create(
                 fecha=request.POST['fecha'],
                 horario=request.POST['hora'],
