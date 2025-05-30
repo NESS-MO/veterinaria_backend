@@ -28,6 +28,8 @@ urlpatterns = [
     path('usuarios/editar/<str:documento>/', views.editar_usuario, name='editar_usuario'),
     path('usuarios/toggle-estado/<str:documento>/', views.toggle_estado_usuario, name='toggle_estado_usuario'),
     path('usuarios/crear/', views.crear_usuario, name='crear_usuario'),
+
+    path('cambia_con/<str:token>/', views.cambia_con, name='cambia_con'),
     path('logout/', views.logout, name='logout'),
 
     path('aceptar-cita/<int:cita_id>/', views.aceptar_cita, name='aceptar_cita'),
@@ -40,5 +42,3 @@ urlpatterns = [
     path('editar_estado_observacion_normal/<int:cita_id>/', views.editar_estado_observacion_normal, name='editar_estado_observacion_normal'),
     path('Cancelacion/', views.Cancelarcita, name='CancelarCita'),
 ]
-
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
