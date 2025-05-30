@@ -42,6 +42,77 @@ def Agendar(request):
         'min_date': min_date,
         'max_date': max_date
     })
+    if request.method == 'POST':
+        try:
+            numero_documento = request.POST['numero_documento']
+            cliente, _ = Cliente.objects.get_or_create(
+                numero_documento=numero_documento,
+                defaults={
+                    'primer_nombre': request.POST['primer_nombre'],
+                    'primer_apellido': request.POST['primer_apellido'],
+                    'tipo_documento': request.POST['tipo_documento'],
+                    'telefono': request.POST['telefono'],
+                    'correo_electronico': request.POST['correo_electronico'],
+                }
+            )
+            nombre_mascota = request.POST['mascota']
+            mascota, _ = Mascota.objects.get_or_create(
+                nombre_mascota=nombre_mascota,
+                cliente=cliente,
+                defaults={
+                    'especie': request.POST['clase-mascota'],
+                    'raza': request.POST.get('otra-raza') or request.POST['raza-mascota'],
+                    'edad': f"{request.POST['edad-numero']} {request.POST['edad-unidad']}",
+                }
+            )
+            servicios = [request.POST['main_service']]
+            if request.POST.get('extra_service') and request.POST['extra_service'] != 'ninguno':
+                servicios.append(request.POST['extra_service'])
+            Cita.objects.create(
+                fecha=request.POST['fecha'],
+                horario=request.POST['hora'],
+                extra=", ".join(servicios),
+                cliente=cliente,
+                mascota=mascota,  # <--- Aquí agregas la mascota correcta
+                estado='pendiente'
+            )
+            messages.success(request, "Cita agendada exitosamente")
+            return redirect('agendar')
+        except Exception as e:
+            messages.error(request, f"Error al registrar: {str(e)}")
+
+    citas = Cita.objects.all()
+    return render(request, '3. Agendar.html', {'citas': citas})
+
+def RegistroC(request):
+    if request.method == 'POST':
+        data = request.POST.copy()
+        valor = data.get('edad_mascota_valor', '')
+        tipo = data.get('edad_mascota_tipo', '')
+        if valor and tipo:
+            edad = f"{valor} {tipo}"
+        else:
+            edad = ""
+        data['edad_mascota'] = edad
+
+        form = CitaRapidaForm(data)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Cita agregada correctamente.")
+            return redirect('registroc')
+        else:
+            messages.error(request, "Por favor corrige los errores del formulario.")
+    else:
+        form = CitaRapidaForm()
+    citas_rapidas = CitaRapida.objects.all()
+    rango_edades = range(1, 21)
+    rango_meses = range(0, 12)
+    return render(request, 'registrocitas.html', {
+        'rango_edades': rango_edades,
+        'rango_meses': rango_meses,
+        'citas_rapidas': citas_rapidas,
+        'form': form,
+    })
 
 # views.py
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
