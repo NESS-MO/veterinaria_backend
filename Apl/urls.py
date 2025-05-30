@@ -24,6 +24,7 @@ urlpatterns = [
     path('rechazar-cita/<int:cita_id>/', views.rechazar_cita, name='rechazar_cita'),
     path('eliminar-cita/<int:cita_id>/', views.eliminar_cita, name='eliminar_cita'),
     path('cambiar-estado-cita/<int:cita_id>/', views.cambiar_estado_cita, name='cambiar_estado_cita'),
+    #allala
     path('editar-observacion-cita/<int:cita_id>/', views.editar_observacion_cita, name='editar_observacion_cita'),
     path('editar_estado_observacion_rapida/<int:cita_id>/', views.editar_estado_observacion_rapida, name='editar_estado_observacion_rapida'),
     path('editar_estado_observacion_normal/<int:cita_id>/', views.editar_estado_observacion_normal, name='editar_estado_observacion_normal'),

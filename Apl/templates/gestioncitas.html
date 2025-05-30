@@ -130,6 +130,7 @@
                         {% else %}
                             Sin mascota
                         {% endif %}
+                        <!---hoala-!-->
                     </td>
                     <td>{{ cita.fecha }}</td>
                     <td>{{ cita.horario }}</td>
@@ -209,7 +210,7 @@
                 if (fila.querySelector('td[colspan]')) {
                     fila.style.display = '';
                     continue;
-                }
+                }##
                 let mostrar = true;
                 // Filtra por cada campo
                 if (filtros.nombre.value && !fila.cells[0].textContent.toLowerCase().includes(filtros.nombre.value.toLowerCase())) mostrar = false;

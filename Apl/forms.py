@@ -42,7 +42,7 @@ class DatosCliente(forms.Form):
                 'placeholder': 'Ingresa tu nombre',
                 'pattern': '[A-Za-záéíóúÁÉÍÓÚñÑ ]+',
                 'title': 'Solo letras y espacios'
-            }),
+            }),#
             'primer_apellido': forms.TextInput(attrs={
                 'placeholder': 'Ingresa tu apellido',
                 'pattern': '[A-Za-záéíóúÁÉÍÓÚñÑ ]{2,50}',
@@ -113,7 +113,7 @@ class DatosMascota(forms.Form):
             'id': 'edad-numero'
         })
     )
-    
+    #
     edad_unidad = forms.ChoiceField(
         widget=forms.Select(attrs={
             'style': 'width: 35%; display: inline-block; margin-left: 5%;',
@@ -145,7 +145,7 @@ class DatosMascota(forms.Form):
         self.fields['raza_mascota'].choices = self.get_raza_choices()
         
     def get_raza_choices(self):
-        return [
+        return [#
             ('', 'Seleccione la raza'),
             ('Criollo', 'Criollo'),
             ('Labrador Retriever', 'Labrador Retriever'),
@@ -179,7 +179,7 @@ class DatosMascota(forms.Form):
 class CitaForm(forms.Form):
     fecha = forms.DateField(
         widget=forms.DateInput(attrs={
-            'type': 'date',
+            'type': 'date',#
             'required': 'required',
             'id': 'fecha',
             'class': 'date-input'
@@ -255,7 +255,7 @@ class CitaForm(forms.Form):
         return cleaned_data
 
 class CitaRapidaForm(forms.ModelForm):
-    def clean(self):
+    def clean(self):#
         cleaned_data = super().clean()
         edad_valor = self.data.get('edad_mascota_valor')
         edad_tipo = self.data.get('edad_mascota_tipo')
@@ -288,3 +288,4 @@ class CitaRapidaForm(forms.ModelForm):
             'estado': forms.Select(attrs={'class': 'border p-2 rounded-md'}),
             'observaciones': forms.TextInput(attrs={'class': 'border p-2 rounded-md'}),
         }
+# lalala

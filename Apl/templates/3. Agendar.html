@@ -35,7 +35,7 @@
             <a href={% url "login"%}><img class="perfil" src={% static "Images/perfil.png" %} alt="logo DR.PUL"></a>
         </nav>
     </header>
-
+<!---hoala-!-->
     
     <div class="container" id="calen">
         <div class="calendario-section">
@@ -264,6 +264,7 @@
     {% endif %}
 
 <style>
+    ##
     .input-error {
         border: 1px solid #ff3860;
     }
@@ -299,7 +300,7 @@
 
         // Guardar las opciones originales
         const opcionesOriginales = Array.from(razaMascotaSelect.options);
-
+###
         claseMascotaSelect.addEventListener('change', function() {
             const especie = this.value;
             // Limpiar opciones actuales
@@ -767,6 +768,7 @@
         div.form-group > div.date-container + .form-group {
             margin-top: 0px;
         }
+        ##
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function() {

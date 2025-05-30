@@ -82,6 +82,7 @@ def RegistroC(request):
             messages.success(request, "Cita agregada correctamente.")
             return redirect('registroc')
         else:
+            #
             messages.error(request, "Por favor corrige los errores del formulario.")
     else:
         form = CitaRapidaForm()
@@ -249,6 +250,7 @@ def aceptar_cita(request, cita_id):
     )
     enviar_correo_cita(cita.cliente, "aceptada")
     cita.delete()
+    #
     messages.success(request, "Cita aceptada y registrada en el historial.")
     return redirect('gestioncitas')
 
@@ -257,6 +259,7 @@ def rechazar_cita(request, cita_id):
     cita = get_object_or_404(Cita, id=cita_id)
     enviar_correo_cita(cita.cliente, "rechazada")  # <--- Aquí envías el correo
     cita.delete()
+    #
     messages.success(request, "Cita rechazada y eliminada.")
     return redirect('gestioncitas')
 
@@ -264,6 +267,7 @@ def eliminar_cita(request, cita_id):
     if request.method == 'POST':
         cita = get_object_or_404(Cita, id=cita_id)
         cita.delete()
+        #
         messages.success(request, "Cita eliminada correctamente.")
     return redirect('registroc')
 
@@ -273,6 +277,7 @@ def cambiar_estado_cita(request, cita_id):
         nuevo_estado = request.POST.get('estado')
         cita.estado = nuevo_estado
         cita.save()
+        #
         messages.success(request, "Estado actualizado.")
     return redirect('registroc')
 
@@ -282,6 +287,7 @@ def editar_observacion_cita(request, cita_id):
         nueva_obs = request.POST.get('observaciones', '')
         cita.observaciones = nueva_obs
         cita.save()
+        #
         if nueva_obs:
             CitaRapida.objects.create(
                 numero_documento=cita.cliente.numero_documento,
@@ -303,6 +309,7 @@ def editar_estado_observacion_rapida(request, cita_id):
     cita.fecha = request.POST.get('fecha')
     cita.hora = request.POST.get('hora')
     cita.save()
+    #
     messages.success(request, "Cita actualizada correctamente.")
     return redirect('registroc')
 
@@ -314,6 +321,7 @@ def editar_estado_observacion_normal(request, cita_id):
     cita.fecha = request.POST.get('fecha')
     cita.horario = request.POST.get('hora')
     cita.save()
+    #
     messages.success(request, "Cita actualizada correctamente.")
     return redirect('registroc')
 
@@ -324,5 +332,6 @@ def enviar_correo_cita(cliente, estado):
     else:
         mensaje = f"Hola {cliente.primer_nombre}, lamentamos informarte que tu cita fue RECHAZADA."
     destinatario = [cliente.correo_electronico]
+    #
     send_mail(asunto, mensaje, None, destinatario)
 
