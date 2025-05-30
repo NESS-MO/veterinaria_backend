@@ -1,6 +1,7 @@
 from django.db import models
 from django.core.validators import MinLengthValidator, EmailValidator
 from Apl.models.cliente import Cliente
+from Apl.models.mascota import Mascota
 
 
 class Cita(models.Model):
@@ -22,6 +23,13 @@ class Cita(models.Model):
         Cliente,
         on_delete=models.CASCADE,
         related_name='citas'
+    )
+    mascota = models.ForeignKey(
+        Mascota,
+        on_delete=models.CASCADE,
+        related_name='citas',
+        null=True,  # Permite migración sin errores
+        blank=True
     )
     observaciones = models.TextField(blank=True, null=True)
 

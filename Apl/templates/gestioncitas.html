@@ -126,7 +126,7 @@
                     <td>{{ cita.cliente.telefono }}</td>
                     <td>
                         {% if cita.cliente.mascotas.all %}
-                            {{ cita.cliente.mascotas.first.nombre_mascota }}
+                            {{ cita.mascota.nombre_mascota }}
                         {% else %}
                             Sin mascota
                         {% endif %}

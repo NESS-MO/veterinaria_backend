@@ -54,6 +54,7 @@ def Agendar(request):
                 horario=request.POST['hora'],
                 extra=", ".join(servicios),
                 cliente=cliente,
+                mascota=mascota,  # <--- Aquí agregas la mascota correcta
                 estado='pendiente'
             )
             messages.success(request, "Cita agendada exitosamente")
@@ -232,7 +233,7 @@ def gestion_galeria(request):
 @require_POST
 def aceptar_cita(request, cita_id):
     cita = get_object_or_404(Cita, id=cita_id)
-    mascota = cita.cliente.mascotas.first() if cita.cliente.mascotas.exists() else None
+    mascota = cita.mascota  # <-- Usa la mascota de la cita, no la primera del cliente
     observaciones = cita.observaciones if cita.observaciones is not None else ""
     CitaRapida.objects.create(
         numero_documento=cita.cliente.numero_documento,
@@ -246,7 +247,7 @@ def aceptar_cita(request, cita_id):
         estado='Pendiente',
         observaciones=observaciones
     )
-    enviar_correo_cita(cita.cliente, "aceptada")  # <--- Aquí envías el correo
+    enviar_correo_cita(cita.cliente, "aceptada")
     cita.delete()
     messages.success(request, "Cita aceptada y registrada en el historial.")
     return redirect('gestioncitas')
