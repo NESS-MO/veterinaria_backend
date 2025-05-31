@@ -5,6 +5,7 @@ from .mascota import Mascota
 from .servicios import Servicio
 from .TipDeLaSemana import TipSemana
 from .ModificarGaleria import ImagenGaleria
+from .AdminCitas import CitaRapida
 
 __all__ =[
     'Administrador',
@@ -13,5 +14,6 @@ __all__ =[
     'Mascota',
     'Servicio',
     'TipSemana',
-    'ImagenGaleria'
+    'ImagenGaleria',
+    'CitaRapida'
 ]

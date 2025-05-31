@@ -121,6 +121,7 @@ STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'Apl/static'), 
     os.path.join(BASE_DIR, 'static'),  # Carpeta 'static' en la raíz del proyecto
 ]
 
@@ -132,6 +133,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# Email settings
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'luisalejandrorojasrincon@gmail.com'
+EMAIL_HOST_PASSWORD = 'hgkerfhnxadqfvca'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
 # settings.py
 AUTH_USER_MODEL = 'Apl.Administrador'  # Reemplaza 'tu_app' con el nombre de tu aplicación
 

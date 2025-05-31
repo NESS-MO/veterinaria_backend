@@ -1,4 +1,4 @@
-{%load static%}
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -7,174 +7,498 @@
   <title>Registro de Citas</title>
   <link rel="icon" href="{% static 'Images/logo.png' %}"/>
   <script src="https://cdn.tailwindcss.com"></script>
-</head>
-<script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            primary: '#33C0F1',
-            secondary: '#1E2D93'
-          }
-        }
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    @media (max-width: 767px) {
+      .sidebar-responsive {
+        position: fixed;
+        z-index: 50;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        width: 70vw;
+        transform: translateX(-100%);
+        transition: transform 0.3s;
+      }
+      .sidebar-open {
+        transform: translateX(0);
       }
     }
-  </script>
+    @keyframes fade-in-down {
+      from { opacity: 0; transform: translateY(-20px);}
+      to { opacity: 1; transform: translateY(0);}
+    }
+    .animate-fade-in-down {
+      animation: fade-in-down 0.5s;
+    }
+  </style>
+</head>
 <body class="bg-gray-100 font-sans">
-    <!-- Sidebar -->
-    <div class="fixed top-0 left-0 z-20 w-full md:w-80 h-full bg-gradient-to-br from-primary to-secondary text-white p-5 transform -translate-x-full md:translate-x-0 transition-transform duration-300" id="sidebar">
-    <img class="h-15 mx-auto mb-2" src="{% static 'Images/logo2.png' %}" alt="Logo" />
-    <ul class="space-y-2 text-lg">
-            <li><a href="{% url 'gestioncitas' %}" class="block hover:bg-white/20 p-2 rounded">Citas Solicitadas</a></li>
-            <li><a href="{% url 'registroc' %}" class="block bg-white/30 hover:bg-white/40 p-2 rounded text-gray-900">Registro Citas</a></li>
-            <li><a href="{% url 'usuarios' %}" class="block hover:bg-white/20 p-2 rounded">Gestión de Usuario</a></li>
-            <li><a href="{% url 'Tipdelasemana' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Tip de la Semana</a></li>
-            <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Galería</a></li>
-            <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Servicios</a></li>
-            <li><a href="{% url 'backup' %}" class="block hover:bg-white/20 p-2 rounded">Copia de seguridad</a></li>
-           <li><a href="{% url 'logout' %}" class="block hover:bg-red-500/80 p-2 rounded">Cerrar sesión</a></li>
-        </ul>
-        
-        <div class="absolute bottom-0 left-0 w-full p-4 bg-white/10">
-            <div class="text-center">
-                <p class="font-bold">Usuario:</p>
-                <p>{{ request.user.nombre_completo }}</p>
+
+  <!-- Botón menú móvil -->
+  <div class="md:hidden flex items-center justify-between bg-[#1E2D93] text-white p-4">
+    <h1 class="text-lg font-bold">Citas</h1>
+    <button id="menu-toggle" class="text-2xl"><i class="fas fa-bars"></i></button>
+  </div>
+
+  <!-- Sidebar -->
+  <div id="sidebar" class="sidebar-responsive w-72 md:w-72 bg-gradient-to-br from-[#33C0F1] to-[#1E2D93] text-white p-7 md:fixed md:h-full top-0 left-0 z-10 font-sans md:translate-x-0 -translate-x-full transition-transform duration-300 ease-in-out">
+    <img class="h-24 mx-auto mb-4" src="{% static 'Images/logo2.png' %}" alt="Logo" />
+    <ul class="space-y-4 text-lg">
+      <li><a href="{% url 'gestioncitas' %}" class="block hover:bg-white/20 p-2 rounded">Citas Solicitadas</a></li>
+      <li><a href="{% url 'registroc' %}" class="block bg-white/30 hover:bg-white/40 p-2 rounded text-gray-900">Registro Citas</a></li>
+      <li><a href="{% url 'Tipdelasemana' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Tip de la Semana</a></li>
+      <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Galería</a></li>
+      <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Servicios</a></li>
+      <li><a href="{% url 'backup' %}" class="block hover:bg-white/20 p-2 rounded">Copia de seguridad</a></li>
+      <li><a href="{% url 'index' %}" class="block hover:bg-red-500/80 p-2 rounded">Cerrar sesión</a></li>
+    </ul>
+  </div>
+
+  <!-- Main Content -->
+  <div class="flex-1 md:ml-72 p-6 fade-in">
+    <div class="max-w-7xl mx-auto bg-white rounded-2xl shadow-lg p-6">
+      <h2 class="text-3xl font-bold mb-6 text-blue-800">📅 Registro de Citas</h2>
+
+      <!-- Mensaje de éxito -->
+      <div id="mensaje-exito" class="hidden mb-4 p-3 rounded-md bg-green-100 text-green-800 text-sm font-medium transition duration-300">
+        ✅ Cita agregada exitosamente.
+      </div>
+
+      <!-- Mensajes de Django -->
+      {% if messages %}
+        <div id="alertas-mensaje" class="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md">
+          {% for message in messages %}
+            <div class="bg-green-100 border border-green-400 text-green-800 px-4 py-3 rounded relative shadow-lg mb-2 flex items-center justify-between animate-fade-in-down">
+              <span class="font-semibold">{{ message }}</span>
+              <button onclick="this.parentElement.style.display='none'" class="ml-4 text-green-700 hover:text-green-900 text-xl leading-none">&times;</button>
             </div>
+          {% endfor %}
         </div>
-    </div>
+        <script>
+          setTimeout(function() {
+            var alerta = document.getElementById('alertas-mensaje');
+            if(alerta) alerta.style.display = 'none';
+          }, 3000);
+        </script>
+      {% endif %}
 
-    <!-- Main Content -->
-    <div class="flex-1 md:ml-72 p-6 fade-in">
-        <nav class="flex ml-8 mb-9 w-full justify-start">
-        <ol class="inline-flex items-center space-x-1 md:space-x-2">
-            <li class="inline-flex items-center">
-                <a href="{% url 'gestioncitas' %}" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors">
-                    <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M14.707 7.793a1 1 0 0 0-1.414 0L11 10.086V1.5a1 1 0 0 0-2 0v8.586L6.707 7.793a1 1 0 1 0-1.414 1.414l4 4a1 1 0 0 0 1.416 0l4-4a1 1 0 0 0-.002-1.414Z"/>
-                        <path d="M18 12h-2.55l-2.975 2.975a3.5 3.5 0 0 1-4.95 0L4.55 12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/>
-                    </svg>
-                    Administrador
-                </a>
-            </li>
-            <li>
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
-                    </svg>
-                    <span class="ml-1 text-sm font-medium text-gray-700 md:ml-2">Registro citas</span>
+      <!-- Formulario para nuevas citas -->
+      <form method="post" class="mb-6 bg-white p-4 rounded shadow" id="form-cita">
+        {% csrf_token %}
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div class="flex flex-col">
+            <label for="numero_documento" class="text-xs font-semibold mb-1 text-gray-700">Documento</label>
+            <input type="text" name="numero_documento" id="numero_documento" placeholder="Documento" required
+              pattern="[0-9]{6,15}" maxlength="15"
+              class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm transition-all" />
+            <span id="error-numero_documento" class="text-xs text-red-500 mt-1 hidden">Solo números, mínimo 6 dígitos</span>
+          </div>
+
+          <div class="flex flex-col">
+            <label for="nombre_cliente" class="text-xs font-semibold mb-1 text-gray-700">Cliente</label>
+            <input type="text" name="nombre_cliente" id="nombre_cliente" placeholder="Nombre" required
+              pattern="[A-Za-záéíóúÁÉÍÓÚñÑ ]{2,50}"
+              class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm transition-all" />
+            <span id="error-nombre_cliente" class="text-xs text-red-500 mt-1 hidden">Solo letras y espacios, mínimo 2 caracteres</span>
+          </div>
+
+          <div class="flex flex-col">
+            <label for="nombre_mascota" class="text-xs font-semibold mb-1 text-gray-700">Mascota</label>
+            <input type="text" name="nombre_mascota" id="nombre_mascota" placeholder="Nombre mascota" required
+              pattern="[A-Za-záéíóúÁÉÍÓÚñÑ ]{2,30}"
+              class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm transition-all" />
+            <span id="error-nombre_mascota" class="text-xs text-red-500 mt-1 hidden">Solo letras y espacios, mínimo 2 caracteres</span>
+          </div>
+
+          <div class="flex flex-col">
+            <label for="edad_mascota" class="text-xs font-semibold mb-1 text-gray-700">Edad</label>
+            <div class="flex gap-2">
+              <input type="number" min="0" max="20" name="edad_mascota_valor" id="edad_mascota_valor"
+                class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm w-1/2 transition-all" placeholder="Edad" required />
+              <select name="edad_mascota_tipo" id="edad_mascota_tipo"
+                class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm w-1/2 transition-all" required>
+                <option value="" disabled selected>Tipo</option>
+                <option value="años">Años</option>
+                <option value="meses">Meses</option>
+              </select>
+            </div>
+            <span id="error-edad_mascota" class="text-xs text-red-500 mt-1 hidden">Edad inválida (0-20 años o 0-11 meses)</span>
+          </div>
+
+          <div class="flex flex-col">
+            <label for="raza_mascota" class="text-xs font-semibold mb-1 text-gray-700">Especie y Raza</label>
+            <input type="text" name="raza_mascota" id="raza_mascota" placeholder="Raza" required
+              pattern="[A-Za-záéíóúÁÉÍÓÚñÑ ]{2,30}"
+              class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm transition-all" />
+            <span id="error-raza_mascota" class="text-xs text-red-500 mt-1 hidden">Solo letras y espacios, mínimo 2 caracteres</span>
+          </div>
+
+          <div class="flex flex-col">
+            <label for="fecha" class="text-xs font-semibold mb-1 text-gray-700">Fecha</label>
+            <input type="date" name="fecha" id="fecha" required
+              min="{{ today|date:'Y-m-d' }}"
+              class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm transition-all" />
+            <span id="error-fecha" class="text-xs text-red-500 mt-1 hidden">Debe seleccionar una fecha</span>
+          </div>
+
+          <div class="flex flex-col">
+            <label for="hora" class="text-xs font-semibold mb-1 text-gray-700">Hora</label>
+            <input type="time" name="hora" id="hora"
+              min="06:00" max="18:00" step="1200"
+              class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm transition-all" required />
+            <span id="error-hora" class="text-xs text-red-500 mt-1 hidden">Debe seleccionar una hora</span>
+          </div>
+
+          <div class="flex flex-col">
+            <label for="servicio" class="text-xs font-semibold mb-1 text-gray-700">Servicio</label>
+            <select name="servicio" id="servicio" required
+              class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm transition-all">
+              <option value="" disabled selected>Seleccione un servicio</option>
+              <option value="Consulta">Consulta</option>
+              <option value="Esterilización Canina y Felina">Esterilización Canina y Felina</option>
+              <option value="Guardería">Guardería</option>
+              <option value="Vacunación">Vacunación</option>
+              <option value="Profilaxis">Profilaxis</option>
+              <option value="Hospitalización">Hospitalización</option>
+              <option value="Cirugías">Cirugías</option>
+              <option value="Asistencia Médica">Asistencia Médica</option>
+            </select>
+            <span id="error-servicio" class="text-xs text-red-500 mt-1 hidden">Debe seleccionar un servicio</span>
+          </div>
+
+          <div class="flex flex-col">
+            <label for="estado" class="text-xs font-semibold mb-1 text-gray-700">Estado</label>
+            <select name="estado" id="estado" required
+              class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm transition-all">
+              <option value="Pendiente" selected>Pendiente</option>
+              <option value="Completada">Completada</option>
+              <option value="Cancelada">Cancelada</option>
+              <option value="Realizada">Realizada</option>
+            </select>
+            <span id="error-estado" class="text-xs text-red-500 mt-1 hidden">Debe seleccionar un estado</span>
+          </div>
+
+          <div class="flex flex-col md:col-span-2">
+            <label for="observaciones" class="text-xs font-semibold mb-1 text-gray-700">Observaciones</label>
+            <input type="text" name="observaciones" id="observaciones" placeholder="Observaciones"
+              maxlength="250"
+              class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm transition-all" />
+            <span id="error-observaciones" class="text-xs text-red-500 mt-1 hidden">Máximo 250 caracteres</span>
+          </div>
+          <div class="flex items-end">
+            <button type="submit"
+              class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 active:scale-95 transition font-semibold">
+              Agregar Cita
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Mensaje de error Django -->
+      {% if form.errors %}
+        <div class="text-red-500 text-xs">
+          {{ form.errors }}
+        </div>
+      {% endif %}
+
+      <!-- Filtros -->
+      <div class="mb-4">
+        <div class="flex flex-wrap gap-2 mb-2">
+          <input type="text" id="filtro-documento" placeholder="Filtrar Documento" class="border p-1 rounded text-xs flex-1 min-w-[150px]" />
+          <input type="text" id="filtro-cliente" placeholder="Filtrar Cliente" class="border p-1 rounded text-xs flex-1 min-w-[150px]" />
+          <input type="date" id="filtro-fecha" class="border p-1 rounded text-xs flex-1 min-w-[130px]" />
+          <input type="time" id="filtro-hora" class="border p-1 rounded text-xs flex-1 min-w-[110px]" />
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <input type="text" id="filtro-servicio" placeholder="Filtrar Servicio" class="border p-1 rounded text-xs flex-1 min-w-[150px]" />
+          <select id="filtro-estado" class="border p-1 rounded text-xs flex-1 min-w-[140px]">
+            <option value="">Todos los estados</option>
+            <option value="completada">Completada</option>
+            <option value="pendiente">Pendiente</option>
+            <option value="cancelada">Cancelada</option>
+          </select>
+          <input type="text" id="filtro-observaciones" placeholder="Filtrar Observaciones" class="border p-1 rounded text-xs flex-1 min-w-[150px]" />
+          <button id="btn-limpiar-filtros" class="bg-gray-200 px-2 rounded text-xs">Limpiar</button>
+        </div>
+      </div>
+
+      <!-- Tabla de citas -->
+      <div class="overflow-x-auto">
+        <table class="min-w-full border border-gray-200 text-sm" id="tabla-citas">
+          <thead class="bg-gray-100 text-gray-700 font-semibold">
+            <tr>
+              <th class="px-4 py-2 text-left">Documento</th>
+              <th class="px-4 py-2 text-left">Cliente</th>
+              <th class="px-4 py-2 text-left">Mascota</th>
+              <th class="px-4 py-2 text-left">Edad</th>
+              <th class="px-4 py-2 text-left">Raza</th>
+              <th class="px-4 py-2 text-left">Fecha</th>
+              <th class="px-4 py-2 text-left">Hora</th>
+              <th class="px-4 py-2 text-left">Servicio</th>
+              <th class="px-4 py-2 text-left">Estado</th>
+              <th class="px-4 py-2 text-left">Observaciones</th>
+            </tr>
+          </thead>
+          <tbody id="cuerpo-tabla" class="divide-y divide-gray-200 text-gray-700">
+            {% for cita in citas_rapidas %}
+            <tr>
+              <td>{{ cita.numero_documento }}</td>
+              <td>{{ cita.nombre_cliente }}</td>
+              <td>{{ cita.nombre_mascota }}</td>
+              <td>{{ cita.edad_mascota }}</td>
+              <td>{{ cita.raza_mascota }}</td>
+              <td>
+                <form method="post" action="{% url 'editar_estado_observacion_rapida' cita.id %}">
+                  {% csrf_token %}
+                  <input type="date" name="fecha" value="{{ cita.fecha|date:'Y-m-d' }}" class="border rounded p-1 text-xs w-full" required />
+              </td>
+              <td>
+                  <input type="time" name="hora" value="{{ cita.hora|time:'H:i' }}"
+                    min="06:00" max="18:00" step="1200"
+                    class="border rounded p-1 text-xs w-full" required />
+              </td>
+              <td>{{ cita.servicio }}</td>
+              <td>
+                <select name="estado" class="border rounded p-1 text-xs w-full">
+                  <option value="Completada" {% if cita.estado == "Completada" %}selected{% endif %}>Completada</option>
+                  <option value="Pendiente" {% if cita.estado == "Pendiente" %}selected{% endif %}>Pendiente</option>
+                  <option value="Cancelada" {% if cita.estado == "Cancelada" %}selected{% endif %}>Cancelada</option>
+                </select>
+              </td>
+              <td>
+                <div class="flex gap-2 items-center">
+                  <input type="text" name="observaciones" value="{{ cita.observaciones }}" class="border rounded p-1 text-xs w-full" />
+                  <button type="submit" class="bg-blue-500 text-white px-2 py-1 rounded text-xs ml-2">Guardar</button>
                 </div>
-            </li>
-        </ol>
-    </nav>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
 
-
-      <div class="max-w-7xl mx-auto bg-white rounded-2xl shadow-lg p-6">
-        <h2 class="text-3xl font-bold mb-6 text-blue-800">📅 Registro de Citas</h2>
-
-        <!-- Mensaje de éxito -->
-        <div id="mensaje-exito" class="hidden mb-4 p-3 rounded-md bg-green-100 text-green-800 text-sm font-medium transition duration-300">
-          ✅ Cita agregada exitosamente.
-        </div>
-
-        <!-- Formulario -->
-        <form id="form-cita" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-          <input type="text" id="cliente" placeholder="Nombre del cliente" required class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400" />
-          <input type="date" id="fecha" required class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400" />
-          <input type="time" id="hora" required class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400" />
-
-          <select id="servicio" required class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400">
-            <option value="" disabled selected>Seleccione un servicio</option>
-            <option value="Consulta">Consulta</option>
-            <option value="Esterilización Canina y Felina">Esterilización Canina y Felina</option>
-            <option value="Guardería">Guardería</option>
-            <option value="Vacunación">Vacunación</option>
-            <option value="Profilaxis">Profilaxis</option>
-            <option value="Hospitalización">Hospitalización</option>
-            <option value="Cirugías">Cirugías</option>
-            <option value="Asistencia Médica">Asistencia Médica</option>
-          </select>
-
-          <select id="estado" required class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400">
-            <option value="Realizada">Realizada</option>
-            <option value="Reprogramada">Reprogramada</option>
-            <option value="Cancelada">Cancelada</option>
-          </select>
-
-          <input type="text" id="observaciones" placeholder="Observaciones" class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400" />
-
-          <button type="submit" class="col-span-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 active:scale-95 transition">Agregar Cita</button>
-        </form>
-
-        <!-- Tabla -->
-        <div class="overflow-x-auto">
-          <table class="min-w-full border border-gray-200 text-sm" id="tabla-citas">
-            <thead class="bg-gray-100 text-gray-700 font-semibold">
-              <tr>
-                <th class="px-4 py-2 text-left">Cliente</th>
-                <th class="px-4 py-2 text-left">Fecha</th>
-                <th class="px-4 py-2 text-left">Hora</th>
-                <th class="px-4 py-2 text-left">Servicio</th>
-                <th class="px-4 py-2 text-left">Estado</th>
-                <th class="px-4 py-2 text-left">Observaciones</th>
-              </tr>
-            </thead>
-            <tbody id="cuerpo-tabla" class="divide-y divide-gray-200 text-gray-700">
-              <!-- Filas dinámicas aquí -->
-            </tbody>
-          </table>
-        </div>
+            {% if not citas_rapidas and not citas_normales %}
+            <tr>
+                <td colspan="10">No hay citas registradas.</td>
+            </tr>
+            {% endif %}
+          </tbody>
+        </table>
       </div>
     </div>
   </div>
 
-    <script src={% static "JavaScript/sienna.js" %}></script>
-    <script src={% static "JavaScript/custom.js" %}></script>
-
-  <!-- Script -->
+  <!-- Scripts -->
   <script>
-    const form = document.getElementById("form-cita");
-    const tabla = document.getElementById("cuerpo-tabla");
-    const mensajeExito = document.getElementById("mensaje-exito");
+    // Sidebar móvil
+    const toggleBtn = document.getElementById('menu-toggle');
+    const sidebar = document.getElementById('sidebar');
+    if(toggleBtn && sidebar){
+      toggleBtn.addEventListener('click', () => {
+        sidebar.classList.toggle('sidebar-open');
+        sidebar.classList.toggle('-translate-x-full');
+      });
+    }
 
-    form.addEventListener("submit", function (e) {
-      e.preventDefault();
+    // Filtros de tabla
+    document.addEventListener('DOMContentLoaded', function () {
+      const filtros = {
+        documento: document.getElementById('filtro-documento'),
+        cliente: document.getElementById('filtro-cliente'),
+        fecha: document.getElementById('filtro-fecha'),
+        hora: document.getElementById('filtro-hora'),
+        servicio: document.getElementById('filtro-servicio'),
+        estado: document.getElementById('filtro-estado'),
+        observaciones: document.getElementById('filtro-observaciones')
+      };
+      const tabla = document.getElementById('tabla-citas').getElementsByTagName('tbody')[0];
+      const filas = tabla.getElementsByTagName('tr');
 
-      const cliente = document.getElementById("cliente").value.trim();
-      const fecha = document.getElementById("fecha").value;
-      const hora = document.getElementById("hora").value;
-      const servicio = document.getElementById("servicio").value;
-      const estado = document.getElementById("estado").value;
-      const observaciones = document.getElementById("observaciones").value.trim();
-
-      if (!cliente || !fecha || !hora || !servicio || !estado) {
-        alert("Por favor, complete todos los campos obligatorios.");
-        return;
+      function filtrarTabla() {
+        for (let fila of filas) {
+          if (fila.querySelector('td[colspan]')) {
+            fila.style.display = '';
+            continue;
+          }
+          let mostrar = true;
+          if (filtros.documento && filtros.documento.value) {
+            const textoDocumento = fila.cells[0].textContent.toLowerCase();
+            if (!textoDocumento.includes(filtros.documento.value.toLowerCase())) mostrar = false;
+          }
+          if (filtros.cliente.value) {
+            const palabras = filtros.cliente.value.toLowerCase().split(' ').filter(Boolean);
+            const textoCliente = fila.cells[1].textContent.toLowerCase();
+            for (let palabra of palabras) {
+              if (!textoCliente.includes(palabra)) {
+                mostrar = false;
+                break;
+              }
+            }
+          }
+          if (filtros.fecha.value) {
+            const inputFecha = fila.cells[2].querySelector('input[type="date"]');
+            if (!inputFecha || inputFecha.value !== filtros.fecha.value) mostrar = false;
+          }
+          if (filtros.hora.value) {
+            const inputHora = fila.cells[3].querySelector('input[type="time"]');
+            if (!inputHora || inputHora.value !== filtros.hora.value) mostrar = false;
+          }
+          if (filtros.servicio.value && !fila.cells[4].textContent.toLowerCase().includes(filtros.servicio.value.toLowerCase())) mostrar = false;
+          if (filtros.estado.value) {
+            const selectEstado = fila.cells[5].querySelector('select');
+            if (!selectEstado || selectEstado.value.toLowerCase() !== filtros.estado.value.toLowerCase()) mostrar = false;
+          }
+          if (filtros.observaciones.value) {
+            const inputObs = fila.cells[6].querySelector('input[type="text"]');
+            if (!inputObs || !inputObs.value.toLowerCase().includes(filtros.observaciones.value.toLowerCase())) mostrar = false;
+          }
+          fila.style.display = mostrar ? '' : 'none';
+        }
       }
 
-      const estadoClases = {
-        "Realizada": "bg-green-100 text-green-800",
-        "Reprogramada": "bg-yellow-100 text-yellow-800",
-        "Cancelada": "bg-red-100 text-red-800"
-      };
+      Object.values(filtros).forEach(input => {
+        input.addEventListener('input', filtrarTabla);
+        if (input.tagName === 'SELECT') input.addEventListener('change', filtrarTabla);
+      });
 
-      const fila = document.createElement("tr");
-      fila.classList.add("fade-in");
-      fila.innerHTML = `
-        <td class="px-4 py-2">${cliente}</td>
-        <td class="px-4 py-2">${fecha}</td>
-        <td class="px-4 py-2">${hora}</td>
-        <td class="px-4 py-2">${servicio}</td>
-        <td class="px-4 py-2">
-          <span class="px-2 py-1 ${estadoClases[estado]} rounded-full text-xs font-medium">${estado}</span>
-        </td>
-        <td class="px-4 py-2">${observaciones}</td>
-      `;
+      document.getElementById('btn-limpiar-filtros').addEventListener('click', function(){
+        Object.values(filtros).forEach(input => input.value = '');
+        filtrarTabla();
+      });
+    });
 
-      tabla.appendChild(fila);
-      form.reset();
+    // Validación de hora en intervalos de 20 minutos
+    document.querySelectorAll('input[type="time"]').forEach(input => {
+      input.addEventListener('change', function() {
+        const value = this.value;
+        if (!value) return;
+        const [h, m] = value.split(':').map(Number);
+        if (h < 6 || h > 18 || ![0, 20, 40].includes(m)) {
+          alert('Seleccione una hora entre 6:00 y 18:00, en intervalos de 20 minutos (00, 20, 40).');
+          this.value = '';
+        }
+      });
+    });
 
-      mensajeExito.classList.remove("hidden");
-      setTimeout(() => mensajeExito.classList.add("hidden"), 2500);
+    // Validaciones en tiempo real para el formulario
+    function mostrarError(input, errorId, mensaje) {
+      input.classList.add('border-red-500');
+      document.getElementById(errorId).textContent = mensaje;
+      document.getElementById(errorId).classList.remove('hidden');
+    }
+    function ocultarError(input, errorId) {
+      input.classList.remove('border-red-500');
+      document.getElementById(errorId).classList.add('hidden');
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+      // Documento
+      const doc = document.getElementById('numero_documento');
+      doc.addEventListener('input', function() {
+        if (!/^[0-9]{6,15}$/.test(doc.value)) {
+          mostrarError(doc, 'error-numero_documento', 'Solo números, mínimo 6 dígitos');
+        } else {
+          ocultarError(doc, 'error-numero_documento');
+        }
+      });
+
+      // Cliente
+      const cliente = document.getElementById('nombre_cliente');
+      cliente.addEventListener('input', function() {
+        if (!/^[A-Za-záéíóúÁÉÍÓÚñÑ ]{2,50}$/.test(cliente.value)) {
+          mostrarError(cliente, 'error-nombre_cliente', 'Solo letras y espacios, mínimo 2 caracteres');
+        } else {
+          ocultarError(cliente, 'error-nombre_cliente');
+        }
+      });
+
+      // Mascota
+      const mascota = document.getElementById('nombre_mascota');
+      mascota.addEventListener('input', function() {
+        if (!/^[A-Za-záéíóúÁÉÍÓÚñÑ ]{2,30}$/.test(mascota.value)) {
+          mostrarError(mascota, 'error-nombre_mascota', 'Solo letras y espacios, mínimo 2 caracteres');
+        } else {
+          ocultarError(mascota, 'error-nombre_mascota');
+        }
+      });
+
+      // Edad
+      const edadValor = document.getElementById('edad_mascota_valor');
+      const edadTipo = document.getElementById('edad_mascota_tipo');
+      function validarEdad() {
+        if (!edadValor.value || !edadTipo.value) {
+          mostrarError(edadValor, 'error-edad_mascota', 'Edad inválida (0-20 años o 0-11 meses)');
+          mostrarError(edadTipo, 'error-edad_mascota', 'Edad inválida (0-20 años o 0-11 meses)');
+        } else if (edadTipo.value === 'años' && (edadValor.value < 0 || edadValor.value > 20)) {
+          mostrarError(edadValor, 'error-edad_mascota', 'Edad en años debe estar entre 0 y 20');
+        } else if (edadTipo.value === 'meses' && (edadValor.value < 0 || edadValor.value > 11)) {
+          mostrarError(edadValor, 'error-edad_mascota', 'Edad en meses debe estar entre 0 y 11');
+        } else {
+          ocultarError(edadValor, 'error-edad_mascota');
+          ocultarError(edadTipo, 'error-edad_mascota');
+        }
+      }
+      edadValor.addEventListener('input', validarEdad);
+      edadTipo.addEventListener('change', validarEdad);
+
+      // Raza
+      const raza = document.getElementById('raza_mascota');
+      raza.addEventListener('input', function() {
+        if (!/^[A-Za-záéíóúÁÉÍÓÚñÑ ]{2,30}$/.test(raza.value)) {
+          mostrarError(raza, 'error-raza_mascota', 'Solo letras y espacios, mínimo 2 caracteres');
+        } else {
+          ocultarError(raza, 'error-raza_mascota');
+        }
+      });
+
+      // Fecha
+      const fecha = document.getElementById('fecha');
+      fecha.addEventListener('input', function() {
+        if (!fecha.value) {
+          mostrarError(fecha, 'error-fecha', 'Debe seleccionar una fecha');
+        } else {
+          ocultarError(fecha, 'error-fecha');
+        }
+      });
+
+      // Hora
+      const hora = document.getElementById('hora');
+      hora.addEventListener('input', function() {
+        if (!hora.value) {
+          mostrarError(hora, 'error-hora', 'Debe seleccionar una hora');
+        } else {
+          ocultarError(hora, 'error-hora');
+        }
+      });
+
+      // Servicio
+      const servicio = document.getElementById('servicio');
+      servicio.addEventListener('change', function() {
+        if (!servicio.value) {
+          mostrarError(servicio, 'error-servicio', 'Debe seleccionar un servicio');
+        } else {
+          ocultarError(servicio, 'error-servicio');
+        }
+      });
+
+      // Estado
+      const estado = document.getElementById('estado');
+      estado.addEventListener('change', function() {
+        if (!estado.value) {
+          mostrarError(estado, 'error-estado', 'Debe seleccionar un estado');
+        } else {
+          ocultarError(estado, 'error-estado');
+        }
+      });
+
+      // Observaciones
+      const obs = document.getElementById('observaciones');
+      obs.addEventListener('input', function() {
+        if (obs.value.length > 250) {
+          mostrarError(obs, 'error-observaciones', 'Máximo 250 caracteres');
+        } else {
+          ocultarError(obs, 'error-observaciones');
+        }
+      });
     });
   </script>
 </body>

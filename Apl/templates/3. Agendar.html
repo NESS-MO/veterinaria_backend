@@ -14,28 +14,28 @@
     <link rel="stylesheet" href={% static "css/header.css" %}>
 </head>
 <body>
-<header>
-    <!--Logo de encabezado-->
-    <div class="Logotipo">
-        <a href="{% url 'index' %}">
-            <img src="{% static 'Images/logo2.png' %}" alt="logo DR.PUL">
-        </a>
-        <h3 class="eslogan">COMPROMETIDOS CON LA SALUD ANIMAL</h3>
-    </div>
+    <header>
+        <!--Logo de encabezado-->
+        <div class="Logotipo">
+            <a href={% url "index" %}>
+                <img src={% static "Images/logo2.png" %} alt="logo DR.PUL">
+            </a>
+            <h3 class="eslogan">COMPROMETIDOS CON LA SALUD ANIMAL</h3>
+        </div>
 
-    <!--Menú hamburguesa responsivo-->
-    <button class="abrir" id="abrir-menu">☰</button>
-    
-    <!--Opciones de encabezado-->
-    <nav class="opciones" id="menu">
-        <button class="cerrar" id="cerrar-menu">✕</button>
-        <a href="{% url 'index' %}">INICIO</a>
-        <a href="{% url 'index' %}#conocenos">CONÓCENOS</a>
-        <a href="{% url 'servicios' %}">SERVICIOS</a>
-        <a href="{% url 'agendar' %}">AGENDAR CITA</a>
-        <a href="{% url 'login' %}"><img class="perfil" src="{% static 'Images/perfil.png' %}" alt="Perfil"></a>
-    </nav>
-</header>
+        <!--Menú hamburguesa responsivo-->
+        <button class="abrir" id="abrir-menu">☰</button>
+        
+        <!--Opciones de encabezado-->
+        <nav class="opciones" id="menu">
+            <button class="cerrar" id="cerrar-menu">✕</button>
+            <a href={% url "index"%}>INICIO</a>
+            <a href="#conocenos">CONÓCENOS</a>
+            <a href={% url "servicios" %}>SERVICIOS</a>
+            <a href={% url "agendar" %}>AGENDAR CITA</a>
+            <a href={% url "login"%}><img class="perfil" src={% static "Images/perfil.png" %} alt="logo DR.PUL"></a>
+        </nav>
+    </header>
 
     
     <div class="container" id="calen">
@@ -47,76 +47,790 @@
     </div>
 
     <section class="formulario" id="formulario">
-        <div class="container">
-            <h2>Agendar Cita</h2>
-            <h4></h4>
-            <p>Complete el formulario para agendar una cita con nuestros veterinarios.</p>
-            <form action="#" method="POST" id="appointment-form">
-                <div class="form-group">
-                    <label for="nombre">Nombre (Dueño) </label>
-                    <input type="text" id="nombre" name="nombre" required placeholder="Ingresa tu nombre">
-                </div>
-                <div class="form-group">
-                    <label for="apellido">Apellido</label>
-                    <input type="text" id="apellido" name="apellido" required placeholder="Ingresa tu Apellido">
-                </div>
-                <div class="form-group">
-                    <label for="tipo_documento">Tipo de Documento</label>
-                    <select id="tipo_documento" name="tipo_documento" required>
-                        <option value="">Selecciona Documento</option>
-                        <option value="cedula">Cedula de Ciudadania</option>
-                        <option value="extranjeria">Cedula de Extranjeria</option>
+    <div class="container">
+        <h2>Agendar Cita</h2>
+        <h4></h4>
+        <p>Complete el formulario para agendar una cita con nuestros veterinarios.</p>
+        <form method="POST" action="{% url 'agendar' %}" method="POST" id="appointment-form">
+            {% csrf_token %}
+            <!-- Ejemplo para el campo de nombre -->
+            <div class="form-group">
+                <label for="primer_nombre">Nombre (Dueño)</label>
+                <input type="text" id="primer_nombre" name="primer_nombre" required
+                    pattern="[A-Za-záéíóúÁÉÍÓÚñÑ ]+" 
+                    title="Solo letras y espacios" 
+                    placeholder="Ingresa tu nombre"
+                    maxlength="50">
+                <div class="error-message" id="primer_nombre-error"></div>
+            </div>
+
+            <!-- Campo Apellido -->
+            <div class="form-group">
+                <label for="primer_apellido">Apellido (Dueño)</label>
+                <input type="text" id="primer_apellido" name="primer_apellido" required
+                    pattern="[A-Za-záéíóúÁÉÍÓÚñÑ ]{2,50}"
+                    title="Solo letras (entre 2 y 50 caracteres)"
+                    placeholder="Ingresa tu apellido"
+                    maxlength="50">
+                <div class="error-message" id="primer_apellido-error"></div>
+            </div>
+
+            <!-- Campo Tipo Documento -->
+            <div class="form-group">
+                <label for="tipo_documento">Tipo de Documento</label>
+                <select id="tipo_documento" name="tipo_documento" required>
+                    <option value="">Seleccione su tipo de documento</option>
+                    <option value="CC">Cédula de Ciudadanía</option>
+                    <option value="TI">Tarjeta de Identidad</option>
+                    <option value="CE">Cédula de Extranjería</option>
+                </select>
+            </div>
+
+            <!-- Campo Número Documento -->
+            <div class="form-group">
+                <label for="numero_documento">Número de documento</label>
+                <input type="text" id="numero_documento" name="numero_documento" required
+                    title="Entre 6 y 12 dígitos numéricos o formato para extranjería"
+                    placeholder="Ingresa tu número de documento">
+                <div class="error-message" id="numero_documento-error"></div>
+            </div>
+            <!-- Ejemplo para el campo de email -->
+            <div class="form-group">
+                <label for="correo">Correo Electrónico</label>
+                <input type="email" id="correo" name="correo_electronico" required 
+                    placeholder="Ingresa tu correo electrónico">
+                <div class="error-message" id="correo-error"></div>
+            </div>
+            <div class="form-group">
+                <label for="telefono">Número de Teléfono</label>
+                <input type="tel" id="telefono" name="telefono" required
+                    pattern="[0-9]{10}" 
+                    title="10 dígitos numéricos"
+                    placeholder="Ingresa tu número de teléfono">
+                <div class="error-message" id="telefono-error"></div>
+            </div>
+            <div class="form-group">
+                <label for="mascota">Nombre de la Mascota</label>
+                <input type="text" id="mascota" name="mascota" required
+                    pattern="[A-Za-záéíóúÁÉÍÓÚñÑ ]{2,30}"
+                    title="Solo letras (entre 2 y 30 caracteres)"
+                    placeholder="Ingresa el nombre de tu mascota">
+                <div class="error-message" id="mascota-error"></div>
+            </div>
+            <div class="form-group">
+                <label for="clase-mascota">Especie de la Mascota</label>
+                <select id="clase-mascota" name="clase-mascota" required>
+                    <option value="">Selecciona la especie de tu mascota</option>
+                    <option value="Perro">Perro</option>
+                    <option value="Gato">Gato</option>
+                </select>
+                <div class="error-message" id="clase-mascota-error"></div>
+            </div>
+            <div class="form-group">
+                <label for="edad-mascota">Edad de la Mascota</label>
+                <div class="edad-container">
+                    <input type="number" id="edad-numero" name="edad-numero" min="0" max="30" 
+                        placeholder="Número" style="width: 60%; display: inline-block;">
+                    <select id="edad-unidad" name="edad-unidad" style="width: 35%; display: inline-block; margin-left: 5%;">
+                        <option value="meses">Meses</option>
+                        <option value="años">Años</option>
                     </select>
                 </div>
-                <div class="form-group">
-                    <label for="num_domumento">Número de documento </label>
-                    <input type="text" id="documento" name="documento" required placeholder="Ingresa tu número de documento">
+                <div class="error-message" id="edad-mascota-error"></div>
+            </div>
+            <div class="form-group">
+                <label for="raza-mascota">Raza de la Mascota</label>
+                <select id="raza-mascota" name="raza-mascota" required>
+                    <option value="">Seleccione la raza</option>
+                    <optgroup label="Perros">
+                        <option value="Criollo">Criollo</option>
+                        <option value="Labrador Retriever">Labrador Retriever</option>
+                        <option value="Bulldog Francés">Bulldog Francés</option>
+                        <option value="Poodle">Poodle</option>
+                        <option value="Golden Retriever">Golden Retriever</option>
+                        <option value="Pug">Pug</option>
+                        <option value="Bulldog Inglés">Bulldog Inglés</option>
+                        <option value="Beagle">Beagle</option>
+                        <option value="Rottweiler">Rottweiler</option>
+                        <option value="Pastor Alemán">Pastor Alemán</option>
+                        <option value="Pinscher Miniatura">Pinscher Miniatura</option>
+                        <option value="Shih Tzu">Shih Tzu</option>
+                        <option value="Chihuahua">Chihuahua</option>
+                        <option value="Dachshund">Dachshund (Perro Salchicha)</option>
+                        <option value="Boxer">Boxer</option>
+                        <option value="Schnauzer Miniatura">Schnauzer Miniatura</option>
+                        <option value="Yorkshire Terrier">Yorkshire Terrier</option>
+                        <option value="Border Collie">Border Collie</option>
+                        <option value="Doberman">Doberman</option>
+                        <option value="Fox Terrier">Fox Terrier</option>
+                    </optgroup>
+                    <optgroup label="Gatos">
+                        <option value="Criollo">Criollo</option>
+                        <option value="Persa">Persa</option>
+                        <option value="Siamés">Siamés</option>
+                        <option value="Bengalí">Bengalí</option>
+                        <option value="Maine Coon">Maine Coon</option>
+                        <option value="Ragdoll">Ragdoll</option>
+                        <option value="Esfinge">Esfinge</option>
+                        <option value="Angora">Angora</option>
+                        <option value="British Shorthair">British Shorthair</option>
+                        <option value="Scottish Fold">Scottish Fold</option>
+                        <option value="Oriental">Oriental</option>
+                        <option value="Bombay">Bombay</option>
+                        <option value="Azul Ruso">Azul Ruso</option>
+                        <option value="Abisinio">Abisinio</option>
+                        <option value="Savannah">Savannah</option>
+                        <option value="Americano de pelo corto">Americano de pelo corto</option>
+                        <option value="Devon Rex">Devon Rex</option>
+                        <option value="Birmano">Birmano</option>
+                    </optgroup>
+                    <option value="otro">Otro (especificar)</option>
+                </select>
+                <div id="otra-raza-container" style="display: none; margin-top: 10px;">
+                    <input type="text" id="otra-raza" name="otra-raza" placeholder="Especifique la raza">
                 </div>
-                <div class="form-group">
-                    <label for="correo">Correo Electrónico</label>
-                    <input type="email" id="correo" name="correo" required placeholder="Ingresa tu correo electrónico">
+                <div class="error-message" id="raza-mascota-error"></div>
+            </div>
+            <div class="form-group">
+                <label for="fecha">Fecha de la Cita</label>
+                <div class="date-container">
+                    <input type="date" id="fecha" name="fecha" required class="date-input" min="{{ today|date:'Y-m-d' }}">
+                    <small class="date-hint">Seleccione una fecha futura</small>
                 </div>
-                <div class="form-group">
-                    <label for="telefono">Número de Teléfono</label>
-                    <input type="tel" id="telefono" name="telefono" required placeholder="Ingresa tu número de teléfono">
-                </div>
-                <div class="form-group">
-                    <label for="mascota">Nombre de la Mascota</label>
-                    <input type="text" id="mascota" name="mascota" required placeholder="Ingresa el nombre de tu mascota">
-                </div>
-                <div class="form-group">
-                    <label for="clase-mascota">Clase de Mascota</label>
-                    <select id="clase-mascota" name="clase-mascota" required>
-                        <option value="">Selecciona la clase de tu mascota</option>
-                        <option value="Perro">Perro</option>
-                        <option value="Gato">Gato</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="fecha">Selecciona en el calendario de arriba la fecha que este disponible</label>
-                    <input type="date" id="fecha" name="fecha" required readonly>
-                </div>
-                <div class="form-group">
-                    <label for="hora">Hora de la Cita</label>
+                <div class="error-message" id="fecha-error"></div>
+            </div>
+            <div class="form-group">
+                <label for="hora">Hora de la Cita</label>
+                <div style="display: flex; align-items: center; gap: 10px;">
                     <input type="time" id="hora" name="hora" required>
+                    <button type="button" id="mostrar-horarios" style="padding: 8px 12px; background: #3a6ead; color: #fff; border: none; border-radius: 4px; cursor: pointer;">
+                        Ver horarios disponibles
+                    </button>
                 </div>
-                <div class="form-group">
-                    <label for="services">Motivo de la Cita:</label>
-                    <div class="checkbox-group">
-                        <label>Consulta <input type="checkbox" name="services" value="consulta"></label>
-                        <label>Esterilización <input type="checkbox" name="services" value="esterilizacion"></label>
-                        <label>Guardería <input type="checkbox" name="services" value="guarderia"></label>
-                        <label>Vacunación <input type="checkbox" name="services" value="vacunacion"></label>
-                        <label>Profilaxis <input type="checkbox" name="services" value="profilaxis"></label>
-                        <label>Cirugías <input type="checkbox" name="services" value="cirugias"></label>
+                <div id="lista-horarios" style="display: none; margin-top: 10px; background: #f9f9f9; border: 1px solid #ccc; border-radius: 6px; max-width: 250px; max-height: 200px; overflow-y: auto; z-index: 10; position: absolute;">
+                    <!-- Aquí se llenan los horarios con JS -->
+                </div>
+                <div class="error-message" id="hora-error"></div> <!-- <-- Aquí debe estar -->
+            </div>
+            <div class="form-group">
+                <label>Motivo de la Cita:</label>
+                <div class="services-container">
+                    <!-- Servicio Principal -->
+                    <div class="service-col">
+                        <select id="main-service" name="main_service" required class="service-select">
+                            <option value="">Seleccione principal*</option>
+                            <option value="consulta">Consulta</option>
+                            <option value="esterilizacion">Esterilización</option>
+                            <option value="guarderia">Guardería</option>
+                            <option value="vacunacion">Vacunación</option>
+                            <option value="profilaxis">Profilaxis</option>
+                            <option value="cirugias">Cirugías</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Servicio Extra -->
+                    <div class="service-col">
+                        <select id="extra-service" name="extra_service" class="service-select">
+                            <option value="">Servicio extra (opcional)</option>
+                            <option value="consulta">Consulta</option>
+                            <option value="esterilizacion">Esterilización</option>
+                            <option value="guarderia">Guardería</option>
+                            <option value="vacunacion">Vacunación</option>
+                            <option value="profilaxis">Profilaxis</option>
+                            <option value="cirugias">Cirugías</option>
+                            <option value="ninguno">Ninguno</option>
+                        </select>
                     </div>
                 </div>
-                <button type="submit" class="agendar">Enviar</button>
-                <a class="dispo" href="#inicio"><h3>⬆️ Disponibilidad ⬆️</h3></a>
-            </form>
-        </div>
-    </section>
+                <div class="error-message" id="services-error"></div>
+            </div>
+            <button type="submit" class="agendar">Enviar</button>
+            <div id="form-error" class="alert alert-danger" style="display: none;"></div>
+            <a href="{% url 'CancelarCita' %}" class="agendar" style="margin-top: 10px; display: inline-block;">Cancelar una cita</a>
+            <a class="dispo" href="#inicio"><h3>⬆️ Disponibilidad ⬆️</h3></a>
+        </form>
+    </div>
+</section>
 
+
+    {% if messages %}
+    <div class="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md">
+        {% for message in messages %}
+        <div class="bg-green-100 border border-green-400 text-green-800 px-4 py-3 rounded relative shadow-lg mb-2 flex items-center justify-between animate-fade-in-down">
+            <span class="font-semibold">{{ message }}</span>
+            <button onclick="this.parentElement.style.display='none'" class="ml-4 text-green-700 hover:text-green-900 text-xl leading-none">&times;</button>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+<style>
+    .input-error {
+        border: 1px solid #ff3860;
+    }
+
+    .error-message {
+        color: #ff3860;
+        font-size: 0.85em;
+        margin-top: 0.25rem;
+        display: none;
+    }
+
+    .checkbox-group .error-message {
+        color: #ff3860;
+        margin-top: 0.5rem;
+        display: none;
+    }
+</style>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Elementos del formulario
+        const form = document.getElementById('appointment-form');
+        const primer_nombreInput = document.getElementById('primer_nombre');
+        const primer_apellidoInput = document.getElementById('primer_apellido');
+        const numero_documentoInput = document.getElementById('numero_documento');
+        const tipoDocumentoSelect = document.getElementById('tipo_documento');
+        const correoInput = document.getElementById('correo');
+        const telefonoInput = document.getElementById('telefono');
+        const mascotaInput = document.getElementById('mascota');
+        const fechaInput = document.getElementById('fecha');
+        const horaInput = document.getElementById('hora');
+        const razaMascotaSelect = document.getElementById('raza-mascota');
+        const claseMascotaSelect = document.getElementById('clase-mascota');
+
+        // Guardar las opciones originales
+        const opcionesOriginales = Array.from(razaMascotaSelect.options);
+
+        claseMascotaSelect.addEventListener('change', function() {
+            const especie = this.value;
+            // Limpiar opciones actuales
+            razaMascotaSelect.innerHTML = '';
+            // Filtrar y agregar solo las opciones correspondientes
+            opcionesOriginales.forEach(option => {
+                // Mostrar siempre la opción por defecto y "otro"
+                if (
+                    option.value === '' ||
+                    option.value === 'otro' ||
+                    (especie === 'Perro' && option.parentElement && option.parentElement.label === 'Perros') ||
+                    (especie === 'Gato' && option.parentElement && option.parentElement.label === 'Gatos')
+                ) {
+                    razaMascotaSelect.appendChild(option.cloneNode(true));
+                }
+            });
+            // Si la especie cambia, ocultar el campo "otra raza"
+            document.getElementById('otra-raza-container').style.display = 'none';
+            document.getElementById('otra-raza').value = '';
+        });
+
+        // Mostrar el campo para especificar otra raza si se selecciona "otro"
+        razaMascotaSelect.addEventListener('change', function() {
+            if (this.value === 'otro') {
+                document.getElementById('otra-raza-container').style.display = 'block';
+                document.getElementById('otra-raza').required = true;
+            } else {
+                document.getElementById('otra-raza-container').style.display = 'none';
+                document.getElementById('otra-raza').required = false;
+                document.getElementById('otra-raza').value = '';
+            }
+        });
+
+        // Configuración inicial
+        const today = new Date().toISOString().split('T')[0];
+        fechaInput.min = today;
+
+        // Expresiones regulares
+        const regexSoloLetras = /^[A-Za-záéíóúÁÉÍÓÚñÑ\s]+$/;
+        const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        const regexTelefono = /^[0-9]{10}$/;
+        const regexDocumentoCC_TI = /^[0-9]{6,12}$/;
+        const regexDocumentoCE = /^[A-Za-z]{1,2}[0-9]{4,8}$/;
+
+        // Funciones de ayuda
+        function showError(input, message) {
+            const errorElement = document.getElementById(`${input.id}-error`);
+            if (errorElement) {
+                errorElement.textContent = message;
+                errorElement.style.display = 'block';
+                errorElement.classList.add('visible');
+                input.classList.add('input-error');
+            }
+        }
+        function clearError(input) {
+            const errorElement = document.getElementById(`${input.id}-error`);
+            if (errorElement) {
+                errorElement.textContent = '';
+                errorElement.style.display = 'none';
+                errorElement.classList.remove('visible');
+                input.classList.remove('input-error');
+            }
+        }
+
+        // Validación en tiempo real
+        primer_nombreInput.addEventListener('input', function() {
+            if (!regexSoloLetras.test(this.value)) {
+                showError(this, 'Solo se permiten letras y espacios');
+            } else {
+                clearError(this);
+            }
+        });
+
+        primer_apellidoInput.addEventListener('input', function() {
+            if (!regexSoloLetras.test(this.value)) {
+                showError(this, 'Solo se permiten letras y espacios');
+            } else if (this.value.length < 2) {
+                showError(this, 'Mínimo 2 caracteres');
+            } else {
+                clearError(this);
+            }
+        });
+
+        tipoDocumentoSelect.addEventListener('change', function() {
+            clearError(numero_documentoInput);
+        });
+
+        numero_documentoInput.addEventListener('input', function() {
+            const tipoDocumento = tipoDocumentoSelect.value;
+            let isValid = false;
+            
+            if (tipoDocumento === 'CC' || tipoDocumento === 'TI') {
+                isValid = regexDocumentoCC_TI.test(this.value);
+            } else if (tipoDocumento === 'CE') {
+                isValid = regexDocumentoCE.test(this.value);
+            }
+            
+            if (!isValid && this.value) {
+                showError(this, 'Formato de documento inválido');
+            } else {
+                clearError(this);
+            }
+        });
+
+        correoInput.addEventListener('input', function() {
+            if (!regexEmail.test(this.value)) {
+                showError(this, 'Ingrese un correo electrónico válido');
+            } else {
+                clearError(this);
+            }
+        });
+
+        telefonoInput.addEventListener('input', function() {
+            if (!regexTelefono.test(this.value)) {
+                showError(this, 'El teléfono debe tener 10 dígitos numéricos');
+            } else {
+                clearError(this);
+            }
+        });
+
+        mascotaInput.addEventListener('input', function() {
+            if (!regexSoloLetras.test(this.value)) {
+                showError(this, 'Solo se permiten letras y espacios');
+            } else if (this.value.length < 2) {
+                showError(this, 'Mínimo 2 caracteres');
+            } else {
+                clearError(this);
+            }
+        });
+
+        // Validación de edad
+        edadNumeroInput.addEventListener('input', function() {
+            const value = this.value;
+            const unidad = edadUnidadSelect.value;
+            
+            if (!value) {
+                clearError(this);
+                return;
+            }
+            
+            const numValue = parseInt(value);
+            
+            if (isNaN(numValue)) {
+                showError(this, 'Ingrese un número válido');
+            } else if (unidad === 'años' && (numValue < 0 || numValue > 30)) {
+                showError(this, 'La edad en años debe estar entre 0 y 30');
+            } else if (unidad === 'meses' && (numValue < 0 || numValue > 360)) {
+                showError(this, 'La edad en meses debe estar entre 0 y 360');
+            } else {
+                clearError(this);
+            }
+        });
+
+        edadUnidadSelect.addEventListener('change', function() {
+            if (edadNumeroInput.value) {
+                edadNumeroInput.dispatchEvent(new Event('input'));
+            }
+        });
+
+        // Manejador para raza "otro"
+        razaMascotaSelect.addEventListener('change', function() {
+            if (this.value === 'otro') {
+                otraRazaContainer.style.display = 'block';
+                otraRazaInput.required = true;
+            } else {
+                otraRazaContainer.style.display = 'none';
+                otraRazaInput.required = false;
+                clearError(otraRazaInput);
+            }
+        });
+
+        otraRazaInput.addEventListener('input', function() {
+            if (!regexSoloLetras.test(this.value)) {
+                showError(this, 'Solo se permiten letras y espacios');
+            } else if (this.value.length < 2) {
+                showError(this, 'Mínimo 2 caracteres');
+            } else {
+                clearError(this);
+            }
+        });
+
+        // Validación de servicios
+        mainService.addEventListener('change', function() {
+            if (extraService.value === this.value && this.value !== '') {
+                extraService.value = 'ninguno';
+            }
+            clearError(mainService);
+        });
+
+        extraService.addEventListener('change', function() {
+            if (mainService.value === this.value && this.value !== '' && this.value !== 'ninguno') {
+                showError(this, 'No puede seleccionar el mismo servicio');
+                this.value = 'ninguno';
+            } else {
+                clearError(this);
+            }
+        });
+
+        // Validación al enviar
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            let isValid = true;
+
+            // Limpiar errores previos
+            document.querySelectorAll('.error-message').forEach(el => {
+                el.style.display = 'none';
+            });
+            document.querySelectorAll('.input-error').forEach(el => {
+                el.classList.remove('input-error');
+            });
+
+            // Validar campos requeridos
+            if (!primer_nombreInput.value.trim()) {
+                showError(primer_nombreInput, 'Este campo es requerido');
+                isValid = false;
+            }
+
+            if (!primer_apellidoInput.value.trim()) {
+                showError(primer_apellidoInput, 'Este campo es requerido');
+                isValid = false;
+            }
+
+            const tipoDocumento = tipoDocumentoSelect.value;
+            if (!tipoDocumento) {
+                showError(tipoDocumentoSelect, 'Seleccione un tipo de documento');
+                isValid = false;
+            } else if (!numero_documentoInput.value.trim()) {
+                showError(numero_documentoInput, 'Este campo es requerido');
+                isValid = false;
+            }
+
+            if (!correoInput.value.trim()) {
+                showError(correoInput, 'Este campo es requerido');
+                isValid = false;
+            } else if (!regexEmail.test(correoInput.value)) {
+                showError(correoInput, 'Ingrese un correo válido');
+                isValid = false;
+            }
+
+            if (!telefonoInput.value.trim()) {
+                showError(telefonoInput, 'Este campo es requerido');
+                isValid = false;
+            } else if (!regexTelefono.test(telefonoInput.value)) {
+                showError(telefonoInput, 'El teléfono debe tener 10 dígitos');
+                isValid = false;
+            }
+
+            if (!mascotaInput.value.trim()) {
+                showError(mascotaInput, 'Este campo es requerido');
+                isValid = false;
+            } else if (!regexSoloLetras.test(mascotaInput.value)) {
+                showError(mascotaInput, 'Solo letras y espacios');
+                isValid = false;
+            } else if (mascotaInput.value.length < 2) {
+                showError(mascotaInput, 'Mínimo 2 caracteres');
+                isValid = false;
+            }
+
+            if (!claseMascotaSelect.value) {
+                showError(claseMascotaSelect, 'Seleccione la especie');
+                isValid = false;
+            }
+
+            if (!edadNumeroInput.value.trim()) {
+                showError(edadNumeroInput, 'Este campo es requerido');
+                isValid = false;
+            } else {
+                const numValue = parseInt(edadNumeroInput.value);
+                const unidad = edadUnidadSelect.value;
+                
+                if (isNaN(numValue)) {
+                    showError(edadNumeroInput, 'Ingrese un número válido');
+                    isValid = false;
+                } else if (unidad === 'años' && (numValue < 0 || numValue > 30)) {
+                    showError(edadNumeroInput, 'La edad en años debe estar entre 0 y 30');
+                    isValid = false;
+                } else if (unidad === 'meses' && (numValue < 0 || numValue > 360)) {
+                    showError(edadNumeroInput, 'La edad en meses debe estar entre 0 y 360');
+                    isValid = false;
+                }
+            }
+
+            if (razaMascotaSelect.value === 'otro' && !otraRazaInput.value.trim()) {
+                showError(otraRazaInput, 'Por favor especifique la raza');
+                isValid = false;
+            } else if (razaMascotaSelect.value === 'otro' && !regexSoloLetras.test(otraRazaInput.value)) {
+                showError(otraRazaInput, 'Solo se permiten letras y espacios');
+                isValid = false;
+            }
+
+            // Validación de fecha
+            const selectedDate = new Date(fechaInput.value);
+            const todayObj = new Date();
+            todayObj.setHours(0, 0, 0, 0);
+            
+            if (!fechaInput.value || selectedDate < todayObj) {
+                showError(fechaInput, 'Seleccione una fecha válida (no pasada)');
+                isValid = false;
+            }
+
+            // Validación de hora
+            if (!horaInput.value) {
+                showError(horaInput, 'Seleccione una hora');
+                isValid = false;
+            } else {
+                const [h, m] = horaInput.value.split(':').map(Number);
+                const minutosTotales = h * 60 + m;
+                const inicio = 8 * 60;   // 08:00 en minutos
+                const fin = 17 * 60;     // 17:00 en minutos
+                if (
+                    minutosTotales < inicio ||
+                    minutosTotales > fin ||
+                    m % 20 !== 0
+                ) {
+                    showError(horaInput, 'La hora debe estar entre 08:00 y 5:00 en intervalos de 20 minutos');
+                    isValid = false;
+                } else {
+                    clearError(horaInput);
+                }
+            }
+
+            // Validación de servicios
+            if (!mainService.value) {
+                showError(mainService, 'Seleccione el servicio principal');
+                isValid = false;
+            }
+
+            if (isValid) {
+                // Mostrar feedback de envío
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Enviando...';
+                submitBtn.classList.add('loading');
+                
+                // Enviar formulario
+                form.submit();
+            } else {
+                window.scrollTo({
+                    top: form.offsetTop - 100,
+                    behavior: 'smooth'
+                });
+            }
+        });
+    });
+</script>
+    <style>
+        .date-container {
+            position: relative;
+            margin-bottom: 15px;
+        }
+        .date-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+        .services-container {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+        .service-col {
+            flex: 1;
+        }
+        .service-select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background-color: white;
+            font-size: 15px;
+        }
+        #main-service {
+            border-left: 4px solid #3a6ead;
+        }
+        #extra-service {
+            border-left: 4px solid #6c757d;
+        }
+        .input-error {
+            border: 2px solid #ff4444 !important;
+        }
+        .error-message {
+            color: #ff4444;
+            font-size: 0.8em;
+            margin-top: 5px;
+            display: none;
+        }
+        #otra-raza-container {
+            transition: all 0.3s ease;
+        }
+
+        #otra-raza {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        .edad-container {
+            display: flex;
+            align-items: center;
+            gap: 5%;
+        }
+
+        .edad-container input,
+        .edad-container select {
+            margin-bottom: 0;
+        }
+        .input-error {
+            border: 2px solid #ff4444 !important;
+        }
+        
+        .error-message {
+            color: #ff4444;
+            font-size: 0.8em;
+            margin-top: 5px;
+            display: none;
+            height: auto;
+        }
+        
+        .error-message.visible {
+            display: block;
+        }
+        
+        .checkbox-group {
+            position: relative;
+        }
+        
+        .checkbox-group .error-message {
+            position: absolute;
+            bottom: -20px;
+            left: 0;
+            background: #fff;
+            padding: 2px 5px;
+            border-radius: 3px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 1;
+        }
+        
+        .checkbox-group.input-error {
+            border: 2px solid #ff4444;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 25px; /* Más espacio para el mensaje de error */
+        }
+        .input-error {
+            border: 2px solid #ff4444 !important;
+        }
+
+        .error-message {
+            color: #ff4444;
+            font-size: 0.8em;
+            margin-top: 5px;
+            display: none;
+        }
+
+        .checkbox-group.input-error {
+            border: 2px solid #ff4444;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        div.form-group > div.date-container {
+            margin-bottom: 0px;
+        }
+
+        div.form-group > div.date-container + .form-group {
+            margin-top: 0px;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const mostrarHorariosBtn = document.getElementById('mostrar-horarios');
+            const listaHorarios = document.getElementById('lista-horarios');
+            const horaInput = document.getElementById('hora');
+
+            function generarHorarios() {
+                const horarios = [];
+                let hora = 8, minuto = 0;
+                while (hora < 17 || (hora === 17 && minuto === 0)) {
+                    let h = hora.toString().padStart(2, '0');
+                    let m = minuto.toString().padStart(2, '0');
+                    horarios.push(`${h}:${m}`);
+                    minuto += 20;
+                    if (minuto >= 60) {
+                        minuto = 0;
+                        hora += 1;
+                    }
+                }
+                return horarios;
+            }
+
+            function mostrarListaHorarios() {
+                listaHorarios.innerHTML = '';
+                generarHorarios().forEach(horario => {
+                    const item = document.createElement('div');
+                    // Mostrar en formato 12h amigable
+                    let [h, m] = horario.split(':');
+                    let hNum = parseInt(h);
+                    let ampm = hNum >= 12 ? 'p. m.' : 'a. m.';
+                    let h12 = hNum % 12 === 0 ? 12 : hNum % 12;
+                    let horarioAmigable = `${h12}:${m} ${ampm}`;
+                    item.textContent = horarioAmigable;
+                    item.style.padding = '8px 12px';
+                    item.style.cursor = 'pointer';
+                    item.style.borderBottom = '1px solid #eee';
+                    item.addEventListener('click', function() {
+                        horaInput.value = horario;
+                        listaHorarios.style.display = 'none';
+                    });
+                    listaHorarios.appendChild(item);
+                });
+                listaHorarios.style.display = 'block';
+            }
+
+            mostrarHorariosBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                if (listaHorarios.style.display === 'block') {
+                    listaHorarios.style.display = 'none';
+                } else {
+                    mostrarListaHorarios();
+                }
+            });
+
+            // Ocultar la lista si se hace clic fuera
+            document.addEventListener('click', function(e) {
+                if (!listaHorarios.contains(e.target) && e.target !== mostrarHorariosBtn) {
+                    listaHorarios.style.display = 'none';
+                }
+            });
+        });
+    </script>
     <footer>
         <div class="footer-container">
             <!-- Información de contacto -->
@@ -168,123 +882,33 @@
     </footer>
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js'></script>
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/locales/es.min.js'></script>
-    <script>
-    document.addEventListener('DOMContentLoaded', function () {
+<script>
+    // Convierte las citas de Django a un array de eventos para FullCalendar
+    var eventosCitas = [
+        {% for cita in citas %}
+        {
+            title: "Cita: {{ cita.cliente.primer_nombre }}",
+            start: "{{ cita.fecha }}T{{ cita.horario|time:'H:i' }}",
+            description: "{{ cita.extra|escapejs }}"
+        }{% if not forloop.last %},{% endif %}
+        {% endfor %}
+    ];
+    console.log(eventosCitas); // <-- Esto te permite ver en la consola si hay eventos
+</script>    
+<script>
+document.addEventListener('DOMContentLoaded', function () {
     var calendarEl = document.getElementById('calendario');
     var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         locale: 'es',
-        events: function (fetchInfo, successCallback, failureCallback) {
-            var citas = JSON.parse(localStorage.getItem('citas')) || [];
-            var events = citas.map(function (cita, index) {
-                return {
-                    title: `Cita: ${cita.mascota}`,
-                    start: `${cita.fecha}T${cita.hora}`,
-                    description: `Servicios: ${cita.servicios.join(', ')}`,
-                    extendedProps: {
-                        citaIndex: index
-                    }
-                };
-            });
-            successCallback(events);
-        },
-        dateClick: function (info) {
-            var fechaSeleccionada = info.dateStr;
-            document.getElementById('fecha').value = fechaSeleccionada;
-
-            window.scrollTo({
-                top: document.getElementById('formulario').offsetTop,
-                behavior: 'smooth'
-            });
-        },
-        eventClick: function (info) {
-            if (confirm(`¿Deseas cancelar la cita para ${info.event.title}?`)) {
-                var citas = JSON.parse(localStorage.getItem('citas')) || [];
-                var citaIndex = info.event.extendedProps.citaIndex;
-                citas.splice(citaIndex, 1);
-                localStorage.setItem('citas', JSON.stringify(citas));
-                info.event.remove();
-            }
-
-        },
-        eventTimeFormat: {
-            hour: '2-digit',
-            minute: '2-digit',
-            meridiem: 'short'
+        events: eventosCitas, // <-- Aquí cargas los eventos desde Django
+        eventClick: function(info) {
+            alert(info.event.title + "\n" + info.event.extendedProps.description);
         }
     });
-
     calendar.render();
-
-    document.getElementById('appointment-form').addEventListener('submit', function (e) {
-        e.preventDefault();
-
-        var nombre = document.getElementById('nombre').value;
-        var correo = document.getElementById('correo').value;
-        var telefono = document.getElementById('telefono').value;
-        var mascota = document.getElementById('mascota').value;
-        var fecha = document.getElementById('fecha').value;
-        var hora = document.getElementById('hora').value;
-        var services = [];
-        const serviceCheckboxes = document.querySelectorAll('input[name="services"]:checked');
-
-        serviceCheckboxes.forEach(function (checkbox) {
-            services.push(checkbox.value);
-        });
-
-        if (!fecha || !hora || services.length === 0) {
-            alert('Por favor llena los campos de la fecha, hora o un motivo de cita.');
-            return;
-        }
-
-        var citas = JSON.parse(localStorage.getItem('citas')) || [];
-        var existeCita = citas.some(function (cita) {
-            return cita.fecha === fecha && cita.hora === hora;
-        });
-
-        if (existeCita) {
-            alert('¡Esta hora ya está ocupada! Por favor, selecciona otra hora.');
-            return;
-        }
-
-        var nuevaCita = {
-            nombre: nombre,
-            correo: correo,
-            telefono: telefono,
-            mascota: mascota,
-            fecha: fecha,
-            hora: hora,
-            servicios: services
-        };
-
-        citas.push(nuevaCita);
-        localStorage.setItem('citas', JSON.stringify(citas));
-
-        calendar.addEvent({
-            title: `Cita: ${mascota}`,
-            start: `${fecha}T${hora}`,
-            description: `Servicios: ${services.join(', ')}`
-        });
-
-        document.getElementById('appointment-form').reset();
-        alert('✅ ¡Tu cita ha sido guardada exitosamente!');
-    });
 });
-
-document.addEventListener('DOMContentLoaded', function () {
-    // Obtener el parámetro "servicio" de la URL
-    const params = new URLSearchParams(window.location.search);
-    const servicio = params.get('servicio');
-
-    if (servicio) {
-        const checkbox = document.querySelector(`input[name="services"][value="${servicio}"]`);
-        if (checkbox) {
-            checkbox.checked = true;
-        }
-    }
-});
-
-    </script>
+</script>
 
     <script src={% static "JavaScript/MenuHamburguesa.js" %}></script>
 
@@ -311,6 +935,6 @@ document.addEventListener('DOMContentLoaded', function () {
 <script src={% static "JavaScript/js-BotonAyuda.js" %}></script>
 
 <script src={% static "JavaScript/From.js" %}></script>
-
+<!-- filepath: c:\Users\luisa\OneDrive\Escritorio\DjangoVeterinaria\Apl\templates\3. Agendar.html -->
 </body>
 </html>
