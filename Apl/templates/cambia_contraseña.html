@@ -1,0 +1,87 @@
+{% load static %} 
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <!-- Define la codificación de caracteres -->
+    <meta charset="UTF-8">
+    <!-- Configuración del viewport para dispositivos móviles -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Título de la página -->
+    <title>Cambiar Contraseña</title>
+  </head>
+  <body>
+    <!-- Contenedor principal de la página -->
+    <div class="content-wrapper">
+      <!-- Formulario para cambiar la contraseña.
+           Se envía por POST y se llama a la función JavaScript validatePasswordChange() al hacer submit -->
+      <form class="reset-form" method="POST" onsubmit="return validatePasswordChange()">
+        <!-- Token de seguridad CSRF para proteger la aplicación -->
+        {% csrf_token %}
+        <!-- Título del formulario -->
+        <h2>Cambia Tu Contraseña</h2>
+        
+        <!-- Sección para mostrar mensajes (errores, avisos) enviados desde el backend -->
+        {% if messages %}
+          {% for message in messages %}
+            <!-- Cada mensaje se muestra dentro de un contenedor con clases para estilos -->
+            <div class="alert alert-warning">{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+        
+        <!-- Grupo de campos para la nueva contraseña -->
+        <div class="form-group">
+          <!-- Etiqueta para el campo de nueva contraseña -->
+          <label for="new_password">Nueva Contraseña</label>
+          <!-- Campo de entrada para la nueva contraseña; es de tipo password para ocultar caracteres -->
+          <input type="password" id="new_password" name="new_password" placeholder="Ingresa la nueva contraseña" required>
+        </div>
+        
+        <!-- Grupo de campos para la confirmación de la nueva contraseña -->
+        <div class="form-group">
+          <!-- Etiqueta para el campo de confirmación de la contraseña -->
+          <label for="confirm_password">Confirmar Nueva Contraseña</label>
+          <!-- Campo de entrada para confirmar la contraseña; también de tipo password -->
+          <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirma la nueva contraseña" required>
+        </div>
+        
+        <!-- Botón para enviar el formulario y proceder al cambio de contraseña -->
+        <button type="submit">Cambiar Contraseña</button>
+        <!-- Enlace para volver a la página de inicio de sesión -->
+        <a href="{% url '4. Login' %}" class="back-link">Volver al inicio de sesión</a>
+      </form>
+    </div>
+    
+    <!-- Bloque de script para la validación del formulario en el navegador -->
+    <script>
+      // Función que valida los datos antes de enviar el formulario
+      function validatePasswordChange() {
+          // Obtiene el valor del campo de nueva contraseña
+          var newPassword = document.getElementById('new_password').value;
+          // Obtiene el valor del campo para confirmar la nueva contraseña
+          var confirmPassword = document.getElementById('confirm_password').value;
+          
+          // Expresión regular para validar la nueva contraseña:
+          // - Al menos 1 letra mayúscula
+          // - Al menos 1 carácter especial: (@, !, |, ., /, &)
+          // - Al menos 12 caracteres de longitud en total
+          var regex = /^(?=.*[A-Z])(?=.*[@!|./&]).{12,}$/;
+          
+          // Si la contraseña no cumple con la expresión regular, se muestra un mensaje de alerta y se evita el envío
+          if (!regex.test(newPassword)) {
+            alert("La contraseña debe tener mínimo 12 caracteres, 1 letra mayúscula y un carácter especial (@!|./&).");
+            return false;
+          }
+          
+          // Se comprueba que los valores de nueva contraseña y confirmación sean iguales
+          if (newPassword !== confirmPassword) {
+            // Si no coinciden, se muestra un mensaje de alerta y se evita el envío del formulario
+            alert("Las contraseñas no coinciden.");
+            return false;
+          }
+          
+          // Se solicita una confirmación final al usuario antes de cambiar la contraseña
+          return confirm("¿Estás seguro de cambiar tu contraseña?");
+      }
+    </script>
+  </body>
+</html>

@@ -11,24 +11,34 @@
     <title>Login</title>
     <link rel="icon" href={% static "Images/Logo.png" %}/>
     <link rel="stylesheet" href="{% static 'css/4. Login.css' %}">
+    <!-- Agregamos SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href={% static "css/header.css" %}>
 </head>
 
-<body style="background-repeat: no-repeat; background-size: cover; background-image: url(https://img2.wallspic.com/crops/3/2/0/2/82023/82023-gato-raza_de_perro-cuidado_de_mascotas-refugio_de_animales-veterinario-1366x768.jpg)">
-    <header>
-        <div class="Logotipo">
-            <a href={% url "index" %}>
-                <img src={% static "Images/logo2.png" %} alt="logo DR.PUL">
-            </a>
-            <h3 class="eslogan">COMPROMETIDOS CON LA SALUD ANIMAL</h3>
-        </div>
-        <nav class="opciones" id="menu">
-            <a href="{% url "index" %}">INICIO</a>
-            <a href="{% url "index" %}#conocenos">CONÓCENOS</a>
-            <a href="{% url "servicios" %}">SERVICIOS</a>
-            <a href="{% url "agendar" %}">AGENDAR CITA</a>
-            <a href="{% url "login" %}"><img class="perfil" src={% static "Images/perfil.png" %} alt="logo DR.PUL"></a>
-        </nav>
-    </header>
+<body >
+<header>
+    <!--Logo de encabezado-->
+    <div class="Logotipo">
+        <a href="{% url 'index' %}">
+            <img src="{% static 'Images/logo2.png' %}" alt="logo DR.PUL">
+        </a>
+        <h3 class="eslogan">COMPROMETIDOS CON LA SALUD ANIMAL</h3>
+    </div>
+
+    <!--Menú hamburguesa responsivo-->
+    <button class="abrir" id="abrir-menu">☰</button>
+    
+    <!--Opciones de encabezado-->
+    <nav class="opciones" id="menu">
+        <button class="cerrar" id="cerrar-menu">✕</button>
+        <a href="{% url 'index' %}">INICIO</a>
+        <a href="{% url 'index' %}#conocenos">CONÓCENOS</a>
+        <a href="{% url 'servicios' %}">SERVICIOS</a>
+        <a href="{% url 'agendar' %}">AGENDAR CITA</a>
+        <a href="{% url 'login' %}"><img class="perfil" src="{% static 'Images/perfil.png' %}" alt="Perfil"></a>
+    </nav>
+</header>
     <div class="formulario">
         <h1>
             <div class="volver2">
@@ -36,20 +46,29 @@
             </div>
             INICIAR SESION 
         </h1>
-        <form id="login-form" method="POST" action= {% url "Galeria" %}>
+        <form id="login-form" method="POST" action="{% url 'login' %}">
+            {% csrf_token %}
+            {% if form.non_field_errors %}
+                <div class="error-message" id="form-errors">
+                    {% for error in form.non_field_errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            
             <div class="username">
-                <label>Nombre de usuario</label>
-                <input type="text" id="username" required>
+                <label for="id_username">Documento</label>
+                {{ form.username }}
+                {% if form.username.errors %}
+                    <div class="error-message">{{ form.username.errors }}</div>
+                {% endif %}
             </div>
             <div class="username">
-                <label>Contraseña</label>
-                <input type="password" id="password" required>
-            </div>
-            <!-- Campo para seleccionar el tipo de usuario (role) -->
-            <div class="rol">
-                <select id="user-type" required>
-                    <option value="administrador">Administrador</option>
-                </select>
+                <label for="id_password">Contraseña</label>
+                {{ form.password }}
+                {% if form.password.errors %}
+                    <div class="error-message">{{ form.password.errors }}</div>
+                {% endif %}
             </div>
             <div class="recordar">
                 <a href={% url "RContrasena" %}>¿Olvidaste tu contraseña?</a>
@@ -57,46 +76,102 @@
             <input type="submit" value="Iniciar">
         </form>
     </div>
+</body>
 
-    <script>
-        const usuarios = [
-            { username: "admin", password: "veterinaria", role: "administrador" },
-        ];
+<!-- Añade esto justo antes del cierre del body (antes de los scripts) -->
+<div class="loader" id="loader">
+    <div class="spinner"></div>
+</div>
 
-        document.getElementById("login-form").addEventListener("submit", function(event) {
-            event.preventDefault();
+    <script src={% static "JavaScript/MenuHamburguesa.js" %}></script>
+        <!--Boton Tip de la semana-->
+    <script src="{% static 'JavaScript/js-BotonTipSemana.js' %}"></script>
+    
+    <!--Boton Whatsapp-->
+    <script src={% static "JavaScript/js-BotonWhatsapp.js" %}></script>
+    <!--Boton Ayuda-->
+    <script src={% static "JavaScript/js-botonAyuda.js" %}></script>
 
-            const username = document.getElementById("username").value.trim();
-            const password = document.getElementById("password").value.trim();
-            const userType = document.getElementById("user-type").value;
+    <script src={% static "JavaScript/sienna.js" %}></script>
+    <script src={% static "JavaScript/custom.js" %}></script>
+    
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('login-form');
+        const formErrors = document.getElementById('form-errors');
+        const loader = document.getElementById('loader');
+        
+        // Verificar si hay errores al cargar la página
+        if (formErrors && formErrors.textContent.trim() !== '') {
+            Swal.fire({
+                icon: 'error',
+                title: 'Error de autenticación',
+                text: 'Documento o contraseña incorrecta, Intente nuevamente.',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'Entendido'
+            });
+        }
 
-            const usuarioValido = usuarios.find(user => user.username === username && user.password === password);
-
-            if (!usuarioValido) {
-                alert("Usuario o contraseña incorrectos.");
-            } else if (usuarioValido.role !== userType) {
-                alert("El rol seleccionado no coincide con el usuario.");
-            } else {
-                alert(`Inicio de sesión exitoso. Bienvenido ${username} como ${userType}!`);
-
-                if (userType === "administrador") {
-                    window.location.href = "{% url 'gestioncitas' %}";
-                }
-            }
-        });
-
-        // Mantener labels arriba cuando hay contenido
-        document.querySelectorAll('.username input').forEach(input => {
-            // Verificar si hay contenido al cargar
-            if(input.value) {
-                input.nextElementSibling.classList.add('active-label');
+        // Manejar el envío del formulario
+        form.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            // Validación básica del lado del cliente
+            const username = document.getElementById('id_username').value.trim();
+            const password = document.getElementById('id_password').value.trim();
+            
+            if (!username || !password) {
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Campos incompletos',
+                    text: 'Por favor ingresa tu documento y contraseña',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'Entendido'
+                });
+                return;
             }
             
-            // Escuchar cambios en los inputs
-            input.addEventListener('input', function() {
-                this.nextElementSibling.classList.toggle('active-label', this.value.trim() !== '');
-            });
+            // Mostrar el spinner de carga
+            loader.style.display = 'flex';
+            
+            try {
+                const response = await fetch(this.action, {
+                    method: 'POST',
+                    body: new FormData(this),
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest' // Identificar como AJAX
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    // Redirigir después de éxito
+                    window.location.href = data.redirect_url;
+                } else {
+                    // Ocultar spinner y mostrar error
+                    loader.style.display = 'none';
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error de autenticación',
+                        text: data.message || 'Documento o contraseña incorrecta',
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'Entendido'
+                    });
+                }
+            } catch (error) {
+                loader.style.display = 'none';
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Error',
+                    text: 'Ocurrió un error al procesar la solicitud',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'Entendido'
+                });
+            }
         });
-    </script>
-</body>
+    });
+</script>
+
+
 </html>

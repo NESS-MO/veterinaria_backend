@@ -141,3 +141,9 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'luisalejandrorojasrincon@gmail.com'
 EMAIL_HOST_PASSWORD = 'hgkerfhnxadqfvca'
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+# settings.py
+AUTH_USER_MODEL = 'Apl.Administrador'  # Reemplaza 'tu_app' con el nombre de tu aplicación
+
+LOGIN_URL = '/login/'
+LOGIN_REDIRECT_URL = '/gestioncitas/'
+LOGOUT_REDIRECT_URL = '/'
