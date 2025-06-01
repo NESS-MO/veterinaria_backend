@@ -1,9 +1,11 @@
 from . import views
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
-from .models import Administrador, Cliente 
-from .forms import CitaForm,CitaRapidaForm
+from .models import Administrador, Cliente
+from .forms import CitaRapidaForm
+from .models.AdminCitas import CitaRapida
 from datetime import date, timedelta
+from django.db.models import Q, Count 
 from django.contrib import messages
 from .models import TipSemana, administrador
 from django.http import JsonResponse
@@ -13,7 +15,7 @@ from .models import ImagenGaleria
 from .forms import ImagenGaleriaForm
 
 from django.http import HttpResponseForbidden
-from .models import Servicio, Cita, CitaRapida, Mascota
+from .models import Servicio, Cita, Mascota
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
@@ -25,6 +27,7 @@ from django.core.mail import EmailMultiAlternatives, send_mail
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
 
+from django.utils import timezone
 
 
 
@@ -36,7 +39,8 @@ def index(request):
     return render(request, "1. Index.html", {'imagenes_galeria': imagenes_galeria})
 
 def servicios(request):
-    return render(request, "2. Servicios.html")
+    servicios = Servicio.objects.filter(activo=True).order_by('orden')
+    return render(request, "2. Servicios.html", {'servicios': servicios})
 
 def gestion_citas(request):
     citas = Cita.objects.filter(estado='pendiente')
@@ -86,8 +90,20 @@ def Agendar(request):
         except Exception as e:
             messages.error(request, f"Error al registrar: {str(e)}")
 
-    citas = Cita.objects.all()
-    return render(request, '3. Agendar.html', {'citas': citas})
+    # SOLO ESTO CAMBIA:
+    hoy = timezone.now().date()
+    citas_rapidas = (
+        CitaRapida.objects
+        .exclude(estado__iexact='Cancelada')
+        .filter(fecha__gte=hoy)
+        .values('fecha')
+        .annotate(total=Count('id'))
+    )
+    citas_por_fecha = [{'fecha': item['fecha'], 'total': item['total']} for item in citas_rapidas]
+
+    return render(request, '3. Agendar.html', {
+        'citas_por_fecha': citas_por_fecha,
+    })
 
 def RegistroC(request):
     if request.method == 'POST':
@@ -292,8 +308,6 @@ def gestion(request):
 def ModificarS(request):
     return render(request, "modificarservicios.html")
 
-def RegistroC(request):
-    return render(request, "registrocitas.html")
 
 def usuarios(request):
     return render(request, "GestionUsuarios.html")

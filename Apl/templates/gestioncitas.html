@@ -8,60 +8,108 @@
     <link rel="icon" href="{% static 'Images/logo.png' %}"/>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <link rel="stylesheet" href="{% static 'css/GestionCitas.css' %}">
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              primary: '#33C0F1',
+              secondary: '#1E2D93'
+            }
+          }
+        }
+      }
+    </script>
+    <link rel="stylesheet" href="{% static 'css/GestionCitas.css' %}">
     <style>
-      /* Oculta el sidebar en móvil y muestra un botón para abrirlo */
-      @media (max-width: 767px) {
-        .sidebar-responsive {
-          position: fixed;
-          z-index: 50;
-          left: 0;
-          top: 0;
-          height: 100vh;
-          width: 70vw;
-          transform: translateX(-100%);
-          transition: transform 0.3s;
-        }
-        .sidebar-open {
-          transform: translateX(0);
-        }
-      }
-      /* Hace la tabla desplazable horizontalmente en móvil */
-      .tabla-responsive {
-        overflow-x: auto;
-      }
-      @keyframes fade-in-down {
-        from { opacity: 0; transform: translateY(-20px);}
-        to { opacity: 1; transform: translateY(0);}
-      }
-      .animate-fade-in-down {
-        animation: fade-in-down 0.5s;
-      }
+    /* Oculta el sidebar en móvil y muestra un botón para abrirlo */
+    @media (max-width: 767px) {
+    .sidebar-responsive {
+        position: fixed;
+        z-index: 50;
+        left: 0;
+        top: 0;
+        height: 100vh;
+        width: 70vw;
+        transform: translateX(-100%);
+        transition: transform 0.3s;
+    }
+    .sidebar-open {
+        transform: translateX(0);
+    } 
+    }
+    /* Hace la tabla desplazable horizontalmente en móvil */
+    .tabla-responsive {
+    overflow-x: auto;
+    }
+    @keyframes fade-in-down {
+    from { opacity: 0; transform: translateY(-20px);}
+    to { opacity: 1; transform: translateY(0);}
+    }
+    .animate-fade-in-down {
+    animation: fade-in-down 0.5s;
+    }
     </style>
 </head>
 <body>
     <!-- Botón menú móvil -->
-    <div class="md:hidden flex items-center justify-between bg-[#1E2D93] text-white p-4">
-      <h1 class="text-lg font-bold">Citas</h1>
-      <button id="menu-toggle" class="text-2xl"><i class="fas fa-bars"></i></button>
-    </div>
-    <!-- Sidebar -->
-    <div id="sidebar" class="sidebar-responsive w-72 md:w-72 bg-gradient-to-br from-[#33C0F1] to-[#1E2D93] text-white p-7 md:fixed md:h-full top-0 left-0 z-10 font-sans md:translate-x-0 -translate-x-full transition-transform duration-300 ease-in-out">
-        <img class="h-24 mx-auto mb-4" src="{% static 'Images/logo2.png' %}" alt="Logo" />
-        <ul class="space-y-4 text-lg">
-            <li><a href="{% url 'gestioncitas' %}" class="block bg-white/30 hover:bg-white/40 p-2 rounded text-gray-900" >Citas Solicitadas</a></li>
-            <li><a href="{% url 'registroc' %}" class="block hover:bg-white/20 p-2 rounded">Registro Citas</a></li>
-            <li><a href="{% url 'Tipdelasemana' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Tip de la Semana</a></li>
-            <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Galería</a></li>
-            <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Servicios</a></li>
-             <li><a href="{% url 'backup' %}" class="block hover:bg-white/20 p-2 rounded">Copia de seguridad</a></li>
-            <li><a href="{% url 'index' %}" class="block hover:bg-red-500/80 p-2 rounded">Cerrar sesión</a></li>
-        </ul>
-    </div>
-    <section class="ml-0 md:ml-80 mt-4 p-4 md:p-8 transition-all">
-        <h1 class="text-2xl md:text-3xl font-bold mb-4">Panel de Administración de Citas</h1>
+    <button class="md:hidden fixed top-4 left-4 z-30 bg-primary text-white p-2 rounded-lg shadow-lg" id="mobileMenuBtn">
+      <i class="fas fa-bars"></i>
+    </button>
 
+    <!-- Overlay para móvil -->
+    <div class="md:hidden fixed inset-0 bg-black/50 z-10 opacity-0 pointer-events-none transition-opacity duration-300" id="overlay"></div>
+
+    <!-- Sidebar -->
+    <div class="fixed top-0 left-0 z-20 w-full md:w-80 h-full bg-gradient-to-br from-primary to-secondary text-white p-5 transform -translate-x-full md:translate-x-0 transition-transform duration-300" id="sidebar">
+      <img class="h-15 mx-auto mb-2" src="{% static 'Images/logo2.png' %}" alt="Logo" />
+      <ul class="space-y-2 text-lg">
+        <li><a href="{% url 'gestioncitas' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Citas Solicitadas</a></li>
+        <li><a href="{% url 'registroc' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Registro Citas</a></li>
+        <li><a href="{% url 'usuarios' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Gestión de Usuario</a></li>
+        <li><a href="{% url 'Tipdelasemana' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Modificar Tip de la Semana</a></li>
+        <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Modificar Galería</a></li>
+        <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Modificar Servicios</a></li>
+        <li><a href="{% url 'backup' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Copia de seguridad</a></li>
+        <li><a href="{% url 'index' %}" class="block hover:bg-red-500/80 p-2 rounded transition-colors">Cerrar sesión</a></li>
+      </ul>
+      <div class="absolute bottom-0 left-0 w-full p-4 bg-white/10 border-t border-white/20">
+        <div class="text-center">
+          <p class="font-bold">Usuario:</p>
+          <p class="text-sm">{{ request.user.nombre_completo }}</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="main-content fade-in md:ml-72 p-4 lg:p-8">
+      <!-- Breadcrumb alineado -->
+      <nav class="flex ml-8 mb-9 w-full justify-start">
+        <ol class="inline-flex items-center space-x-1 md:space-x-2">
+          <li class="inline-flex items-center">
+            <a href="{% url 'gestioncitas' %}" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors">
+              <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M14.707 7.793a1 1 0 0 0-1.414 0L11 10.086V1.5a1 1 0 0 0-2 0v8.586L6.707 7.793a1 1 0 1 0-1.414 1.414l4 4a1 1 0 0 0 1.416 0l4-4a1 1 0 0 0-.002-1.414Z"/>
+                <path d="M18 12h-2.55l-2.975 2.975a3.5 3.5 0 0 1-4.95 0L4.55 12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/>
+              </svg>
+              Administrador
+            </a>
+          </li>
+          <li>
+            <div class="flex items-center">
+              <svg class="w-5 h-5 text-gray-400 mx-1" aria-hidden="true" fill="none" viewBox="0 0 6 10">
+                <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+              </svg>
+              <span class="ml-1 text-sm font-medium text-gray-700 md:ml-2">Gestión de Citas</span>
+            </div>
+          </li>
+        </ol>
+      </nav>
+
+      <!-- Título y resto del contenido -->
+      <h1 class="text-2xl md:text-3xl font-bold mb-4 text-center">Panel de Administración de Citas</h1>
+
+      <div class="md:ml-8 ml-4">
         <button id="toggle-filtros" class="mb-4 px-4 py-2 bg-blue-500 text-white rounded shadow flex items-center gap-2">
             <i class="fas fa-sliders-h"></i>
             <span>Filtros</span>
@@ -101,59 +149,57 @@
             </div>
         </div>
 
-        <div id="loading" style="display: none;">
-            <img src="{% static 'Images/loading.gif' %}" alt="Cargando...">
-        </div>
         <div class="tabla-responsive">
-        <table id="tabla-citas" class="min-w-full bg-white border border-gray-200 text-xs md:text-base">
-            <thead>
-                <tr class="bg-gray-100 text-gray-700">
-                    <th class="p-3 text-left">Nombre</th>
-                    <th class="p-3 text-left">Correo</th>
-                    <th class="p-3 text-left">Teléfono</th>
-                    <th class="p-3 text-left">Mascota</th>
-                    <th class="p-3 text-left">Fecha</th>
-                    <th class="p-3 text-left">Hora</th>
-                    <th class="p-3 text-left">Servicios</th>
-                    <th class="p-3 text-left">Acciones</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for cita in citas %}
-                <tr>
-                    <td>{{ cita.cliente.primer_nombre }} {{ cita.cliente.primer_apellido }}</td>
-                    <td>{{ cita.cliente.correo_electronico }}</td>
-                    <td>{{ cita.cliente.telefono }}</td>
-                    <td>
-                        {% if cita.cliente.mascotas.all %}
-                            {{ cita.mascota.nombre_mascota }}
-                        {% else %}
-                            Sin mascota
-                        {% endif %}
-                    </td>
-                    <td>{{ cita.fecha }}</td>
-                    <td>{{ cita.horario }}</td>
-                    <td>{{ cita.extra }}</td>
-                    <td>
-                        <form action="{% url 'aceptar_cita' cita.id %}" method="post" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="bg-green-500 text-white px-2 py-1 rounded">Aceptar</button>
-                        </form>
-                        <form action="{% url 'rechazar_cita' cita.id %}" method="post" style="display:inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="bg-red-500 text-white px-2 py-1 rounded">Rechazar</button>
-                        </form>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="8">No hay citas agendadas.</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+          <table id="tabla-citas" class="min-w-full bg-white border border-gray-200 text-xs md:text-base">
+              <thead>
+                  <tr class="bg-gray-100 text-gray-700">
+                      <th class="p-3 text-left">Nombre</th>
+                      <th class="p-3 text-left">Correo</th>
+                      <th class="p-3 text-left">Teléfono</th>
+                      <th class="p-3 text-left">Mascota</th>
+                      <th class="p-3 text-left">Fecha</th>
+                      <th class="p-3 text-left">Hora</th>
+                      <th class="p-3 text-left">Servicios</th>
+                      <th class="p-3 text-left">Acciones</th>
+                  </tr>
+              </thead>
+              <tbody>
+                  {% for cita in citas %}
+                  <tr>
+                      <td>{{ cita.cliente.primer_nombre }} {{ cita.cliente.primer_apellido }}</td>
+                      <td>{{ cita.cliente.correo_electronico }}</td>
+                      <td>{{ cita.cliente.telefono }}</td>
+                      <td>
+                          {% if cita.cliente.mascotas.all %}
+                              {{ cita.mascota.nombre_mascota }}
+                          {% else %}
+                              Sin mascota
+                          {% endif %}
+                      </td>
+                      <td>{{ cita.fecha }}</td>
+                      <td>{{ cita.horario }}</td>
+                      <td>{{ cita.extra }}</td>
+                      <td>
+                          <form action="{% url 'aceptar_cita' cita.id %}" method="post" style="display:inline;">
+                              {% csrf_token %}
+                              <button type="submit" class="bg-green-500 text-white px-2 py-1 rounded">Aceptar</button>
+                          </form>
+                          <form action="{% url 'rechazar_cita' cita.id %}" method="post" style="display:inline;">
+                              {% csrf_token %}
+                              <button type="submit" class="bg-red-500 text-white px-2 py-1 rounded">Rechazar</button>
+                          </form>
+                      </td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                      <td colspan="8">No hay citas agendadas.</td>
+                  </tr>
+                  {% endfor %}
+              </tbody>
+          </table>
         </div>
-    </section>
+      </div>
+    </div>
     {% if messages %}
       <div id="alertas-mensaje" class="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md">
         {% for message in messages %}
@@ -238,6 +284,33 @@
             });
         }
     });
+    </script>
+    <script>
+document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    sidebar.classList.toggle('-translate-x-full');
+    overlay.classList.toggle('opacity-0');
+    overlay.classList.toggle('pointer-events-none');
+});
+document.getElementById('overlay').addEventListener('click', function() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    sidebar.classList.add('-translate-x-full');
+    overlay.classList.add('opacity-0');
+    overlay.classList.add('pointer-events-none');
+});
+document.querySelectorAll('#sidebar a').forEach(link => {
+    link.addEventListener('click', function() {
+        if (window.innerWidth < 768) {
+            const sidebar = document.getElementById('sidebar');
+            const overlay = document.getElementById('overlay');
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.add('opacity-0');
+            overlay.classList.add('pointer-events-none');
+        }
+    });
+});
     </script>
 </body>
 </html>

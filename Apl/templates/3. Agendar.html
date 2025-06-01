@@ -254,11 +254,11 @@
 
 
     {% if messages %}
-    <div class="fixed top-6 left-1/2 transform -translate-x-1/2 z-50 w-full max-w-md">
+    <div class="mensaje-exito-container">
         {% for message in messages %}
-        <div class="bg-green-100 border border-green-400 text-green-800 px-4 py-3 rounded relative shadow-lg mb-2 flex items-center justify-between animate-fade-in-down">
-            <span class="font-semibold">{{ message }}</span>
-            <button onclick="this.parentElement.style.display='none'" class="ml-4 text-green-700 hover:text-green-900 text-xl leading-none">&times;</button>
+        <div class="mensaje-exito">
+            <span class="mensaje-texto">{{ message }}</span>
+            <button onclick="this.parentElement.style.display='none'" class="cerrar-mensaje">&times;</button>
         </div>
         {% endfor %}
     </div>
@@ -280,6 +280,43 @@
         color: #ff3860;
         margin-top: 0.5rem;
         display: none;
+    }
+    .mensaje-exito-container {
+        position: fixed;
+        top: 30px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 9999;
+        width: 90%;
+        max-width: 350px;
+    }
+    .mensaje-exito {
+        background: #e6ffed;
+        color: #217a3a;
+        border: 1.5px solid #38c172;
+        border-radius: 8px;
+        padding: 14px 18px 14px 18px;
+        margin-bottom: 10px;
+        font-size: 1em;
+        font-weight: 500;
+        box-shadow: 0 2px 8px rgba(56,193,114,0.08);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        animation: despliegue 0.5s;
+    }
+    .cerrar-mensaje {
+        background: none;
+        border: none;
+        color: #217a3a;
+        font-size: 1.3em;
+        cursor: pointer;
+        margin-left: 10px;
+        line-height: 1;
+    }
+    @keyframes despliegue {
+        from { opacity: 0; transform: translateY(-30px);}
+        to { opacity: 1; transform: translateY(0);}
     }
 </style>
 <script>
@@ -883,28 +920,25 @@
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js'></script>
     <script src='https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/locales/es.min.js'></script>
 <script>
-    // Convierte las citas de Django a un array de eventos para FullCalendar
+    // Mostrar solo el conteo de citas por día
     var eventosCitas = [
-        {% for cita in citas %}
+        {% for item in citas_por_fecha %}
         {
-            title: "Cita: {{ cita.cliente.primer_nombre }}",
-            start: "{{ cita.fecha }}T{{ cita.horario|time:'H:i' }}",
-            description: "{{ cita.extra|escapejs }}"
+            title: "Citas solicitadas: {{ item.total }}",
+            start: "{{ item.fecha|date:'Y-m-d' }}", // <-- Forzar formato ISO
+            allDay: true
         }{% if not forloop.last %},{% endif %}
         {% endfor %}
     ];
-    console.log(eventosCitas); // <-- Esto te permite ver en la consola si hay eventos
-</script>    
+    console.log(eventosCitas);
+</script>
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     var calendarEl = document.getElementById('calendario');
     var calendar = new FullCalendar.Calendar(calendarEl, {
         initialView: 'dayGridMonth',
         locale: 'es',
-        events: eventosCitas, // <-- Aquí cargas los eventos desde Django
-        eventClick: function(info) {
-            alert(info.event.title + "\n" + info.event.extendedProps.description);
-        }
+        events: eventosCitas
     });
     calendar.render();
 });
