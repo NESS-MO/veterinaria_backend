@@ -135,7 +135,8 @@
       <!-- Formulario para nuevas citas -->
       <form method="post" class="mb-6 bg-white p-4 rounded shadow" id="form-cita">
         {% csrf_token %}
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Documento -->
           <div class="flex flex-col">
             <label for="numero_documento" class="text-xs font-semibold mb-1 text-gray-700">Documento</label>
             <input type="text" name="numero_documento" id="numero_documento" placeholder="Documento" required
@@ -144,6 +145,7 @@
             <span id="error-numero_documento" class="text-xs text-red-500 mt-1 hidden">Solo números, mínimo 6 dígitos</span>
           </div>
 
+          <!-- Cliente -->
           <div class="flex flex-col">
             <label for="nombre_cliente" class="text-xs font-semibold mb-1 text-gray-700">Cliente</label>
             <input type="text" name="nombre_cliente" id="nombre_cliente" placeholder="Nombre" required
@@ -152,6 +154,7 @@
             <span id="error-nombre_cliente" class="text-xs text-red-500 mt-1 hidden">Solo letras y espacios, mínimo 2 caracteres</span>
           </div>
 
+          <!-- Mascota -->
           <div class="flex flex-col">
             <label for="nombre_mascota" class="text-xs font-semibold mb-1 text-gray-700">Mascota</label>
             <input type="text" name="nombre_mascota" id="nombre_mascota" placeholder="Nombre mascota" required
@@ -160,8 +163,9 @@
             <span id="error-nombre_mascota" class="text-xs text-red-500 mt-1 hidden">Solo letras y espacios, mínimo 2 caracteres</span>
           </div>
 
+          <!-- Edad y Tipo -->
           <div class="flex flex-col">
-            <label for="edad_mascota" class="text-xs font-semibold mb-1 text-gray-700">Edad</label>
+            <label for="edad_mascota_valor" class="text-xs font-semibold mb-1 text-gray-700">Edad</label>
             <div class="flex gap-2">
               <input type="number" min="0" max="20" name="edad_mascota_valor" id="edad_mascota_valor"
                 class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm w-1/2 transition-all" placeholder="Edad" required />
@@ -175,6 +179,7 @@
             <span id="error-edad_mascota" class="text-xs text-red-500 mt-1 hidden">Edad inválida (0-20 años o 0-11 meses)</span>
           </div>
 
+          <!-- Raza -->
           <div class="flex flex-col">
             <label for="raza_mascota" class="text-xs font-semibold mb-1 text-gray-700">Especie y Raza</label>
             <input type="text" name="raza_mascota" id="raza_mascota" placeholder="Raza" required
@@ -183,6 +188,7 @@
             <span id="error-raza_mascota" class="text-xs text-red-500 mt-1 hidden">Solo letras y espacios, mínimo 2 caracteres</span>
           </div>
 
+          <!-- Fecha -->
           <div class="flex flex-col">
             <label for="fecha" class="text-xs font-semibold mb-1 text-gray-700">Fecha</label>
             <input type="date" name="fecha" id="fecha" required
@@ -191,12 +197,13 @@
             <span id="error-fecha" class="text-xs text-red-500 mt-1 hidden">Debe seleccionar una fecha</span>
           </div>
 
+          <!-- Hora -->
           <div class="flex flex-col">
             <label for="hora" class="text-xs font-semibold mb-1 text-gray-700">Hora</label>
             <div class="flex items-center gap-2">
               <input type="time" name="hora" id="hora"
                 min="08:00" max="17:00" step="1200"
-                class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm transition-all" required />
+                class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm transition-all w-full" required />
               <button type="button" id="mostrar-horarios" class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs">
                 Ver horarios disponibles
               </button>
@@ -205,6 +212,7 @@
             <span id="error-hora" class="text-xs text-red-500 mt-1 hidden">Debe seleccionar una hora</span>
           </div>
 
+          <!-- Servicio -->
           <div class="flex flex-col">
             <label for="servicio" class="text-xs font-semibold mb-1 text-gray-700">Servicio</label>
             <select name="servicio" id="servicio" required
@@ -222,31 +230,23 @@
             <span id="error-servicio" class="text-xs text-red-500 mt-1 hidden">Debe seleccionar un servicio</span>
           </div>
 
-          <div class="flex flex-col">
-            <label for="estado" class="text-xs font-semibold mb-1 text-gray-700">Estado</label>
-            <select name="estado" id="estado" required
-              class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm transition-all">
-              <option value="Pendiente" selected>Pendiente</option>
-              <option value="Completada">Completada</option>
-              <option value="Cancelada">Cancelada</option>
-            </select>
-            <span id="error-estado" class="text-xs text-red-500 mt-1 hidden">Debe seleccionar un estado</span>
-          </div>
-
-          <div class="flex flex-col md:col-span-2">
-            <label for="observaciones" class="text-xs font-semibold mb-1 text-gray-700">Observaciones</label>
-            <input type="text" name="observaciones" id="observaciones" placeholder="Observaciones"
-              maxlength="250"
-              class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm transition-all" />
-            <span id="error-observaciones" class="text-xs text-red-500 mt-1 hidden">Máximo 250 caracteres</span>
-          </div>
-          <div class="flex items-end">
+          <!-- Observaciones y botón en la misma fila -->
+          <div class="flex flex-col md:flex-row md:col-span-2 gap-2 items-end">
+            <div class="flex flex-col flex-1">
+              <label for="observaciones" class="text-xs font-semibold mb-1 text-gray-700">Observaciones</label>
+              <input type="text" name="observaciones" id="observaciones" placeholder="Observaciones"
+                maxlength="250"
+                class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm transition-all w-full" />
+              <span id="error-observaciones" class="text-xs text-red-500 mt-1 hidden">Máximo 250 caracteres</span>
+            </div>
             <button type="submit"
-              class="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 active:scale-95 transition font-semibold">
+              class="w-full md:w-auto bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 active:scale-95 transition font-semibold md:ml-2">
               Agregar Cita
             </button>
           </div>
         </div>
+        <!-- Estado oculto -->
+        <input type="hidden" name="estado" value="Pendiente">
       </form>
 
       <!-- Mensaje de error Django -->

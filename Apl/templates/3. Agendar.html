@@ -202,7 +202,7 @@
             <div class="form-group">
                 <label for="hora">Hora de la Cita</label>
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <input type="time" id="hora" name="hora" required>
+                    <input type="time" id="hora" name="hora" required min="08:00" max="17:00" step="1200" oninvalid="return false;">
                     <button type="button" id="mostrar-horarios" style="padding: 8px 12px; background: #3a6ead; color: #fff; border: none; border-radius: 4px; cursor: pointer;">
                         Ver horarios disponibles
                     </button>
@@ -365,7 +365,25 @@
 
         // Guardar las opciones originales
         const opcionesOriginales = Array.from(razaMascotaSelect.options);
-
+        horaInput.addEventListener('input', function() {
+            if (!this.value) {
+                clearError(this);
+                return;
+            }
+            const [h, m] = this.value.split(':').map(Number);
+            const minutosTotales = h * 60 + m;
+            const inicio = 8 * 60;
+            const fin = 17 * 60;
+            if (
+                minutosTotales < inicio ||
+                minutosTotales > fin ||
+                m % 20 !== 0
+            ) {
+                showError(this, 'Error digite los horarios disponibles de la veterinaria (08:00 a 17:00, cada 20 minutos)');
+            } else {
+                clearError(this);
+            }
+        });
         claseMascotaSelect.addEventListener('change', function() {
             const especie = this.value;
             // Limpiar opciones actuales
@@ -680,13 +698,13 @@
                     minutosTotales > fin ||
                     m % 20 !== 0
                 ) {
-                    showError(horaInput, 'La hora debe estar entre 08:00 y 5:00 en intervalos de 20 minutos');
+                    showError(horaInput, 'Error digite los horarios disponibles de la veterinaria (08:00 a 17:00, cada 20 minutos)');
+                    horaInput.value = '';
                     isValid = false;
                 } else {
                     clearError(horaInput);
                 }
             }
-
             // Validación de servicios
             if (!mainService.value) {
                 showError(mainService, 'Seleccione el servicio principal');
@@ -1074,10 +1092,25 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnCancelarTerminos = document.getElementById('btn-cancelar-terminos');
     const form = document.getElementById('appointment-form');
 
+    // Encuentra la función de validación ya existente
+    function validarFormulario() {
+        // Dispara el evento submit para activar la validación JS existente
+        let evento = new Event('submit', {cancelable: true});
+        let resultado = form.dispatchEvent(evento);
+        // Si la validación JS previene el envío, resultado será false
+        return resultado;
+    }
+
     btnAbrirTerminos.addEventListener('click', function(e) {
-        // Antes de mostrar el modal, valida el formulario (opcional)
-        // Si quieres que solo se muestre el modal si el formulario es válido, puedes validar aquí.
-        modalTerminos.style.display = 'flex';
+        // Valida el formulario antes de mostrar el modal
+        // Si tienes validación personalizada, llama aquí a tu función de validación
+        // Si usas solo HTML5, puedes usar form.checkValidity()
+        if (form.checkValidity()) {
+            modalTerminos.style.display = 'flex';
+        } else {
+            // Dispara la validación nativa para mostrar mensajes
+            form.reportValidity();
+        }
     });
 
     btnCancelarTerminos.addEventListener('click', function() {
@@ -1085,9 +1118,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     btnAceptarTerminos.addEventListener('click', function() {
-        modalTerminos.style.display = 'none';
-        // Envía el formulario
-        form.submit();
+        // Envía el formulario solo si es válido
+        if (form.checkValidity()) {
+            form.submit();
+        } else {
+            modalTerminos.style.display = 'none';
+            form.reportValidity();
+        }
     });
 
     // Opcional: cerrar modal al hacer click fuera del cuadro
