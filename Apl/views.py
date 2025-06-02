@@ -382,33 +382,28 @@ def gestion_galeria(request):
     imagenes = ImagenGaleria.objects.all().order_by('orden')
     
     if request.method == 'POST':
-        # Manejar eliminación y toggle activa como antes
-        if 'eliminar' in request.POST:
-            imagen_id = request.POST.get('eliminar')
-            imagen = ImagenGaleria.objects.get(id=imagen_id)
-            imagen.delete()
-            messages.success(request, 'Imagen eliminada correctamente')
-            return redirect('Galeria')
-            
+        # Manejar toggle activa/inactiva
         if 'toggle_activa' in request.POST:
-            imagen_id = request.POST.get('toggle_activa')
-            imagen = ImagenGaleria.objects.get(id=imagen_id)
+            imagen_id = request.POST['toggle_activa']
+            imagen = get_object_or_404(ImagenGaleria, id=imagen_id)
             imagen.activa = not imagen.activa
             imagen.save()
-            messages.success(request, f'Imagen {"activada" if imagen.activa else "ocultada"} correctamente')
+            messages.success(request, f'Imagen {"mostrada" if imagen.activa else "ocultada"} correctamente')
             return redirect('Galeria')
             
-        # Manejar edición de imagen
+        # Resto del código para manejar edición/creación...
         imagen_id = request.POST.get('imagen_id')
         if imagen_id:
+            # Manejar edición de imagen existente
             imagen = get_object_or_404(ImagenGaleria, id=imagen_id)
             form = ImagenGaleriaForm(request.POST, request.FILES, instance=imagen)
         else:
+            # Manejar creación de nueva imagen
             form = ImagenGaleriaForm(request.POST, request.FILES)
-            
+        
         if form.is_valid():
             form.save()
-            action = "actualizada" if imagen_id else "agregada"
+            action = 'actualizada' if imagen_id else 'agregada'
             messages.success(request, f'Imagen {action} correctamente')
             return redirect('Galeria')
         else:
@@ -416,36 +411,6 @@ def gestion_galeria(request):
     else:
         form = ImagenGaleriaForm()
         
-    return render(request, '5. modificar-galeria.html', {
-        'imagenes': imagenes,
-        'form': form,
-        'total_imagenes': ImagenGaleria.objects.count()
-    })
-    imagenes = ImagenGaleria.objects.all().order_by('orden')
-    if request.method == 'POST':
-        if 'eliminar' in request.POST:
-            imagen_id = request.POST.get('eliminar')
-            imagen = ImagenGaleria.objects.get(id=imagen_id)
-            imagen.delete()
-            messages.success(request, 'Imagen eliminada correctamente')
-            return redirect('Galeria')
-        if 'toggle_activa' in request.POST:
-            imagen_id = request.POST.get('toggle_activa')
-            imagen = ImagenGaleria.objects.get(id=imagen_id)
-            imagen.activa = not imagen.activa
-            imagen.save()
-            messages.success(request, f'Imagen {"activada" if imagen.activa else "ocultada"} correctamente')
-            return redirect('Galeria')
-        form = ImagenGaleriaForm(request.POST, request.FILES)
-        if form.is_valid():
-            if ImagenGaleria.objects.count() >= 9:
-                messages.error(request, 'Solo se permiten 9 imágenes en la galería')
-            else:
-                form.save()
-                messages.success(request, 'Imagen agregada correctamente')
-            return redirect('Galeria')
-    else:
-        form = ImagenGaleriaForm()
     return render(request, '5. modificar-galeria.html', {
         'imagenes': imagenes,
         'form': form,
@@ -530,6 +495,17 @@ def api_galeria(request, imagen_id=None):
             return JsonResponse({'error': str(e)}, status=400)
     
     return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+
+def eliminar_imagen(request, imagen_id):
+    if request.method == 'POST':
+        imagen = get_object_or_404(ImagenGaleria, id=imagen_id)
+        imagen.delete()
+        messages.success(request, 'Imagen eliminada correctamente.')
+        return redirect('Galeria')  # Redirige a la galería después de eliminar
+    else:
+        messages.error(request, 'Método no permitido.')
+        return redirect('Galeria')  # Redirige a la galería si no es un POST
 
 # --- Gestión de citas ---
 

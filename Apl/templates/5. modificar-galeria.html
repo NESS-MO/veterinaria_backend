@@ -94,10 +94,22 @@
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div class="md:col-span-2">
                             <label class="block text-sm font-medium text-gray-700 mb-1">Imagen*</label>
-                            {{ form.imagen }}
-                            {% if form.imagen.errors %}
-                                <p class="text-red-500 text-xs mt-1">{{ form.imagen.errors.as_text }}</p>
-                            {% endif %}
+                            <div class="flex flex-col items-start gap-2">
+                                <label for="id_imagen" class="cursor-pointer w-full">
+                                    <div class="w-full h-48 border-2 border-dashed border-gray-300 rounded-lg relative overflow-hidden group transition-all hover:border-blue-500 bg-gray-50 flex items-center justify-center">
+                                        <img id="previewImagenGaleria" src="{% static 'images/placeholder.jpg' %}" class="w-full h-full object-cover hidden">
+                                        <div id="emptyStateImagenGaleria" class="text-center p-4">
+                                            <i class="fas fa-camera text-3xl text-gray-400 mb-2"></i>
+                                            <p class="text-sm text-gray-500">Haz clic para subir una imagen</p>
+                                            <p class="text-xs text-gray-400">Recomendado: 800x600 px</p>
+                                        </div>
+                                    </div>
+                                </label>
+                                {{ form.imagen }}
+                                {% if form.imagen.errors %}
+                                    <p class="text-red-500 text-xs mt-1">{{ form.imagen.errors.as_text }}</p>
+                                {% endif %}
+                            </div>
                         </div>
                         <div>
                             <label class="block text-sm font-medium text-gray-700 mb-1">Orden*</label>
@@ -150,22 +162,20 @@
                                     <i class="material-icons text-sm">edit</i>
                                 </button>
                                 
-                                <!-- Botón de mostrar/ocultar -->
-                                <form method="post" class="inline">
+                                <form method="post" action="{% url 'Galeria' %}" class="inline toggle-form" id="toggle-form-{{ imagen.id }}">
                                     {% csrf_token %}
-                                    <button type="submit" name="toggle_activa" value="{{ imagen.id }}"
+                                    <input type="hidden" name="toggle_activa" value="{{ imagen.id }}">
+                                    <button type="button" onclick="confirmarToggle({{ imagen.id }}, {{ imagen.activa|yesno:'true,false' }})"
                                             class="{% if imagen.activa %}bg-yellow-500 hover:bg-yellow-600{% else %}bg-green-500 hover:bg-green-600{% endif %} text-white rounded-full w-8 h-8 flex items-center justify-center transition-colors"
                                             title="{% if imagen.activa %}Ocultar imagen{% else %}Mostrar imagen{% endif %}">
                                         <i class="material-icons text-sm">{% if imagen.activa %}visibility_off{% else %}visibility{% endif %}</i>
                                     </button>
                                 </form>
-                                
-                                <!-- Botón de eliminar -->
-                                <form method="post" class="inline">
+
+                                <form action="{% url 'eliminar_imagen' imagen.id %}" method="post" style="display:inline;" class="eliminar-form" id="eliminar-form-{{ imagen.id }}">
                                     {% csrf_token %}
-                                    <button type="submit" name="eliminar" value="{{ imagen.id }}"
+                                    <button type="button" onclick="confirmarEliminacion({{ imagen.id }})"
                                             class="bg-red-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-red-600 transition-colors"
-                                            onclick="return confirm('¿Eliminar esta imagen permanentemente?')"
                                             title="Eliminar imagen">
                                         <i class="material-icons text-sm">delete</i>
                                     </button>
@@ -203,83 +213,102 @@
     <script src={% static "JavaScript/custom.js" %}></script>
 
     <script>
-        // Función para editar una imagen
-        function editarImagen(id) {
-            // Mostrar mensaje de carga
-            const Toast = Swal.mixin({
-                toast: true,
-                position: 'top-end',
-                showConfirmButton: false,
-                timer: 800,
-                timerProgressBar: true,
-            });
-            
-            Toast.fire({
-                icon: 'info',
-                title: 'Cargando imagen...'
-            });
+// Agrega estas funciones al script existente
 
-            // Obtener los datos de la imagen
-            fetch(`/api/galeria/${id}/`)
-                .then(response => {
-                    if (!response.ok) throw new Error('Error al cargar la imagen');
-                    return response.json();
-                })
-                .then(data => {
-                    // Rellenar el formulario con los datos de la imagen
-                    document.querySelector('input[name="imagen"]').value = '';
-                    document.querySelector('input[name="orden"]').value = data.orden;
-                    document.querySelector('input[name="titulo"]').value = data.titulo || '';
-                    
-                    // Mostrar nombre del archivo actual
-                    const fileInfo = document.createElement('div');
-                    fileInfo.className = 'mt-1 text-xs text-gray-500';
-                    fileInfo.textContent = `Imagen actual: ${data.imagen.split('/').pop()}`;
-                    document.querySelector('input[name="imagen"]').parentElement.appendChild(fileInfo);
-                    
-                    // Actualizar título del formulario
-                    document.getElementById('formTitle').textContent = 'Editar Imagen';
-                    
-                    // Agregar campo oculto para el ID de la imagen
-                    let idField = document.querySelector('input[name="imagen_id"]');
-                    if (!idField) {
-                        idField = document.createElement('input');
-                        idField.type = 'hidden';
-                        idField.name = 'imagen_id';
-                        document.getElementById('galeriaForm').appendChild(idField);
-                    }
-                    idField.value = data.id;
-                    
-                    // Cambiar texto del botón de submit
-                    document.querySelector('button[type="submit"]').innerHTML = '<i class="material-icons align-middle">save</i> Guardar Cambios';
-                    
-                    // Hacer scroll al formulario con animación suave
-                    const formSection = document.querySelector('.bg-gray-50.rounded-lg.border');
-                    const formPosition = formSection.getBoundingClientRect().top + window.pageYOffset - 20;
-                    
-                    window.scrollTo({
-                        top: formPosition,
-                        behavior: 'smooth'
-                    });
-                    
-                    // Enfocar el primer campo
-                    document.querySelector('input[name="titulo"]').focus();
-                })
-                .catch(error => {
-                    Swal.fire({
-                        title: 'Error',
-                        text: error.message || 'No se pudo cargar la imagen',
-                        icon: 'error',
-                        confirmButtonText: 'Entendido'
-                    });
-                });
+// Mostrar previsualización de imagen al seleccionar archivo
+document.getElementById('id_imagen').addEventListener('change', function(e) {
+    const preview = document.getElementById('previewImagenGaleria');
+    const emptyState = document.getElementById('emptyStateImagenGaleria');
+    
+    if (this.files && this.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            preview.src = e.target.result;
+            preview.classList.remove('hidden');
+            emptyState.classList.add('hidden');
         }
+        reader.readAsDataURL(this.files[0]);
+    }
+});
 
-        // Función para resetear el formulario
+// Modifica la función editarImagen para mostrar la imagen existente
+function editarImagen(id) {
+    // Mostrar mensaje de carga
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 800,
+        timerProgressBar: true,
+    });
+    
+    Toast.fire({
+        icon: 'info',
+        title: 'Cargando imagen...'
+    });
+
+    // Obtener los datos de la imagen
+    fetch(`/api/galeria/${id}/`)
+        .then(response => {
+            if (!response.ok) throw new Error('Error al cargar la imagen');
+            return response.json();
+        })
+        .then(data => {
+            // Rellenar el formulario con los datos de la imagen
+            document.querySelector('input[name="titulo"]').value = data.titulo || ''; // Permitir vacío
+            document.querySelector('input[name="orden"]').value = data.orden || ''; // Permitir vacío
+            
+            // Mostrar la imagen existente en el preview
+            const preview = document.getElementById('previewImagenGaleria');
+            const emptyState = document.getElementById('emptyStateImagenGaleria');
+            
+            if (data.imagen) {
+                preview.src = data.imagen;
+                preview.classList.remove('hidden');
+                emptyState.classList.add('hidden');
+            } else {
+                preview.classList.add('hidden');
+                emptyState.classList.remove('hidden');
+            }
+            
+            // Configurar el formulario para la edición
+            document.getElementById('formTitle').textContent = 'Editar Imagen';
+            
+            let idField = document.querySelector('input[name="imagen_id"]');
+            if (!idField) {
+                idField = document.createElement('input');
+                idField.type = 'hidden';
+                idField.name = 'imagen_id';
+                document.getElementById('galeriaForm').appendChild(idField);
+            }
+            idField.value = data.id;
+            
+            document.querySelector('button[type="submit"]').innerHTML = '<i class="material-icons align-middle">save</i> Guardar Cambios';
+        })
+        .catch(error => {
+            Swal.fire({
+                title: 'Error',
+                text: error.message || 'No se pudo cargar la imagen',
+                icon: 'error',
+                confirmButtonText: 'Entendido'
+            });
+        });
+}
+
+
+
+// Modifica la función resetForm para limpiar también la previsualización
         function resetForm() {
             document.getElementById('galeriaForm').reset();
             const idField = document.querySelector('input[name="imagen_id"]');
             if (idField) idField.remove();
+            
+            // Limpiar previsualización
+            const preview = document.getElementById('previewImagenGaleria');
+            const emptyState = document.getElementById('emptyStateImagenGaleria');
+            preview.src = "{% static 'images/placeholder.jpg' %}";
+            preview.classList.add('hidden');
+            emptyState.classList.remove('hidden');
             
             // Eliminar info de archivo si existe
             const fileInfo = document.querySelector('input[name="imagen"]').parentElement.querySelector('.file-info');
@@ -409,6 +438,63 @@
                 }
             });
         });
+
+
+function confirmarEliminacion(id) {
+    Swal.fire({
+        title: '¿Eliminar imagen?',
+        text: "Esta acción no se puede deshacer",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#33C0F1',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Sí, eliminar',
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Mostrar mensaje de procesamiento
+            Swal.fire({
+                title: 'Eliminando...',
+                html: 'Por favor espere',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                    // Enviar el formulario
+                    document.getElementById(`eliminar-form-${id}`).submit();
+                }
+            });
+        }
+    });
+}
+
+// Función para confirmar mostrar/ocultar
+function confirmarToggle(id, estaActiva) {
+    const accion = estaActiva ? 'ocultar' : 'mostrar';
+    Swal.fire({
+        title: `¿${estaActiva ? 'Ocultar' : 'Mostrar'} imagen?`,
+        text: `Esta imagen ${estaActiva ? 'no será visible' : 'será visible'} en la galería principal`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#33C0F1',
+        cancelButtonColor: '#d33',
+        confirmButtonText: `Sí, ${accion}`,
+        cancelButtonText: 'Cancelar'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            // Mostrar mensaje de procesamiento
+            Swal.fire({
+                title: 'Procesando...',
+                html: 'Por favor espere',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
+                    // Enviar el formulario específico de toggle
+                    document.getElementById(`toggle-form-${id}`).submit();
+                }
+            });
+        }
+    });
+}
     </script>
 </body>
 </html>

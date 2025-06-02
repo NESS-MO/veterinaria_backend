@@ -9,22 +9,25 @@ from datetime import date
 class ImagenGaleriaForm(forms.ModelForm):
     class Meta:
         model = ImagenGaleria
-        fields = ['imagen', 'titulo', 'orden']
-        
+        fields = ['imagen', 'titulo', 'orden']  # Incluye todos los campos necesarios
+
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+        super(ImagenGaleriaForm, self).__init__(*args, **kwargs)
+        # Hacer que el campo de imagen no sea obligatorio
+        self.fields['imagen'].required = False  # Esta línea es clave
         self.fields['orden'].widget.attrs.update({
             'min': '1',
             'max': '9',
-            'class': 'border rounded px-2 py-1 w-full'
+            'class': 'border rounded px-2 py-1 w-full'  # Manteniendo el estilo original
         })
         self.fields['imagen'].widget.attrs.update({
-            'class': 'block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100'
+            'class': 'block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100'  # Manteniendo el estilo original
         })
         self.fields['titulo'].widget.attrs.update({
-            'class': 'border rounded px-2 py-1 w-full',
-            'placeholder': 'Título opcional'
+            'class': 'border rounded px-2 py-1 w-full',  # Manteniendo el estilo original
+            'placeholder': 'Título opcional'  # Placeholder para el campo de título
         })
+
         
 class DatosCliente(forms.Form):
     class Meta:

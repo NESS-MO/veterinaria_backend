@@ -14,6 +14,7 @@ urlpatterns = [
     path('Galeria/', views.gestion_galeria, name='Galeria'),
     path('api/galeria/', views.api_galeria, name='api_galeria'),
     path('api/galeria/<int:imagen_id>/', views.api_galeria, name='api_galeria_detail'),
+    path('eliminar-imagen/<int:imagen_id>/', views.eliminar_imagen, name='eliminar_imagen'),
     path('Tipdelasemana/', views.gestion_tip, name='Tipdelasemana'),
     path('Gestioncitas/', views.gestion_citas, name='gestioncitas'),
     path('modificaservicio/', views.ModificarS, name='modificarservicio'),
