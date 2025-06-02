@@ -5,6 +5,9 @@ from .models import ImagenGaleria
 from .models.AdminCitas import CitaRapida
 from django.core.validators import MinValueValidator
 from datetime import date
+from django.contrib.auth.forms import AuthenticationForm
+from .models import Administrador
+
 
 class ImagenGaleriaForm(forms.ModelForm):
     class Meta:
@@ -37,7 +40,7 @@ class DatosCliente(forms.Form):
             'primer_apellido', 
             'tipo_documento', 
             'correo_electronico', 
-            'telefono'
+            'telefono',
             'numero_documento'
         ]
         widgets = {
@@ -84,8 +87,8 @@ class DatosCliente(forms.Form):
             self.fields['correo_electronico'].required = True
         if 'telefono' in self.fields: 
             self.fields['telefono'].required = True
-        if 'numero_docuemnto' in self.fields:
-            self.fields['numero_docuemnto'].required = True     
+        if 'numero_documento' in self.fields:
+            self.fields['numero_documento'].required = True
             
 class DatosMascota(forms.Form):
     mascota = forms.CharField(
@@ -292,8 +295,6 @@ class CitaRapidaForm(forms.ModelForm):
             'observaciones': forms.TextInput(attrs={'class': 'border p-2 rounded-md'}),
         }
 # forms.py
-from django import forms
-from django.contrib.auth.forms import AuthenticationForm
 
 class LoginForm(AuthenticationForm):
     username = forms.CharField(label="Documento")
@@ -304,8 +305,6 @@ class LoginForm(AuthenticationForm):
         self.fields['username'].widget.attrs.update({'class': 'form-control'})
         self.fields['password'].widget.attrs.update({'class': 'form-control'})
 
-        from django import forms
-from .models import Administrador
 
 class AdministradorForm(forms.ModelForm):
     class Meta:

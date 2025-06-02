@@ -1,9 +1,11 @@
 from . import views
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import HttpResponse, JsonResponse
-from .models import Administrador, Cliente 
-from .forms import CitaForm,CitaRapidaForm
+from .models import Administrador, Cliente
+from .forms import CitaRapidaForm
+from .models.AdminCitas import CitaRapida
 from datetime import date, timedelta
+from django.db.models import Q, Count 
 from django.contrib import messages
 from .models import TipSemana, administrador
 from django.http import JsonResponse
@@ -11,9 +13,12 @@ from django.views.decorators.http import require_POST
 from django.contrib import messages
 from .models import ImagenGaleria
 from .forms import ImagenGaleriaForm
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
+
 
 from django.http import HttpResponseForbidden
-from .models import Servicio, Cita, CitaRapida, Mascota
+from .models import Servicio, Cita, Mascota
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
@@ -25,18 +30,22 @@ from django.core.mail import EmailMultiAlternatives, send_mail
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
 
+from django.utils import timezone
 
 
 
 
 # Create your views here.
+def llamadacita(request):
+    return render(request, "llamadaCitas.html")  
 
 def index(request): 
     imagenes_galeria = ImagenGaleria.objects.filter(activa=True).order_by('orden')[:9]
     return render(request, "1. Index.html", {'imagenes_galeria': imagenes_galeria})
 
 def servicios(request):
-    return render(request, "2. Servicios.html")
+    servicios = Servicio.objects.filter(activo=True).order_by('orden')
+    return render(request, "2. Servicios.html", {'servicios': servicios})
 
 def gestion_citas(request):
     citas = Cita.objects.filter(estado='pendiente')
@@ -86,8 +95,20 @@ def Agendar(request):
         except Exception as e:
             messages.error(request, f"Error al registrar: {str(e)}")
 
-    citas = Cita.objects.all()
-    return render(request, '3. Agendar.html', {'citas': citas})
+    # SOLO ESTO CAMBIA:
+    hoy = timezone.now().date()
+    citas_rapidas = (
+        CitaRapida.objects
+        .exclude(estado__iexact='Cancelada')
+        .filter(fecha__gte=hoy)
+        .values('fecha')
+        .annotate(total=Count('id'))
+    )
+    citas_por_fecha = [{'fecha': item['fecha'], 'total': item['total']} for item in citas_rapidas]
+
+    return render(request, '3. Agendar.html', {
+        'citas_por_fecha': citas_por_fecha,
+    })
 
 def RegistroC(request):
     if request.method == 'POST':
@@ -120,6 +141,70 @@ def RegistroC(request):
         'citas_normales': citas_normales,  # <-- Y esto
         'form': form,
 })
+
+from reportlab.lib.pagesizes import letter, landscape
+from reportlab.pdfgen import canvas
+
+def reporte_citas_pdf(request):
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="reporte_citas.pdf"'
+
+    # Usa orientación horizontal para más espacio
+    p = canvas.Canvas(response, pagesize=landscape(letter))
+    width, height = landscape(letter)
+
+    # Anchos de columna personalizados
+    col_widths = [70, 90, 70, 50, 80, 65, 50, 90, 60, 90]
+    encabezados = ["Documento", "Cliente", "Mascota", "Edad", "Raza", "Fecha", "Hora", "Servicio", "Estado", "Obs."]
+
+    x_start = 40
+    y = height - 50
+
+    # Título
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(x_start, y, "Reporte de Citas (CitaRapida)")
+    y -= 30
+
+    # Encabezados
+    p.setFont("Helvetica-Bold", 10)
+    x = x_start
+    for i, encabezado in enumerate(encabezados):
+        p.drawString(x, y, encabezado)
+        x += col_widths[i]
+    y -= 18
+
+    # Datos
+    p.setFont("Helvetica", 9)
+    citas = CitaRapida.objects.all().order_by('-fecha')
+    for cita in citas:
+        datos = [
+            cita.numero_documento,
+            cita.nombre_cliente,
+            cita.nombre_mascota,
+            cita.edad_mascota,
+            cita.raza_mascota,
+            cita.fecha.strftime('%Y-%m-%d'),
+            cita.hora.strftime('%H:%M'),
+            cita.servicio,
+            cita.estado,
+            (cita.observaciones or "")[:30],  # recorta observaciones
+        ]
+        x = x_start
+        for i, dato in enumerate(datos):
+            # Recorta texto si es muy largo para la columna
+            texto = str(dato)
+            max_chars = int(col_widths[i] // 5.5)
+            if len(texto) > max_chars:
+                texto = texto[:max_chars-3] + "..."
+            p.drawString(x, y, texto)
+            x += col_widths[i]
+        y -= 15
+        if y < 40:
+            p.showPage()
+            y = height - 40
+            p.setFont("Helvetica", 9)
+    p.save()
+    return response
 
 # views.py
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout
@@ -732,215 +817,7 @@ def api_servicios(request, servicio_id=None):
             return JsonResponse({'error': str(e)}, status=400)
     
     return JsonResponse({'error': 'Método no permitido'}, status=405)
-    if request.method == 'GET':
-        if servicio_id:
-            # Detalle de un servicio específico
-            try:
-                servicio = Servicio.objects.get(id=servicio_id)
-                data = {
-                    'id': servicio.id,
-                    'nombre': servicio.nombre,
-                    'imagen_cuadro': servicio.imagen_cuadro.url if servicio.imagen_cuadro else '',
-                    'titulo_ventana': servicio.titulo_ventana,
-                    'subtitulo_ventana': servicio.subtitulo_ventana,
-                    'imagen_ventana': servicio.imagen_ventana.url if servicio.imagen_ventana else '',
-                    'contenido_ventana': servicio.contenido_ventana,
-                }
-                return JsonResponse(data)
-            except Servicio.DoesNotExist:
-                return JsonResponse({'error': 'Servicio no encontrado'}, status=404)
-        else:
-            # Listado de todos los servicios
-            servicios = Servicio.objects.all().order_by('orden')
-            data = [{
-                'id': s.id,
-                'nombre': s.nombre,
-                'imagen_cuadro': s.imagen_cuadro.url if s.imagen_cuadro else '',
-                'titulo_ventana': s.titulo_ventana,
-                'subtitulo_ventana': s.subtitulo_ventana,
-                'imagen_ventana': s.imagen_ventana.url if s.imagen_ventana else '',
-                'contenido_ventana': s.contenido_ventana,
-            } for s in servicios]
-            return JsonResponse(data, safe=False)
-    
-    elif request.method == 'POST':
-        # Crear o actualizar un servicio
-        try:
-            data = request.POST
-            files = request.FILES
-            
-            if servicio_id:
-                # Actualizar servicio existente
-                servicio = Servicio.objects.get(id=servicio_id)
-                servicio.nombre = data.get('nombre', servicio.nombre)
-                servicio.titulo_ventana = data.get('titulo_ventana', servicio.titulo_ventana)
-                servicio.subtitulo_ventana = data.get('subtitulo_ventana', servicio.subtitulo_ventana)
-                servicio.contenido_ventana = data.get('contenido_ventana', servicio.contenido_ventana)
-                
-                if 'imagen_cuadro' in files:
-                    servicio.imagen_cuadro = files['imagen_cuadro']
-                if 'imagen_ventana' in files:
-                    servicio.imagen_ventana = files['imagen_ventana']
-                
-                servicio.save()
-                message = 'Servicio actualizado correctamente'
-            else:
-                # Crear nuevo servicio
-                servicio = Servicio.objects.create(
-                    nombre=data['nombre'],
-                    titulo_ventana=data['titulo_ventana'],
-                    subtitulo_ventana=data['subtitulo_ventana'],
-                    contenido_ventana=data['contenido_ventana'],
-                    orden=Servicio.objects.count() + 1
-                )
-                
-                # Manejar imágenes si se enviaron
-                if 'imagen_cuadro' in files:
-                    servicio.imagen_cuadro = files['imagen_cuadro']
-                if 'imagen_ventana' in files:
-                    servicio.imagen_ventana = files['imagen_ventana']
-                servicio.save()
-                message = 'Servicio creado correctamente'
-            
-            return JsonResponse({
-                'success': True,
-                'id': servicio.id,
-                'message': message,
-                'imagen_cuadro': servicio.imagen_cuadro.url if servicio.imagen_cuadro else '',
-                'imagen_ventana': servicio.imagen_ventana.url if servicio.imagen_ventana else ''
-            })
-            
-        except Exception as e:
-            return JsonResponse({
-                'success': False,
-                'error': str(e)
-            }, status=400)
-    
-    elif request.method == 'DELETE':
-        # Eliminar un servicio
-        try:
-            servicio = Servicio.objects.get(id=servicio_id)
-            
-            # Eliminar archivos de imágenes si existen
-            if servicio.imagen_cuadro:
-                servicio.imagen_cuadro.delete()
-            if servicio.imagen_ventana:
-                servicio.imagen_ventana.delete()
-                
-            servicio.delete()
-            return JsonResponse({'success': True, 'message': 'Servicio eliminado correctamente'})
-            
-        except Servicio.DoesNotExist:
-            return JsonResponse({'error': 'Servicio no encontrado'}, status=404)
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
-    
-    return JsonResponse({'error': 'Método no permitido'}, status=405)
-    if request.method == 'POST':
-        try:
-            data = request.POST
-            files = request.FILES
-            
-            if 'servicio_id' in data and data['servicio_id']:
-                # Actualizar servicio existente
-                servicio = Servicio.objects.get(id=data['servicio_id'])
-                servicio.nombre = data.get('nombre', servicio.nombre)
-                
-                servicio.titulo_ventana = data.get('titulo_ventana', servicio.titulo_ventana)
-                servicio.subtitulo_ventana = data.get('subtitulo_ventana', servicio.subtitulo_ventana)
-                servicio.contenido_ventana = data.get('contenido_ventana', servicio.contenido_ventana)
-                
-                if 'imagen_cuadro' in files:
-                    servicio.imagen_cuadro = files['imagen_cuadro']
-                if 'imagen_ventana' in files:
-                    servicio.imagen_ventana = files['imagen_ventana']
-                
-                servicio.save()
-            else:
-                # Crear nuevo servicio - siempre tendrá los botones habilitados
-                servicio = Servicio.objects.create(
-                    nombre=data['nombre'],
-                    imagen_cuadro=files['imagen_cuadro'],
-                    titulo_ventana=data['titulo_ventana'],
-                    subtitulo_ventana=data['subtitulo_ventana'],
-                    imagen_ventana=files['imagen_ventana'],
-                    contenido_ventana=data['contenido_ventana'],
-                    orden=Servicio.objects.count() + 1
-                )
-            
-            return JsonResponse({'success': True, 'id': servicio.id})
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
-    if request.method == 'GET':
-        if servicio_id:
-            servicio = get_object_or_404(Servicio, id=servicio_id)
-            data = {
-                'id': servicio.id,
-                'nombre': servicio.nombre,
-                'imagen_cuadro': servicio.imagen_cuadro.url if servicio.imagen_cuadro else '',
-                'titulo_ventana': servicio.titulo_ventana,
-                'subtitulo_ventana': servicio.subtitulo_ventana,
-                'imagen_ventana': servicio.imagen_ventana.url if servicio.imagen_ventana else '',
-                'contenido_ventana': servicio.contenido_ventana,
-                'mostrar_boton_agendar': servicio.mostrar_boton_agendar,
-            }
-            return JsonResponse(data)
-        else:
-            servicios = Servicio.objects.all().order_by('orden')
-            data = [{
-                'id': s.id,
-                'nombre': s.nombre,
-                'imagen_cuadro': s.imagen_cuadro.url if s.imagen_cuadro else '',
-            } for s in servicios]
-            return JsonResponse(data, safe=False)
-    
-    elif request.method == 'POST':
-        try:
-            data = request.POST
-            files = request.FILES
-            
-            if 'servicio_id' in data and data['servicio_id']:
-                # Actualizar servicio existente
-                servicio = Servicio.objects.get(id=data['servicio_id'])
-                servicio.nombre = data.get('nombre', servicio.nombre)
-                
-                servicio.titulo_ventana = data.get('titulo_ventana', servicio.titulo_ventana)
-                servicio.subtitulo_ventana = data.get('subtitulo_ventana', servicio.subtitulo_ventana)
-                servicio.contenido_ventana = data.get('contenido_ventana', servicio.contenido_ventana)
-                servicio.mostrar_boton_agendar = data.get('mostrar_boton_agendar', 'off') == 'on'
-                
-                if 'imagen_cuadro' in files:
-                    servicio.imagen_cuadro = files['imagen_cuadro']
-                if 'imagen_ventana' in files:
-                    servicio.imagen_ventana = files['imagen_ventana']
-                
-                servicio.save()
-            else:
-                # Crear nuevo servicio
-                servicio = Servicio.objects.create(
-                    nombre=data['nombre'],
-                    imagen_cuadro=files['imagen_cuadro'],
-                    titulo_ventana=data['titulo_ventana'],
-                    subtitulo_ventana=data['subtitulo_ventana'],
-                    imagen_ventana=files['imagen_ventana'],
-                    contenido_ventana=data['contenido_ventana'],
-                    mostrar_boton_agendar=data.get('mostrar_boton_agendar', 'off') == 'on',
-                    orden=Servicio.objects.count() + 1
-                )
-            
-            return JsonResponse({'success': True, 'id': servicio.id})
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
-    
-    elif request.method == 'DELETE':
-        try:
-            servicio = Servicio.objects.get(id=servicio_id)
-            servicio.delete()
-            return JsonResponse({'success': True})
-        except Servicio.DoesNotExist:
-            return JsonResponse({'error': 'Servicio no encontrado'}, status=404)
-    
-    return JsonResponse({'error': 'Método no permitido'}, status=405)
+
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages

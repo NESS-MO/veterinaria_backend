@@ -1,0 +1,65 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <script>
+        const STATIC_URL = "{% static '' %}";
+    </script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cancelar o Reprogramar Cita | DR.PUL</title>
+    <link rel="icon" href="{% static 'Images/logo.png' %}"/>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/1. Index.css' %}">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    <link rel="stylesheet" href={% static "css/custom.css" %}>
+</head>
+
+<body>
+    <!-- Header igual al de Index -->
+    <header>
+        <div class="Logotipo">
+            <a href={% url "index" %}>
+                <img src={% static "Images/logo2.png" %} alt="logo DR.PUL">
+            </a>
+            <h3 class="eslogan">COMPROMETIDOS CON LA SALUD ANIMAL</h3>
+        </div>
+        <button class="abrir" id="abrir-menu">☰</button>
+        <nav class="opciones" id="menu">
+            <button class="cerrar" id="cerrar-menu">✕</button>
+            <a href={% url "index"%}>INICIO</a>
+            <a href="#conocenos">CONÓCENOS</a>
+            <a href={% url "servicios" %}>SERVICIOS</a>
+            <a href={% url "agendar" %}>AGENDAR CITA</a>
+            <a href={% url "login"%}><img class="perfil" src={% static "Images/perfil.png" %} alt="logo DR.PUL"></a>
+        </nav>
+    </header>
+
+    <!-- Solo este bloque queda visible -->
+    <section class="agendar-llamada custom-section" style="background:#e3f6ff;">
+        <h2 style="color:#1E2D93;">¿Quieres agendar tu cita por teléfono?</h2>
+        <p>
+            Puedes llamarnos a nuestro contacto para agendar tu cita:<br>
+            <strong style="color:#0077b6; font-size:1.2em;">Teléfono: +57 310 6890146</strong><br>
+            <br>
+            Horario de atención: Lunes a Viernes de 8:00 am a 6:00 pm
+        </p>
+    </section>
+
+    <script src={% static "JavaScript/MenuHamburguesa.js" %}></script>
+
+    <style>
+    .custom-section {
+        max-width: 600px;
+        margin: 40px auto;
+        padding: 2rem;
+        background: #fff;
+        border-radius: 1rem;
+        box-shadow: 0 2px 8px #0001;
+    }
+    .agendar-llamada.custom-section {
+        background: #e3f6ff !important;
+    }
+    </style>
+</body>
+</html>

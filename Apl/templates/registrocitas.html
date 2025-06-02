@@ -7,6 +7,18 @@
   <title>Registro de Citas</title>
   <link rel="icon" href="{% static 'Images/logo.png' %}"/>
   <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: '#33C0F1',
+            secondary: '#1E2D93'
+          }
+        }
+      }
+    }
+  </script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
   <style>
     @media (max-width: 767px) {
@@ -36,29 +48,66 @@
 <body class="bg-gray-100 font-sans">
 
   <!-- Botón menú móvil -->
-  <div class="md:hidden flex items-center justify-between bg-[#1E2D93] text-white p-4">
-    <h1 class="text-lg font-bold">Citas</h1>
-    <button id="menu-toggle" class="text-2xl"><i class="fas fa-bars"></i></button>
-  </div>
+  <button class="md:hidden fixed top-4 left-4 z-30 bg-primary text-white p-2 rounded-lg shadow-lg" id="mobileMenuBtn">
+    <i class="fas fa-bars"></i>
+  </button>
+
+  <!-- Overlay para móvil -->
+  <div class="md:hidden fixed inset-0 bg-black/50 z-10 opacity-0 pointer-events-none transition-opacity duration-300" id="overlay"></div>
 
   <!-- Sidebar -->
-  <div id="sidebar" class="sidebar-responsive w-72 md:w-72 bg-gradient-to-br from-[#33C0F1] to-[#1E2D93] text-white p-7 md:fixed md:h-full top-0 left-0 z-10 font-sans md:translate-x-0 -translate-x-full transition-transform duration-300 ease-in-out">
-    <img class="h-24 mx-auto mb-4" src="{% static 'Images/logo2.png' %}" alt="Logo" />
-    <ul class="space-y-4 text-lg">
-      <li><a href="{% url 'gestioncitas' %}" class="block hover:bg-white/20 p-2 rounded">Citas Solicitadas</a></li>
-      <li><a href="{% url 'registroc' %}" class="block bg-white/30 hover:bg-white/40 p-2 rounded text-gray-900">Registro Citas</a></li>
-      <li><a href="{% url 'Tipdelasemana' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Tip de la Semana</a></li>
-      <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Galería</a></li>
-      <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded">Modificar Servicios</a></li>
-      <li><a href="{% url 'backup' %}" class="block hover:bg-white/20 p-2 rounded">Copia de seguridad</a></li>
-      <li><a href="{% url 'index' %}" class="block hover:bg-red-500/80 p-2 rounded">Cerrar sesión</a></li>
+  <div id="sidebar" class="fixed top-0 left-0 z-20 w-full md:w-80 h-full bg-gradient-to-br from-primary to-secondary text-white p-5 transform -translate-x-full md:translate-x-0 transition-transform duration-300">
+    <img class="h-15 mx-auto mb-2" src="{% static 'Images/logo2.png' %}" alt="Logo" />
+    <ul class="space-y-2 text-lg">
+      <li><a href="{% url 'gestioncitas' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Citas Solicitadas</a></li>
+      <li><a href="{% url 'registroc' %}" class="block bg-white/30 hover:bg-white/40 p-2 rounded text-gray-900 transition-colors">Registro Citas</a></li>
+      <li><a href="{% url 'usuarios' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Gestión de Usuario</a></li>
+      <li><a href="{% url 'Tipdelasemana' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Modificar Tip de la Semana</a></li>
+      <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Modificar Galería</a></li>
+      <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Modificar Servicios</a></li>
+      <li><a href="{% url 'backup' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Copia de seguridad</a></li>
+      <li><a href="{% url 'index' %}" class="block hover:bg-red-500/80 p-2 rounded transition-colors">Cerrar sesión</a></li>
     </ul>
+    <div class="absolute bottom-0 left-0 w-full p-4 bg-white/10 border-t border-white/20">
+      <div class="text-center">
+        <p class="font-bold">Usuario:</p>
+        <p class="text-sm">{{ request.user.nombre_completo }}</p>
+      </div>
+    </div>
   </div>
 
+  <!-- Breadcrumb -->
   <!-- Main Content -->
-  <div class="flex-1 md:ml-72 p-6 fade-in">
-    <div class="max-w-7xl mx-auto bg-white rounded-2xl shadow-lg p-6">
-      <h2 class="text-3xl font-bold mb-6 text-blue-800">📅 Registro de Citas</h2>
+  <div class="main-content fade-in md:ml-72 p-4 lg:p-8">
+    <nav class="flex ml-8 mb-9 w-full justify-start">
+      <ol class="inline-flex items-center space-x-1 md:space-x-2">
+        <li class="inline-flex items-center">
+          <a href="{% url 'gestioncitas' %}" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors">
+            <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M14.707 7.793a1 1 0 0 0-1.414 0L11 10.086V1.5a1 1 0 0 0-2 0v8.586L6.707 7.793a1 1 0 1 0-1.414 1.414l4 4a1 1 0 0 0 1.416 0l4-4a1 1 0 0 0-.002-1.414Z"/>
+              <path d="M18 12h-2.55l-2.975 2.975a3.5 3.5 0 0 1-4.95 0L4.55 12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/>
+            </svg>
+            Administrador
+          </a>
+        </li>
+        <li>
+          <div class="flex items-center">
+            <svg class="w-5 h-5 text-gray-400 mx-1" aria-hidden="true" fill="none" viewBox="0 0 6 10">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+            </svg>
+            <span class="ml-1 text-sm font-medium text-gray-700 md:ml-2">Registro de Citas</span>
+          </div>
+        </li>
+      </ol>
+    </nav>
+    <div class="max-w-7xl mx-auto bg-white rounded-2xl shadow-lg p-6 md:ml-8 ml-4">
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-3xl font-bold text-blue-800">📅 Registro de Citas</h2>
+        <a href="{% url 'reporte_citas_pdf' %}" target="_blank"
+           class="bg-red-600 text-white px-4 py-2 rounded shadow hover:bg-red-700 transition font-semibold ml-4">
+           Descargar PDF de Citas
+        </a>
+      </div>
 
       <!-- Mensaje de éxito -->
       <div id="mensaje-exito" class="hidden mb-4 p-3 rounded-md bg-green-100 text-green-800 text-sm font-medium transition duration-300">
@@ -144,9 +193,15 @@
 
           <div class="flex flex-col">
             <label for="hora" class="text-xs font-semibold mb-1 text-gray-700">Hora</label>
-            <input type="time" name="hora" id="hora"
-              min="06:00" max="18:00" step="1200"
-              class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm transition-all" required />
+            <div class="flex items-center gap-2">
+              <input type="time" name="hora" id="hora"
+                min="08:00" max="17:00" step="1200"
+                class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm transition-all" required />
+              <button type="button" id="mostrar-horarios" class="px-3 py-1 bg-blue-600 text-white rounded hover:bg-blue-700 text-xs">
+                Ver horarios disponibles
+              </button>
+            </div>
+            <div id="lista-horarios" class="bg-white border rounded shadow mt-2 p-2 text-sm max-h-48 overflow-y-auto hidden" style="position: absolute; z-index: 40; min-width: 150px;"></div>
             <span id="error-hora" class="text-xs text-red-500 mt-1 hidden">Debe seleccionar una hora</span>
           </div>
 
@@ -174,7 +229,6 @@
               <option value="Pendiente" selected>Pendiente</option>
               <option value="Completada">Completada</option>
               <option value="Cancelada">Cancelada</option>
-              <option value="Realizada">Realizada</option>
             </select>
             <span id="error-estado" class="text-xs text-red-500 mt-1 hidden">Debe seleccionar un estado</span>
           </div>
@@ -249,7 +303,7 @@
               <td>{{ cita.edad_mascota }}</td>
               <td>{{ cita.raza_mascota }}</td>
               <td>
-                <form method="post" action="{% url 'editar_estado_observacion_rapida' cita.id %}">
+                <form method="post" action="{% url 'editar_estado_observacion_rapida' cita.id %}" class="flex gap-2 items-center">
                   {% csrf_token %}
                   <input type="date" name="fecha" value="{{ cita.fecha|date:'Y-m-d' }}" class="border rounded p-1 text-xs w-full" required />
               </td>
@@ -260,17 +314,16 @@
               </td>
               <td>{{ cita.servicio }}</td>
               <td>
-                <select name="estado" class="border rounded p-1 text-xs w-full">
-                  <option value="Completada" {% if cita.estado == "Completada" %}selected{% endif %}>Completada</option>
-                  <option value="Pendiente" {% if cita.estado == "Pendiente" %}selected{% endif %}>Pendiente</option>
-                  <option value="Cancelada" {% if cita.estado == "Cancelada" %}selected{% endif %}>Cancelada</option>
-                </select>
+                  <select name="estado" class="border rounded p-1 text-xs w-full transition"
+                    onchange="this.form.submit()">
+                    <option value="Pendiente" {% if cita.estado == 'Pendiente' %}selected{% endif %}>Pendiente</option>
+                    <option value="Completada" {% if cita.estado == 'Completada' %}selected{% endif %}>Completada</option>
+                    <option value="Cancelada" {% if cita.estado == 'Cancelada' %}selected{% endif %}>Cancelada</option>
+                  </select>
               </td>
               <td>
-                <div class="flex gap-2 items-center">
-                  <input type="text" name="observaciones" value="{{ cita.observaciones }}" class="border rounded p-1 text-xs w-full" />
+                  <textarea name="observaciones" class="observacion-auto border rounded p-1 text-xs w-full transition-all resize-none min-h-[28px] max-h-32" rows="1">{{ cita.observaciones }}</textarea>
                   <button type="submit" class="bg-blue-500 text-white px-2 py-1 rounded text-xs ml-2">Guardar</button>
-                </div>
                 </form>
               </td>
             </tr>
@@ -287,15 +340,20 @@
     </div>
   </div>
 
+    <script src={% static "JavaScript/sienna.js" %}></script>
+    <script src={% static "JavaScript/custom.js" %}></script>
+
   <!-- Scripts -->
   <script>
     // Sidebar móvil
-    const toggleBtn = document.getElementById('menu-toggle');
+    const toggleBtn = document.getElementById('mobileMenuBtn');
     const sidebar = document.getElementById('sidebar');
-    if(toggleBtn && sidebar){
+    const overlay = document.getElementById('overlay');
+    if(toggleBtn && sidebar && overlay){
       toggleBtn.addEventListener('click', () => {
-        sidebar.classList.toggle('sidebar-open');
-        sidebar.classList.toggle('-translate-x-full');
+        const isOpen = sidebar.classList.toggle('translate-x-0');
+        overlay.classList.toggle('opacity-100', isOpen);
+        overlay.classList.toggle('pointer-events-auto', isOpen);
       });
     }
 
@@ -320,13 +378,16 @@
             continue;
           }
           let mostrar = true;
+
+          // Documento (col 0)
           if (filtros.documento && filtros.documento.value) {
-            const textoDocumento = fila.cells[0].textContent.toLowerCase();
+            const textoDocumento = fila.cells[0]?.textContent.toLowerCase() || '';
             if (!textoDocumento.includes(filtros.documento.value.toLowerCase())) mostrar = false;
           }
-          if (filtros.cliente.value) {
+          // Cliente (col 1)
+          if (filtros.cliente && filtros.cliente.value) {
             const palabras = filtros.cliente.value.toLowerCase().split(' ').filter(Boolean);
-            const textoCliente = fila.cells[1].textContent.toLowerCase();
+            const textoCliente = fila.cells[1]?.textContent.toLowerCase() || '';
             for (let palabra of palabras) {
               if (!textoCliente.includes(palabra)) {
                 mostrar = false;
@@ -334,22 +395,31 @@
               }
             }
           }
-          if (filtros.fecha.value) {
-            const inputFecha = fila.cells[2].querySelector('input[type="date"]');
+          // Fecha (col 5, input[type="date"] dentro del form)
+          if (filtros.fecha && filtros.fecha.value) {
+            const inputFecha = fila.cells[5]?.querySelector('input[type="date"]');
             if (!inputFecha || inputFecha.value !== filtros.fecha.value) mostrar = false;
           }
-          if (filtros.hora.value) {
-            const inputHora = fila.cells[3].querySelector('input[type="time"]');
+          // Hora (col 6, input[type="time"] dentro del form)
+          if (filtros.hora && filtros.hora.value) {
+            const inputHora = fila.cells[6]?.querySelector('input[type="time"]');
             if (!inputHora || inputHora.value !== filtros.hora.value) mostrar = false;
           }
-          if (filtros.servicio.value && !fila.cells[4].textContent.toLowerCase().includes(filtros.servicio.value.toLowerCase())) mostrar = false;
-          if (filtros.estado.value) {
-            const selectEstado = fila.cells[5].querySelector('select');
+          // Servicio (col 7)
+          if (filtros.servicio && filtros.servicio.value) {
+            const textoServicio = fila.cells[7]?.textContent.toLowerCase() || '';
+            if (!textoServicio.includes(filtros.servicio.value.toLowerCase())) mostrar = false;
+          }
+          // Estado (col 8, select dentro del form)
+          if (filtros.estado && filtros.estado.value) {
+            const selectEstado = fila.cells[8]?.querySelector('select');
             if (!selectEstado || selectEstado.value.toLowerCase() !== filtros.estado.value.toLowerCase()) mostrar = false;
           }
-          if (filtros.observaciones.value) {
-            const inputObs = fila.cells[6].querySelector('input[type="text"]');
-            if (!inputObs || !inputObs.value.toLowerCase().includes(filtros.observaciones.value.toLowerCase())) mostrar = false;
+          // Observaciones (col 9, textarea dentro del form)
+          if (filtros.observaciones && filtros.observaciones.value) {
+            const textareaObs = fila.cells[9]?.querySelector('textarea');
+            const valorObs = textareaObs ? textareaObs.value.toLowerCase() : '';
+            if (!valorObs.includes(filtros.observaciones.value.toLowerCase())) mostrar = false;
           }
           fila.style.display = mostrar ? '' : 'none';
         }
@@ -466,7 +536,22 @@
         if (!hora.value) {
           mostrarError(hora, 'error-hora', 'Debe seleccionar una hora');
         } else {
-          ocultarError(hora, 'error-hora');
+          // Validar hora entre 08:00 y 17:00, solo minutos 00, 20, 40
+          const [h, m] = hora.value.split(':').map(Number);
+          if (
+            h < 8 || h > 17 ||
+            ![0, 20, 40].includes(m) ||
+            (h === 17 && m > 0)
+          ) {
+            mostrarError(
+              hora,
+              'error-hora',
+              'Seleccione una hora entre 08:00 y 17:00, en intervalos de 20 minutos (00, 20, 40)'
+            );
+            hora.value = '';
+          } else {
+            ocultarError(hora, 'error-hora');
+          }
         }
       });
 
@@ -500,6 +585,133 @@
         }
       });
     });
+
+    document.getElementById('mobileMenuBtn').addEventListener('click', function() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        sidebar.classList.toggle('-translate-x-full');
+        overlay.classList.toggle('opacity-0');
+        overlay.classList.toggle('pointer-events-none');
+    });
+    document.getElementById('overlay').addEventListener('click', function() {
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('opacity-0');
+        overlay.classList.add('pointer-events-none');
+    });
+    document.querySelectorAll('#sidebar a').forEach(link => {
+        link.addEventListener('click', function() {
+            if (window.innerWidth < 768) {
+                const sidebar = document.getElementById('sidebar');
+                const overlay = document.getElementById('overlay');
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('opacity-0');
+                overlay.classList.add('pointer-events-none');
+            }
+        });
+    });
   </script>
+  <script>
+document.addEventListener('DOMContentLoaded', function() {
+  const mostrarHorariosBtn = document.getElementById('mostrar-horarios');
+  const listaHorarios = document.getElementById('lista-horarios');
+  const horaInput = document.getElementById('hora');
+
+  function generarHorarios() {
+    const horarios = [];
+    let hora = 8, minuto = 0;
+    while (hora < 17 || (hora === 17 && minuto === 0)) {
+      let h = hora.toString().padStart(2, '0');
+      let m = minuto.toString().padStart(2, '0');
+      horarios.push(`${h}:${m}`);
+      minuto += 20;
+      if (minuto >= 60) {
+        minuto = 0;
+        hora += 1;
+      }
+    }
+    return horarios;
+  }
+
+  function mostrarListaHorarios() {
+    listaHorarios.innerHTML = '';
+    generarHorarios().forEach(horario => {
+      const item = document.createElement('div');
+      // Formato 12h amigable
+      let [h, m] = horario.split(':');
+      let hNum = parseInt(h);
+      let ampm = hNum >= 12 ? 'p. m.' : 'a. m.';
+      let h12 = hNum % 12 === 0 ? 12 : hNum % 12;
+      let horarioAmigable = `${h12}:${m} ${ampm}`;
+      item.textContent = horarioAmigable;
+      item.style.padding = '8px 12px';
+      item.style.cursor = 'pointer';
+      item.style.borderBottom = '1px solid #eee';
+      item.addEventListener('click', function() {
+        horaInput.value = horario;
+        listaHorarios.classList.add('hidden');
+        horaInput.dispatchEvent(new Event('input')); // Para disparar la validación
+      });
+      listaHorarios.appendChild(item);
+    });
+    listaHorarios.classList.remove('hidden');
+  }
+
+  if (mostrarHorariosBtn && listaHorarios && horaInput) {
+    mostrarHorariosBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      if (!listaHorarios.classList.contains('hidden')) {
+        listaHorarios.classList.add('hidden');
+      } else {
+        mostrarListaHorarios();
+      }
+    });
+
+    // Ocultar la lista si se hace clic fuera
+    document.addEventListener('click', function(e) {
+      if (!listaHorarios.contains(e.target) && e.target !== mostrarHorariosBtn) {
+        listaHorarios.classList.add('hidden');
+      }
+    });
+  }
+});
+</script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('select[name="estado"]').forEach(function(select) {
+    function actualizarColor() {
+      select.classList.remove('bg-yellow-100', 'bg-green-100', 'bg-red-100', 'text-yellow-800', 'text-green-800', 'text-red-800');
+      if (select.value === 'Pendiente') {
+        select.classList.add('bg-yellow-100', 'text-yellow-800');
+      } else if (select.value === 'Completada') {
+        select.classList.add('bg-green-100', 'text-green-800');
+      } else if (select.value === 'Cancelada') {
+        select.classList.add('bg-red-100', 'text-red-800');
+      }
+    }
+    actualizarColor();
+    select.addEventListener('change', actualizarColor);
+  });
+});
+</script>
+<script>
+document.querySelectorAll('.observacion-auto').forEach(function(textarea) {
+  textarea.addEventListener('focus', function() {
+    this.rows = 4;
+    this.classList.add('ring-2', 'ring-blue-300');
+    this.style.height = (this.scrollHeight) + 'px';
+  });
+  textarea.addEventListener('blur', function() {
+    this.rows = 1;
+    this.classList.remove('ring-2', 'ring-blue-300');
+    this.style.height = '28px'; // Vuelve al alto mínimo definido en tu clase
+  });
+  textarea.addEventListener('input', function() {
+    this.style.height = 'auto';
+    this.style.height = (this.scrollHeight) + 'px';
+  });
+});
+</script>
 </body>
 </html>
