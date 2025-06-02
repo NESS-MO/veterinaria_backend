@@ -1,87 +1,132 @@
-{% load static %} 
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <!-- Define la codificación de caracteres -->
-    <meta charset="UTF-8">
-    <!-- Configuración del viewport para dispositivos móviles -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <!-- Título de la página -->
-    <title>Cambiar Contraseña</title>
-  </head>
-  <body>
-    <!-- Contenedor principal de la página -->
-    <div class="content-wrapper">
-      <!-- Formulario para cambiar la contraseña.
-           Se envía por POST y se llama a la función JavaScript validatePasswordChange() al hacer submit -->
-      <form class="reset-form" method="POST" onsubmit="return validatePasswordChange()">
-        <!-- Token de seguridad CSRF para proteger la aplicación -->
-        {% csrf_token %}
-        <!-- Título del formulario -->
-        <h2>Cambia Tu Contraseña</h2>
-        
-        <!-- Sección para mostrar mensajes (errores, avisos) enviados desde el backend -->
-        {% if messages %}
-          {% for message in messages %}
-            <!-- Cada mensaje se muestra dentro de un contenedor con clases para estilos -->
-            <div class="alert alert-warning">{{ message }}</div>
-          {% endfor %}
-        {% endif %}
-        
-        <!-- Grupo de campos para la nueva contraseña -->
-        <div class="form-group">
-          <!-- Etiqueta para el campo de nueva contraseña -->
-          <label for="new_password">Nueva Contraseña</label>
-          <!-- Campo de entrada para la nueva contraseña; es de tipo password para ocultar caracteres -->
-          <input type="password" id="new_password" name="new_password" placeholder="Ingresa la nueva contraseña" required>
-        </div>
-        
-        <!-- Grupo de campos para la confirmación de la nueva contraseña -->
-        <div class="form-group">
-          <!-- Etiqueta para el campo de confirmación de la contraseña -->
-          <label for="confirm_password">Confirmar Nueva Contraseña</label>
-          <!-- Campo de entrada para confirmar la contraseña; también de tipo password -->
-          <input type="password" id="confirm_password" name="confirm_password" placeholder="Confirma la nueva contraseña" required>
-        </div>
-        
-        <!-- Botón para enviar el formulario y proceder al cambio de contraseña -->
-        <button type="submit">Cambiar Contraseña</button>
-        <!-- Enlace para volver a la página de inicio de sesión -->
-        <a href="{% url '4. Login' %}" class="back-link">Volver al inicio de sesión</a>
-      </form>
-    </div>
-    
-    <!-- Bloque de script para la validación del formulario en el navegador -->
+<head>
     <script>
-      // Función que valida los datos antes de enviar el formulario
-      function validatePasswordChange() {
-          // Obtiene el valor del campo de nueva contraseña
-          var newPassword = document.getElementById('new_password').value;
-          // Obtiene el valor del campo para confirmar la nueva contraseña
-          var confirmPassword = document.getElementById('confirm_password').value;
-          
-          // Expresión regular para validar la nueva contraseña:
-          // - Al menos 1 letra mayúscula
-          // - Al menos 1 carácter especial: (@, !, |, ., /, &)
-          // - Al menos 12 caracteres de longitud en total
-          var regex = /^(?=.*[A-Z])(?=.*[@!|./&]).{12,}$/;
-          
-          // Si la contraseña no cumple con la expresión regular, se muestra un mensaje de alerta y se evita el envío
-          if (!regex.test(newPassword)) {
-            alert("La contraseña debe tener mínimo 12 caracteres, 1 letra mayúscula y un carácter especial (@!|./&).");
-            return false;
-          }
-          
-          // Se comprueba que los valores de nueva contraseña y confirmación sean iguales
-          if (newPassword !== confirmPassword) {
-            // Si no coinciden, se muestra un mensaje de alerta y se evita el envío del formulario
-            alert("Las contraseñas no coinciden.");
-            return false;
-          }
-          
-          // Se solicita una confirmación final al usuario antes de cambiar la contraseña
-          return confirm("¿Estás seguro de cambiar tu contraseña?");
-      }
+        const STATIC_URL = "{% static '' %}";
     </script>
-  </body>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cambiar Contraseña</title>
+    <link rel="icon" href={% static "Images/Logo.png" %}/>
+    <link rel="stylesheet" href="{% static 'css/4. Login.css' %}">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link rel="stylesheet" href={% static "css/header.css" %}>
+</head>
+
+<body>
+<header>
+    <!--Logo de encabezado-->
+    <div class="Logotipo">
+        <a href="{% url 'index' %}">
+            <img src="{% static 'Images/logo2.png' %}" alt="logo DR.PUL">
+        </a>
+        <h3 class="eslogan">COMPROMETIDOS CON LA SALUD ANIMAL</h3>
+    </div>
+
+    <!--Menú hamburguesa responsivo-->
+    <button class="abrir" id="abrir-menu">☰</button>
+    
+    <!--Opciones de encabezado-->
+    <nav class="opciones" id="menu">
+        <button class="cerrar" id="cerrar-menu">✕</button>
+        <a href="{% url 'index' %}">INICIO</a>
+        <a href="{% url 'index' %}#conocenos">CONÓCENOS</a>
+        <a href="{% url 'servicios' %}">SERVICIOS</a>
+        <a href="{% url 'agendar' %}">AGENDAR CITA</a>
+        <a href="{% url 'login' %}"><img class="perfil" src="{% static 'Images/perfil.png' %}" alt="Perfil"></a>
+    </nav>
+</header>
+
+    <div class="formulario">
+        <h1>
+            <div class="volver2">
+                <a href={% url "login" %}> ⬅️ Volver</a> 
+            </div>
+            Cambiar Contraseña
+        </h1>
+        <form method="POST" id="password-change-form" onsubmit="return validatePasswordChange()">
+            {% csrf_token %}
+            
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-warning">{{ message }}</div>
+                {% endfor %}
+            {% endif %}
+            
+            <div class="username">
+                <input type="password" id="new_password" name="new_password" required>
+                <label for="new_password">Nueva Contraseña</label>
+            </div>
+            
+            <div class="username">
+                <input type="password" id="confirm_password" name="confirm_password" required>
+                <label for="confirm_password">Confirmar Contraseña</label>
+            </div>
+            
+            <input type="submit" value="Cambiar Contraseña">
+        </form>
+    </div>
+
+    <!-- Scripts -->
+    <script src={% static "JavaScript/MenuHamburguesa.js" %}></script>
+    <script src={% static "JavaScript/js-BotonWhatsapp.js" %}></script>
+    <script src={% static "JavaScript/js-botonAyuda.js" %}></script>
+    <script src={% static "JavaScript/sienna.js" %}></script>
+    <script src={% static "JavaScript/custom.js" %}></script>
+
+    <script>
+<script>
+    function validatePasswordChange() {
+        var newPassword = document.getElementById('new_password').value;
+        var confirmPassword = document.getElementById('confirm_password').value;
+        
+        var regex = /^(?=.*[A-Z])(?=.*[@!|./&]).{12,}$/;
+        
+        if (!regex.test(newPassword)) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Contraseña inválida',
+                text: 'La contraseña debe tener mínimo 12 caracteres, 1 letra mayúscula y un carácter especial (@!|./&).',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'Entendido'
+            });
+            return false;
+        }
+        
+        if (newPassword !== confirmPassword) {
+            Swal.fire({
+                icon: 'error',
+                title: 'Contraseñas no coinciden',
+                text: 'Las contraseñas ingresadas no coinciden.',
+                confirmButtonColor: '#3085d6',
+                confirmButtonText: 'Entendido'
+            });
+            return false;
+        }
+        
+        // Si todo está bien, el formulario se enviará normalmente
+        return true;
+    }
+
+    // Verificar si hay un mensaje de éxito en los messages de Django
+    {% if messages %}
+        {% for message in messages %}
+            {% if message.tags == 'success' %}
+                Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: '{{ message }}',
+                    confirmButtonColor: '#3085d6',
+                    confirmButtonText: 'Entendido'
+                }).then(() => {
+                    window.location.href = "{% url 'login' %}?password_changed=1";
+                });
+            {% endif %}
+        {% endfor %}
+    {% endif %}
+</script>
+    </script>
+</body>
 </html>

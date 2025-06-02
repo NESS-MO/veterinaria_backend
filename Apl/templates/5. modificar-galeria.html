@@ -247,6 +247,9 @@ function editarImagen(id) {
         title: 'Cargando imagen...'
     });
 
+    // Desplazar al tope de la página inmediatamente
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
     // Obtener los datos de la imagen
     fetch(`/api/galeria/${id}/`)
         .then(response => {
@@ -255,8 +258,8 @@ function editarImagen(id) {
         })
         .then(data => {
             // Rellenar el formulario con los datos de la imagen
-            document.querySelector('input[name="titulo"]').value = data.titulo || ''; // Permitir vacío
-            document.querySelector('input[name="orden"]').value = data.orden || ''; // Permitir vacío
+            document.querySelector('input[name="titulo"]').value = data.titulo || '';
+            document.querySelector('input[name="orden"]').value = data.orden || '';
             
             // Mostrar la imagen existente en el preview
             const preview = document.getElementById('previewImagenGaleria');
@@ -284,6 +287,14 @@ function editarImagen(id) {
             idField.value = data.id;
             
             document.querySelector('button[type="submit"]').innerHTML = '<i class="material-icons align-middle">save</i> Guardar Cambios';
+            
+            // Resaltar el formulario brevemente
+            const formSection = document.querySelector('.bg-gray-50.rounded-lg.border.border-gray-200');
+            formSection.style.transition = 'box-shadow 0.3s';
+            formSection.style.boxShadow = '0 0 0 2px #33C0F1';
+            setTimeout(() => {
+                formSection.style.boxShadow = 'none';
+            }, 2000);
         })
         .catch(error => {
             Swal.fire({

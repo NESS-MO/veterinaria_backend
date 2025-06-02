@@ -82,6 +82,9 @@ DATABASES = {
 }
 
 
+
+
+
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
@@ -147,3 +150,12 @@ AUTH_USER_MODEL = 'Apl.Administrador'  # Reemplaza 'tu_app' con el nombre de tu 
 LOGIN_URL = '/login/'
 LOGIN_REDIRECT_URL = '/gestioncitas/'
 LOGOUT_REDIRECT_URL = '/'
+
+# Configuración de Email
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = 'lapruebaconesta@gmail.com'
+EMAIL_HOST_PASSWORD = 'gtfgwukwqizqyxru'
+DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
