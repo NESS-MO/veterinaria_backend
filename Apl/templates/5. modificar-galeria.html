@@ -9,6 +9,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -85,10 +86,10 @@
                 <p class="text-sm text-gray-500 mt-2">Imágenes en galería: {{ total_imagenes }}/9</p>
             </div>
             
-            <!-- Formulario para agregar nueva imagen -->
+            <!-- Formulario para agregar/editar imagen -->
             <div class="mb-8 p-6 bg-gray-50 rounded-lg border border-gray-200">
-                <h2 class="text-xl font-semibold mb-4">Agregar Nueva Imagen</h2>
-                <form method="post" enctype="multipart/form-data">
+                <h2 class="text-xl font-semibold mb-4" id="formTitle">Agregar Nueva Imagen</h2>
+                <form method="post" enctype="multipart/form-data" id="galeriaForm">
                     {% csrf_token %}
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
                         <div class="md:col-span-2">
@@ -110,9 +111,14 @@
                         <label class="block text-sm font-medium text-gray-700 mb-1">Título (opcional)</label>
                         {{ form.titulo }}
                     </div>
-                    <button type="submit" class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
-                        <i class="material-icons align-middle">file_upload</i> Subir Imagen
-                    </button>
+                    <div class="mt-4 flex justify-end space-x-4">
+                        <button type="button" onclick="resetForm()" class="px-4 py-2 bg-gray-300 text-gray-700 rounded hover:bg-gray-400 transition-colors">
+                            Cancelar
+                        </button>
+                        <button type="submit" class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors">
+                            <i class="material-icons align-middle">file_upload</i> Subir Imagen
+                        </button>
+                    </div>
                 </form>
             </div>
             
@@ -137,6 +143,14 @@
                             <img src="{{ imagen.imagen.url }}" alt="{{ imagen.titulo|default:'Imagen galería' }}" 
                                 class="w-full h-48 object-cover">
                             <div class="absolute top-2 right-2 flex space-x-2">
+                                <!-- Botón de editar -->
+                                <button onclick="editarImagen({{ imagen.id }})"
+                                        class="bg-blue-500 text-white rounded-full w-8 h-8 flex items-center justify-center hover:bg-blue-600 transition-colors"
+                                        title="Editar imagen">
+                                    <i class="material-icons text-sm">edit</i>
+                                </button>
+                                
+                                <!-- Botón de mostrar/ocultar -->
                                 <form method="post" class="inline">
                                     {% csrf_token %}
                                     <button type="submit" name="toggle_activa" value="{{ imagen.id }}"
@@ -145,6 +159,8 @@
                                         <i class="material-icons text-sm">{% if imagen.activa %}visibility_off{% else %}visibility{% endif %}</i>
                                     </button>
                                 </form>
+                                
+                                <!-- Botón de eliminar -->
                                 <form method="post" class="inline">
                                     {% csrf_token %}
                                     <button type="submit" name="eliminar" value="{{ imagen.id }}"
@@ -187,24 +203,174 @@
     <script src={% static "JavaScript/custom.js" %}></script>
 
     <script>
-        // Mostrar nombre del archivo seleccionado
-        document.querySelectorAll('input[type="file"]').forEach(input => {
-            input.addEventListener('change', function() {
-                const fileName = this.files[0]?.name || 'Ningún archivo seleccionado';
-                const label = this.parentElement.querySelector('div');
-                if (label) {
-                    const infoDiv = document.createElement('div');
-                    infoDiv.className = 'mt-1 text-xs text-gray-500';
-                    infoDiv.textContent = `Archivo: ${fileName}`;
+        // Función para editar una imagen
+        function editarImagen(id) {
+            // Mostrar mensaje de carga
+            const Toast = Swal.mixin({
+                toast: true,
+                position: 'top-end',
+                showConfirmButton: false,
+                timer: 800,
+                timerProgressBar: true,
+            });
+            
+            Toast.fire({
+                icon: 'info',
+                title: 'Cargando imagen...'
+            });
+
+            // Obtener los datos de la imagen
+            fetch(`/api/galeria/${id}/`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Error al cargar la imagen');
+                    return response.json();
+                })
+                .then(data => {
+                    // Rellenar el formulario con los datos de la imagen
+                    document.querySelector('input[name="imagen"]').value = '';
+                    document.querySelector('input[name="orden"]').value = data.orden;
+                    document.querySelector('input[name="titulo"]').value = data.titulo || '';
                     
-                    // Eliminar info anterior si existe
-                    const oldInfo = label.querySelector('.file-info');
-                    if (oldInfo) oldInfo.remove();
+                    // Mostrar nombre del archivo actual
+                    const fileInfo = document.createElement('div');
+                    fileInfo.className = 'mt-1 text-xs text-gray-500';
+                    fileInfo.textContent = `Imagen actual: ${data.imagen.split('/').pop()}`;
+                    document.querySelector('input[name="imagen"]').parentElement.appendChild(fileInfo);
                     
-                    infoDiv.classList.add('file-info');
-                    label.appendChild(infoDiv);
+                    // Actualizar título del formulario
+                    document.getElementById('formTitle').textContent = 'Editar Imagen';
+                    
+                    // Agregar campo oculto para el ID de la imagen
+                    let idField = document.querySelector('input[name="imagen_id"]');
+                    if (!idField) {
+                        idField = document.createElement('input');
+                        idField.type = 'hidden';
+                        idField.name = 'imagen_id';
+                        document.getElementById('galeriaForm').appendChild(idField);
+                    }
+                    idField.value = data.id;
+                    
+                    // Cambiar texto del botón de submit
+                    document.querySelector('button[type="submit"]').innerHTML = '<i class="material-icons align-middle">save</i> Guardar Cambios';
+                    
+                    // Hacer scroll al formulario con animación suave
+                    const formSection = document.querySelector('.bg-gray-50.rounded-lg.border');
+                    const formPosition = formSection.getBoundingClientRect().top + window.pageYOffset - 20;
+                    
+                    window.scrollTo({
+                        top: formPosition,
+                        behavior: 'smooth'
+                    });
+                    
+                    // Enfocar el primer campo
+                    document.querySelector('input[name="titulo"]').focus();
+                })
+                .catch(error => {
+                    Swal.fire({
+                        title: 'Error',
+                        text: error.message || 'No se pudo cargar la imagen',
+                        icon: 'error',
+                        confirmButtonText: 'Entendido'
+                    });
+                });
+        }
+
+        // Función para resetear el formulario
+        function resetForm() {
+            document.getElementById('galeriaForm').reset();
+            const idField = document.querySelector('input[name="imagen_id"]');
+            if (idField) idField.remove();
+            
+            // Eliminar info de archivo si existe
+            const fileInfo = document.querySelector('input[name="imagen"]').parentElement.querySelector('.file-info');
+            if (fileInfo) fileInfo.remove();
+            
+            // Restaurar título y botón
+            document.getElementById('formTitle').textContent = 'Agregar Nueva Imagen';
+            document.querySelector('button[type="submit"]').innerHTML = '<i class="material-icons align-middle">file_upload</i> Subir Imagen';
+            
+            Swal.fire({
+                title: 'Formulario reiniciado',
+                text: 'Puedes comenzar a subir una nueva imagen',
+                icon: 'info',
+                confirmButtonText: 'Entendido',
+                confirmButtonColor: '#33C0F1'
+            });
+        }
+
+        // Manejar envío del formulario con AJAX
+        document.getElementById('galeriaForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const formData = new FormData(this);
+            const imagenId = formData.get('imagen_id');
+            
+            Swal.fire({
+                title: 'Procesando',
+                html: imagenId ? 'Actualizando imagen...' : 'Subiendo nueva imagen...',
+                allowOutsideClick: false,
+                didOpen: () => {
+                    Swal.showLoading();
                 }
             });
+
+            const url = imagenId ? `/api/galeria/${imagenId}/` : '/api/galeria/';
+            const method = 'POST';
+            
+            fetch(url, {
+                method: method,
+                body: formData,
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+                }
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => { throw new Error(err.error || 'Error en la respuesta del servidor'); });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success || data.id) {
+                    Swal.fire({
+                        title: '¡Éxito!',
+                        text: imagenId ? 'Imagen actualizada correctamente' : 'Imagen subida correctamente',
+                        icon: 'success',
+                        confirmButtonText: 'Aceptar'
+                    }).then(() => {
+                        location.reload();
+                    });
+                } else {
+                    throw new Error(data.error || 'Error al guardar la imagen');
+                }
+            })
+            .catch(error => {
+                Swal.fire({
+                    title: 'Error',
+                    text: error.message || 'Error al guardar la imagen',
+                    icon: 'error',
+                    confirmButtonText: 'Entendido'
+                });
+                console.error('Error:', error);
+            });
+        });
+
+        // Mostrar nombre del archivo seleccionado
+        document.querySelector('input[type="file"]').addEventListener('change', function() {
+            const fileName = this.files[0]?.name || 'Ningún archivo seleccionado';
+            const label = this.parentElement;
+            if (label) {
+                const infoDiv = document.createElement('div');
+                infoDiv.className = 'mt-1 text-xs text-gray-500';
+                infoDiv.textContent = `Archivo seleccionado: ${fileName}`;
+                
+                // Eliminar info anterior si existe
+                const oldInfo = label.querySelector('.file-info');
+                if (oldInfo) oldInfo.remove();
+                
+                infoDiv.classList.add('file-info');
+                label.appendChild(infoDiv);
+            }
         });
 
         // Control del menú hamburguesa para móviles

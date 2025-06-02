@@ -380,6 +380,48 @@ def obtener_tip_actual(request):
 
 def gestion_galeria(request):
     imagenes = ImagenGaleria.objects.all().order_by('orden')
+    
+    if request.method == 'POST':
+        # Manejar eliminación y toggle activa como antes
+        if 'eliminar' in request.POST:
+            imagen_id = request.POST.get('eliminar')
+            imagen = ImagenGaleria.objects.get(id=imagen_id)
+            imagen.delete()
+            messages.success(request, 'Imagen eliminada correctamente')
+            return redirect('Galeria')
+            
+        if 'toggle_activa' in request.POST:
+            imagen_id = request.POST.get('toggle_activa')
+            imagen = ImagenGaleria.objects.get(id=imagen_id)
+            imagen.activa = not imagen.activa
+            imagen.save()
+            messages.success(request, f'Imagen {"activada" if imagen.activa else "ocultada"} correctamente')
+            return redirect('Galeria')
+            
+        # Manejar edición de imagen
+        imagen_id = request.POST.get('imagen_id')
+        if imagen_id:
+            imagen = get_object_or_404(ImagenGaleria, id=imagen_id)
+            form = ImagenGaleriaForm(request.POST, request.FILES, instance=imagen)
+        else:
+            form = ImagenGaleriaForm(request.POST, request.FILES)
+            
+        if form.is_valid():
+            form.save()
+            action = "actualizada" if imagen_id else "agregada"
+            messages.success(request, f'Imagen {action} correctamente')
+            return redirect('Galeria')
+        else:
+            messages.error(request, 'Por favor corrige los errores del formulario')
+    else:
+        form = ImagenGaleriaForm()
+        
+    return render(request, '5. modificar-galeria.html', {
+        'imagenes': imagenes,
+        'form': form,
+        'total_imagenes': ImagenGaleria.objects.count()
+    })
+    imagenes = ImagenGaleria.objects.all().order_by('orden')
     if request.method == 'POST':
         if 'eliminar' in request.POST:
             imagen_id = request.POST.get('eliminar')
@@ -409,6 +451,85 @@ def gestion_galeria(request):
         'form': form,
         'total_imagenes': ImagenGaleria.objects.count()
     })
+
+@csrf_exempt
+def api_galeria(request, imagen_id=None):
+    if request.method == 'GET':
+        if imagen_id:
+            try:
+                imagen = ImagenGaleria.objects.get(id=imagen_id)
+                data = {
+                    'id': imagen.id,
+                    'imagen': imagen.imagen.url if imagen.imagen else '',
+                    'titulo': imagen.titulo if imagen.titulo else '',
+                    'orden': imagen.orden,
+                    'activa': imagen.activa
+                }
+                return JsonResponse(data)
+            except ImagenGaleria.DoesNotExist:
+                return JsonResponse({'error': 'Imagen no encontrada'}, status=404)
+        else:
+            imagenes = ImagenGaleria.objects.all().order_by('orden')
+            data = [{
+                'id': img.id,
+                'imagen': img.imagen.url if img.imagen else '',
+                'titulo': img.titulo if img.titulo else '',
+                'orden': img.orden,
+                'activa': img.activa
+            } for img in imagenes]
+            return JsonResponse(data, safe=False)
+    
+    elif request.method == 'POST':
+        try:
+            data = request.POST
+            files = request.FILES
+            
+            if imagen_id:
+                # Actualizar imagen existente
+                imagen = ImagenGaleria.objects.get(id=imagen_id)
+                imagen.titulo = data.get('titulo', imagen.titulo)
+                imagen.orden = data.get('orden', imagen.orden)
+                
+                if 'imagen' in files:
+                    imagen.imagen = files['imagen']
+                
+                imagen.save()
+                message = 'Imagen actualizada correctamente'
+            else:
+                # Crear nueva imagen
+                imagen = ImagenGaleria.objects.create(
+                    titulo=data.get('titulo', ''),
+                    orden=data.get('orden', 1),
+                    imagen=files['imagen'] if 'imagen' in files else None
+                )
+                message = 'Imagen creada correctamente'
+            
+            return JsonResponse({
+                'success': True,
+                'id': imagen.id,
+                'message': message,
+                'imagen': imagen.imagen.url if imagen.imagen else ''
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            }, status=400)
+    
+    elif request.method == 'DELETE':
+        try:
+            imagen = ImagenGaleria.objects.get(id=imagen_id)
+            if imagen.imagen:
+                imagen.imagen.delete()
+            imagen.delete()
+            return JsonResponse({'success': True, 'message': 'Imagen eliminada correctamente'})
+        except ImagenGaleria.DoesNotExist:
+            return JsonResponse({'error': 'Imagen no encontrada'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
 
 # --- Gestión de citas ---
 
