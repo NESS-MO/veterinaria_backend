@@ -16,6 +16,7 @@ from .forms import ImagenGaleriaForm
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfgen import canvas
 
+
 from django.http import HttpResponseForbidden
 from .models import Servicio, Cita, Mascota
 from django.http import JsonResponse
@@ -140,10 +141,11 @@ def RegistroC(request):
         'citas_normales': citas_normales,  # <-- Y esto
         'form': form,
 })
-def reporte_citas_pdf(request):
-    from reportlab.lib.pagesizes import letter, landscape
-    from reportlab.pdfgen import canvas
 
+from reportlab.lib.pagesizes import letter, landscape
+from reportlab.pdfgen import canvas
+
+def reporte_citas_pdf(request):
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="reporte_citas.pdf"'
 
@@ -373,8 +375,8 @@ def gestion(request):
     return render(request, 'gestioncitas.html', {'citas': citas})
 
 def ModificarS(request):
-    return render(request, "modificarservicios.html")
-
+    servicios = Servicio.objects.all().order_by('orden')
+    return render(request, "modificarservicios.html", {'servicios': servicios})
 
 def usuarios(request):
     return render(request, "GestionUsuarios.html")
@@ -463,35 +465,132 @@ def obtener_tip_actual(request):
 
 def gestion_galeria(request):
     imagenes = ImagenGaleria.objects.all().order_by('orden')
+    
     if request.method == 'POST':
-        if 'eliminar' in request.POST:
-            imagen_id = request.POST.get('eliminar')
-            imagen = ImagenGaleria.objects.get(id=imagen_id)
-            imagen.delete()
-            messages.success(request, 'Imagen eliminada correctamente')
-            return redirect('Galeria')
+        # Manejar toggle activa/inactiva
         if 'toggle_activa' in request.POST:
-            imagen_id = request.POST.get('toggle_activa')
-            imagen = ImagenGaleria.objects.get(id=imagen_id)
+            imagen_id = request.POST['toggle_activa']
+            imagen = get_object_or_404(ImagenGaleria, id=imagen_id)
             imagen.activa = not imagen.activa
             imagen.save()
-            messages.success(request, f'Imagen {"activada" if imagen.activa else "ocultada"} correctamente')
+            messages.success(request, f'Imagen {"mostrada" if imagen.activa else "ocultada"} correctamente')
             return redirect('Galeria')
-        form = ImagenGaleriaForm(request.POST, request.FILES)
+            
+        # Resto del código para manejar edición/creación...
+        imagen_id = request.POST.get('imagen_id')
+        if imagen_id:
+            # Manejar edición de imagen existente
+            imagen = get_object_or_404(ImagenGaleria, id=imagen_id)
+            form = ImagenGaleriaForm(request.POST, request.FILES, instance=imagen)
+        else:
+            # Manejar creación de nueva imagen
+            form = ImagenGaleriaForm(request.POST, request.FILES)
+        
         if form.is_valid():
-            if ImagenGaleria.objects.count() >= 9:
-                messages.error(request, 'Solo se permiten 9 imágenes en la galería')
-            else:
-                form.save()
-                messages.success(request, 'Imagen agregada correctamente')
+            form.save()
+            action = 'actualizada' if imagen_id else 'agregada'
+            messages.success(request, f'Imagen {action} correctamente')
             return redirect('Galeria')
+        else:
+            messages.error(request, 'Por favor corrige los errores del formulario')
     else:
         form = ImagenGaleriaForm()
+        
     return render(request, '5. modificar-galeria.html', {
         'imagenes': imagenes,
         'form': form,
         'total_imagenes': ImagenGaleria.objects.count()
     })
+
+@csrf_exempt
+def api_galeria(request, imagen_id=None):
+    if request.method == 'GET':
+        if imagen_id:
+            try:
+                imagen = ImagenGaleria.objects.get(id=imagen_id)
+                data = {
+                    'id': imagen.id,
+                    'imagen': imagen.imagen.url if imagen.imagen else '',
+                    'titulo': imagen.titulo if imagen.titulo else '',
+                    'orden': imagen.orden,
+                    'activa': imagen.activa
+                }
+                return JsonResponse(data)
+            except ImagenGaleria.DoesNotExist:
+                return JsonResponse({'error': 'Imagen no encontrada'}, status=404)
+        else:
+            imagenes = ImagenGaleria.objects.all().order_by('orden')
+            data = [{
+                'id': img.id,
+                'imagen': img.imagen.url if img.imagen else '',
+                'titulo': img.titulo if img.titulo else '',
+                'orden': img.orden,
+                'activa': img.activa
+            } for img in imagenes]
+            return JsonResponse(data, safe=False)
+    
+    elif request.method == 'POST':
+        try:
+            data = request.POST
+            files = request.FILES
+            
+            if imagen_id:
+                # Actualizar imagen existente
+                imagen = ImagenGaleria.objects.get(id=imagen_id)
+                imagen.titulo = data.get('titulo', imagen.titulo)
+                imagen.orden = data.get('orden', imagen.orden)
+                
+                if 'imagen' in files:
+                    imagen.imagen = files['imagen']
+                
+                imagen.save()
+                message = 'Imagen actualizada correctamente'
+            else:
+                # Crear nueva imagen
+                imagen = ImagenGaleria.objects.create(
+                    titulo=data.get('titulo', ''),
+                    orden=data.get('orden', 1),
+                    imagen=files['imagen'] if 'imagen' in files else None
+                )
+                message = 'Imagen creada correctamente'
+            
+            return JsonResponse({
+                'success': True,
+                'id': imagen.id,
+                'message': message,
+                'imagen': imagen.imagen.url if imagen.imagen else ''
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            }, status=400)
+    
+    elif request.method == 'DELETE':
+        try:
+            imagen = ImagenGaleria.objects.get(id=imagen_id)
+            if imagen.imagen:
+                imagen.imagen.delete()
+            imagen.delete()
+            return JsonResponse({'success': True, 'message': 'Imagen eliminada correctamente'})
+        except ImagenGaleria.DoesNotExist:
+            return JsonResponse({'error': 'Imagen no encontrada'}, status=404)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=400)
+    
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+
+def eliminar_imagen(request, imagen_id):
+    if request.method == 'POST':
+        imagen = get_object_or_404(ImagenGaleria, id=imagen_id)
+        imagen.delete()
+        messages.success(request, 'Imagen eliminada correctamente.')
+        return redirect('Galeria')  # Redirige a la galería después de eliminar
+    else:
+        messages.error(request, 'Método no permitido.')
+        return redirect('Galeria')  # Redirige a la galería si no es un POST
 
 # --- Gestión de citas ---
 
@@ -606,82 +705,58 @@ def modificar_servicio(request):
     servicios = Servicio.objects.all().order_by('orden')
     return render(request, 'modificarservicios.html', {'servicios': servicios})
 
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.shortcuts import get_object_or_404
+from .models import Servicio
+import json
+
 @csrf_exempt
 def api_servicios(request, servicio_id=None):
-    if request.method == 'POST':
-        try:
-            data = request.POST
-            files = request.FILES
-            
-            if 'servicio_id' in data and data['servicio_id']:
-                # Actualizar servicio existente
-                servicio = Servicio.objects.get(id=data['servicio_id'])
-                servicio.nombre = data.get('nombre', servicio.nombre)
-                
-                servicio.titulo_ventana = data.get('titulo_ventana', servicio.titulo_ventana)
-                servicio.subtitulo_ventana = data.get('subtitulo_ventana', servicio.subtitulo_ventana)
-                servicio.contenido_ventana = data.get('contenido_ventana', servicio.contenido_ventana)
-                servicio.mostrar_boton_agendar = data.get('mostrar_boton_agendar', 'off') == 'on'
-                
-                if 'imagen_cuadro' in files:
-                    servicio.imagen_cuadro = files['imagen_cuadro']
-                if 'imagen_ventana' in files:
-                    servicio.imagen_ventana = files['imagen_ventana']
-                
-                servicio.save()
-            else:
-                # Crear nuevo servicio - ELIMINA mostrar_boton_consulta ya que siempre será True
-                servicio = Servicio.objects.create(
-                    nombre=data['nombre'],
-                    imagen_cuadro=files['imagen_cuadro'],
-                    titulo_ventana=data['titulo_ventana'],
-                    subtitulo_ventana=data['subtitulo_ventana'],
-                    imagen_ventana=files['imagen_ventana'],
-                    contenido_ventana=data['contenido_ventana'],
-                    mostrar_boton_agendar=data.get('mostrar_boton_agendar', 'off') == 'on',
-                    orden=Servicio.objects.count() + 1
-                )
-            
-            return JsonResponse({'success': True, 'id': servicio.id})
-        except Exception as e:
-            return JsonResponse({'error': str(e)}, status=400)
     if request.method == 'GET':
         if servicio_id:
-            servicio = get_object_or_404(Servicio, id=servicio_id)
-            data = {
-                'id': servicio.id,
-                'nombre': servicio.nombre,
-                'imagen_cuadro': servicio.imagen_cuadro.url if servicio.imagen_cuadro else '',
-                'titulo_ventana': servicio.titulo_ventana,
-                'subtitulo_ventana': servicio.subtitulo_ventana,
-                'imagen_ventana': servicio.imagen_ventana.url if servicio.imagen_ventana else '',
-                'contenido_ventana': servicio.contenido_ventana,
-                'mostrar_boton_agendar': servicio.mostrar_boton_agendar,
-            }
-            return JsonResponse(data)
+            # Detalle de un servicio específico
+            try:
+                servicio = Servicio.objects.get(id=servicio_id)
+                data = {
+                    'id': servicio.id,
+                    'nombre': servicio.nombre,
+                    'imagen_cuadro': servicio.imagen_cuadro.url if servicio.imagen_cuadro else '',
+                    'titulo_ventana': servicio.titulo_ventana,  # Siempre será "Detalles del Servicio"
+                    'subtitulo_ventana': servicio.subtitulo_ventana,
+                    'imagen_ventana': servicio.imagen_ventana.url if servicio.imagen_ventana else '',
+                    'contenido_ventana': servicio.contenido_ventana,
+                }
+                return JsonResponse(data)
+            except Servicio.DoesNotExist:
+                return JsonResponse({'error': 'Servicio no encontrado'}, status=404)
         else:
+            # Listado de todos los servicios
             servicios = Servicio.objects.all().order_by('orden')
             data = [{
                 'id': s.id,
                 'nombre': s.nombre,
                 'imagen_cuadro': s.imagen_cuadro.url if s.imagen_cuadro else '',
+                'titulo_ventana': s.titulo_ventana,  # Siempre será "Detalles del Servicio"
+                'subtitulo_ventana': s.subtitulo_ventana,
+                'imagen_ventana': s.imagen_ventana.url if s.imagen_ventana else '',
+                'contenido_ventana': s.contenido_ventana,
             } for s in servicios]
             return JsonResponse(data, safe=False)
     
     elif request.method == 'POST':
+        # Crear o actualizar un servicio
         try:
             data = request.POST
             files = request.FILES
             
-            if 'servicio_id' in data and data['servicio_id']:
+            if servicio_id:
                 # Actualizar servicio existente
-                servicio = Servicio.objects.get(id=data['servicio_id'])
+                servicio = Servicio.objects.get(id=servicio_id)
                 servicio.nombre = data.get('nombre', servicio.nombre)
-                
-                servicio.titulo_ventana = data.get('titulo_ventana', servicio.titulo_ventana)
+                # titulo_ventana no se actualiza, se mantiene fijo
                 servicio.subtitulo_ventana = data.get('subtitulo_ventana', servicio.subtitulo_ventana)
                 servicio.contenido_ventana = data.get('contenido_ventana', servicio.contenido_ventana)
-                servicio.mostrar_boton_agendar = data.get('mostrar_boton_agendar', 'off') == 'on'
                 
                 if 'imagen_cuadro' in files:
                     servicio.imagen_cuadro = files['imagen_cuadro']
@@ -689,32 +764,60 @@ def api_servicios(request, servicio_id=None):
                     servicio.imagen_ventana = files['imagen_ventana']
                 
                 servicio.save()
+                message = 'Servicio actualizado correctamente'
             else:
-                # Crear nuevo servicio
+                # Crear nuevo servicio - título fijo
                 servicio = Servicio.objects.create(
                     nombre=data['nombre'],
-                    imagen_cuadro=files['imagen_cuadro'],
-                    titulo_ventana=data['titulo_ventana'],
+                    titulo_ventana="Detalles del Servicio",  # Valor fijo
                     subtitulo_ventana=data['subtitulo_ventana'],
-                    imagen_ventana=files['imagen_ventana'],
                     contenido_ventana=data['contenido_ventana'],
-                    mostrar_boton_agendar=data.get('mostrar_boton_agendar', 'off') == 'on',
                     orden=Servicio.objects.count() + 1
                 )
+                
+                # Manejar imágenes si se enviaron
+                if 'imagen_cuadro' in files:
+                    servicio.imagen_cuadro = files['imagen_cuadro']
+                if 'imagen_ventana' in files:
+                    servicio.imagen_ventana = files['imagen_ventana']
+                servicio.save()
+                message = 'Servicio creado correctamente'
             
-            return JsonResponse({'success': True, 'id': servicio.id})
+            return JsonResponse({
+                'success': True,
+                'id': servicio.id,
+                'message': message,
+                'imagen_cuadro': servicio.imagen_cuadro.url if servicio.imagen_cuadro else '',
+                'imagen_ventana': servicio.imagen_ventana.url if servicio.imagen_ventana else ''
+            })
+            
+        except Exception as e:
+            return JsonResponse({
+                'success': False,
+                'error': str(e)
+            }, status=400)
+    
+    elif request.method == 'DELETE':
+        # Eliminar un servicio
+        try:
+            servicio = Servicio.objects.get(id=servicio_id)
+            
+            # Eliminar archivos de imágenes si existen
+            if servicio.imagen_cuadro:
+                servicio.imagen_cuadro.delete()
+            if servicio.imagen_ventana:
+                servicio.imagen_ventana.delete()
+                
+            servicio.delete()
+            return JsonResponse({'success': True, 'message': 'Servicio eliminado correctamente'})
+            
+        except Servicio.DoesNotExist:
+            return JsonResponse({'error': 'Servicio no encontrado'}, status=404)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=400)
     
-    elif request.method == 'DELETE':
-        try:
-            servicio = Servicio.objects.get(id=servicio_id)
-            servicio.delete()
-            return JsonResponse({'success': True})
-        except Servicio.DoesNotExist:
-            return JsonResponse({'error': 'Servicio no encontrado'}, status=404)
-    
     return JsonResponse({'error': 'Método no permitido'}, status=405)
+
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
@@ -833,8 +936,55 @@ def editar_usuario(request, documento):
     })
 
 from django.contrib.auth import logout as auth_logout
-
 def toggle_estado_usuario(request, documento):
+    if request.method == 'POST':
+        admin = get_object_or_404(Administrador, documento=documento)
+        es_usuario_actual = (request.user.documento == documento)
+        
+        admin.is_active = not admin.is_active
+        admin.save()
+        
+        mensaje = f'Usuario {"activado" if admin.is_active else "desactivado"} correctamente'
+        
+        # Si el usuario se desactivó a sí mismo
+        if es_usuario_actual and not admin.is_active:
+            auth_logout(request)
+            return JsonResponse({
+                'success': True,
+                'message': mensaje + '. Sesión cerrada automáticamente.',
+                'is_active': admin.is_active,
+                'logout_required': True  # Nueva bandera para indicar que se debe cerrar sesión
+            })
+        
+        return JsonResponse({
+            'success': True,
+            'message': mensaje,
+            'is_active': admin.is_active,
+            'logout_required': False
+        })
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
+
+def eliminar_usuario(request, documento):
+    if request.method == 'POST':
+        admin = get_object_or_404(Administrador, documento=documento)
+        es_usuario_actual = (request.user.documento == documento)
+        
+        admin.delete()
+        
+        if es_usuario_actual:
+            auth_logout(request)
+            return JsonResponse({
+                'success': True, 
+                'message': 'Usuario eliminado correctamente. Sesión cerrada.',
+                'logout_required': True  # Nueva bandera para indicar que se debe cerrar sesión
+            })
+            
+        return JsonResponse({
+            'success': True, 
+            'message': 'Usuario eliminado correctamente',
+            'logout_required': False
+        })
+    return JsonResponse({'error': 'Método no permitido'}, status=405)
     if request.method == 'POST':
         admin = get_object_or_404(Administrador, documento=documento)
         es_usuario_actual = (request.user.documento == documento)

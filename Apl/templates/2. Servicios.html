@@ -50,11 +50,9 @@
                 <button onclick="mostrarDetalleServicio('{{ servicio.nombre|slugify }}')" class="btn-consulta">
                     <i class="fas fa-info-circle"></i> Detalles
                 </button>
-                {% if servicio.mostrar_boton_agendar %}
                 <a href="{% url 'agendar' %}#formulario" class="btn-agendar">
                     <i class="fas fa-calendar-alt"></i> Agendar
                 </a>
-                {% endif %}
             </div>
         </div>
         {% endfor %}
@@ -66,16 +64,13 @@
     <!--Ventana {{ servicio.nombre }}-->
     <div class="detalles" id="{{ servicio.nombre|slugify }}D">
         <button class="salir-garantizado" onclick="cerrarDetalleServicio()">×</button>
-        <h1><strong>Detalles del Servicio</strong></h1>
-        <h2><strong>{{ servicio.titulo_ventana }}</strong></h2>
+        <h1><strong>{{ servicio.titulo_ventana }}</strong></h1>
         <h3>{{ servicio.subtitulo_ventana }}</h3>
         <img class="img2" src="{{ servicio.imagen_ventana.url }}" alt="{{ servicio.nombre }}">
         <p>{{ servicio.contenido_ventana }}</p>
-        {% if servicio.mostrar_boton_agendar %}
         <a href="{% url "agendar" %}#formulario">
             <button class="agendar">Agendar</button>
         </a>
-        {% endif %}
     </div>
     {% endfor %}
 

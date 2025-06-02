@@ -330,22 +330,20 @@
 
         // Funciones del formulario
         function resetForm() {
-            const form = document.getElementById('usuarioForm');
-            form.reset();
-            clearErrors();
-            
-            isEditMode = false;
-            currentDocumento = '';
-            document.getElementById('modalTitle').textContent = 'Nuevo Administrador';
-            document.getElementById('submitButton').textContent = 'Crear';
-            
-            // Mostrar campos de contraseña y hacerlos requeridos
+            document.getElementById('usuarioForm').reset();
+            document.getElementById('inputDocumento').value = '';
+            document.getElementById('inputDocumentoLogin').value = '';
+            document.getElementById('inputDocumentoLogin').readOnly = false;
             document.getElementById('passwordFields').style.display = 'block';
             document.getElementById('inputPassword').required = true;
             document.getElementById('inputConfirmPassword').required = true;
+            document.getElementById('modalTitle').textContent = 'Nuevo Administrador';
+            document.getElementById('submitButton').textContent = 'Crear';
+            isEditMode = false;
+            currentDocumento = '';
             
-            // Habilitar edición de documento
-            document.getElementById('inputDocumentoLogin').readOnly = false;
+            // Limpiar errores
+            clearErrors();
         }
 
         function clearErrors() {
@@ -637,81 +635,192 @@
             }
         }
 
-        async function eliminarUsuario(documento) {
-            try {
-                const usuarioActual = "{{ request.user.documento }}"; // Obtener documento del usuario logueado
-                
-                // Mensaje diferente si intenta eliminarse a sí mismo
-                const mensajeConfirmacion = (documento === usuarioActual) 
-                    ? "Si eliminas tu cuenta, se cerrará la sesión automáticamente y no podras volver a ingresar. ¿Deseas continuar?"
-                    : "¡No podrás revertir esta acción!";
+async function eliminarUsuario(documento) {
+    try {
+        // Verificar si hay un usuario autenticado
+        const usuarioActual = "{{ request.user.documento }}" || null;
+        
+        if (!usuarioActual) {
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error de autenticación',
+                text: 'Debes iniciar sesión para realizar esta acción',
+                confirmButtonText: 'Entendido'
+            });
+            window.location.href = "{% url 'login' %}";
+            return;
+        }
 
-                const result = await Swal.fire({
-                    title: '¿Estás seguro?',
-                    html: mensajeConfirmacion,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Sí, eliminar',
-                    cancelButtonText: 'Cancelar'
-                });
+        const mensajeConfirmacion = (documento === usuarioActual) 
+            ? "Si eliminas tu cuenta, se cerrará la sesión automáticamente. ¿Deseas continuar?"
+            : "¿Estás seguro de que deseas eliminar este usuario?";
 
-                if (result.isConfirmed) {
-                    const response = await fetch(`/usuarios/eliminar/${documento}/`, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRFToken': '{{ csrf_token }}',
-                            'Content-Type': 'application/json',
-                        },
-                    });
-                    
-                    if (!response.ok) {
-                        throw new Error(`Error ${response.status}`);
-                    }
-                    
-                    const data = await response.json();
-                    
-                    if (data.success) {
-                        // Eliminar la fila de la tabla sin recargar
-                        const fila = document.querySelector(`.btn-eliminar[data-documento="${documento}"]`).closest('tr');
-                        fila.remove();
-                        
-                        // Mostrar mensaje de éxito
-                        await Swal.fire({
-                            icon: 'success',
-                            title: '¡Eliminado!',
-                            text: 'El usuario ha sido eliminado correctamente',
-                            confirmButtonText: 'Aceptar'
-                        });
-                        
-                        // Si se eliminó a sí mismo, redirigir al login
-                        if (documento === usuarioActual) {
-                            window.location.href = "{% url 'logout' %}";
-                        }
-                        
-                        // Si la tabla queda vacía, mostrar mensaje
-                        if (document.querySelector('tbody').children.length === 0) {
-                            document.querySelector('tbody').innerHTML = `
-                                <tr>
-                                    <td colspan="6" class="text-center py-4">No hay usuarios registrados</td>
-                                </tr>
-                            `;
-                        }
-                    } else {
-                        throw new Error(data.message || 'Error al eliminar el usuario');
-                    }
+        const result = await Swal.fire({
+            title: '¿Estás seguro?',
+            html: mensajeConfirmacion,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Sí, eliminar',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (result.isConfirmed) {
+            const response = await fetch(`/usuarios/eliminar/${documento}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json',
+                },
+            });
+            
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || `Error ${response.status}`);
+            }
+            
+            if (data.success) {
+                if (data.logout_required) {
+                    window.location.href = "{% url 'logout' %}";
+                    return;
                 }
-            } catch (error) {
-                console.error('Error al eliminar usuario:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: error.message || 'No se pudo eliminar el usuario',
-                    confirmButtonText: 'Entendido'
+                
+                // Eliminar la fila de la tabla
+                const fila = document.querySelector(`.btn-eliminar[data-documento="${documento}"]`).closest('tr');
+                fila.remove();
+                
+                await Swal.fire({
+                    icon: 'success',
+                    title: '¡Eliminado!',
+                    text: data.message,
+                    confirmButtonText: 'Aceptar'
                 });
+                
+                // Si la tabla queda vacía, mostrar mensaje
+                if (document.querySelector('tbody').children.length === 0) {
+                    document.querySelector('tbody').innerHTML = `
+                        <tr>
+                            <td colspan="6" class="text-center py-4">No hay usuarios registrados</td>
+                        </tr>
+                    `;
+                }
+            } else {
+                throw new Error(data.message || 'Error al eliminar el usuario');
             }
         }
+    } catch (error) {
+        console.error('Error al eliminar usuario:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message || 'No se pudo eliminar el usuario',
+            confirmButtonText: 'Entendido'
+        });
+        
+        // Si el error es de autenticación, redirigir al login
+        if (error.message.includes('autenticación') || error.message.includes('AnonymousUser')) {
+            window.location.href = "{% url 'login' %}";
+        }
+    }
+}
+
+async function toggleEstadoUsuario(documento) {
+    try {
+        // Verificar si hay un usuario autenticado
+        const usuarioActual = "{{ request.user.documento }}" || null;
+        
+        if (!usuarioActual) {
+            await Swal.fire({
+                icon: 'error',
+                title: 'Error de autenticación',
+                text: 'Debes iniciar sesión para realizar esta acción',
+                confirmButtonText: 'Entendido'
+            });
+            window.location.href = "{% url 'login' %}";
+            return;
+        }
+
+        const boton = document.querySelector(`.toggle-estado[data-documento="${documento}"]`);
+        const accion = boton.textContent.trim();
+        const esUsuarioActual = (documento === usuarioActual);
+        
+        const mensajeConfirmacion = esUsuarioActual && accion.includes("Desactivar") 
+            ? "Si desactivas tu cuenta, se cerrará la sesión automáticamente. ¿Deseas continuar?"
+            : `¿Deseas ${accion.toLowerCase()} este usuario?`;
+
+        const result = await Swal.fire({
+            title: 'Confirmación',
+            html: mensajeConfirmacion,
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#3085d6',
+            cancelButtonColor: '#d33',
+            confirmButtonText: 'Continuar',
+            cancelButtonText: 'Cancelar'
+        });
+
+        if (result.isConfirmed) {
+            const response = await fetch(`/usuarios/toggle-estado/${documento}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': '{{ csrf_token }}',
+                    'Content-Type': 'application/json',
+                },
+            });
+            
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || `Error ${response.status}`);
+            }
+            
+            if (data.success) {
+                // Actualizar el estado en la interfaz
+                const fila = boton.closest('tr');
+                const estadoCelda = fila.querySelector('td:nth-child(5)');
+                
+                if (data.is_active) {
+                    estadoCelda.innerHTML = '<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Activo</span>';
+                    boton.innerHTML = '<i class="fas fa-ban"></i> <span class="hidden sm:inline">Desactivar</span>';
+                    boton.className = 'toggle-estado bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-md transition-colors inline-flex items-center gap-1 text-sm';
+                } else {
+                    estadoCelda.innerHTML = '<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Inactivo</span>';
+                    boton.innerHTML = '<i class="fas fa-check"></i> <span class="hidden sm:inline">Activar</span>';
+                    boton.className = 'toggle-estado bg-green-500 hover:bg-green-600 text-white px-3 py-1 rounded-md transition-colors inline-flex items-center gap-1 text-sm';
+                }
+                
+                await Swal.fire({
+                    icon: 'success',
+                    title: '¡Éxito!',
+                    text: data.message,
+                    confirmButtonText: 'Aceptar'
+                });
+                
+                // Cerrar sesión si el usuario se desactivó a sí mismo
+                if (data.logout_required) {
+                    window.location.href = "{% url 'logout' %}";
+                }
+            } else {
+                throw new Error(data.message || 'Error al cambiar el estado');
+            }
+        }
+    } catch (error) {
+        console.error('Error al cambiar estado:', error);
+        Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message || 'No se pudo cambiar el estado del usuario',
+            confirmButtonText: 'Entendido'
+        });
+        
+        // Si el error es de autenticación, redirigir al login
+        if (error.message.includes('autenticación') || error.message.includes('AnonymousUser')) {
+            window.location.href = "{% url 'login' %}";
+        }
+    }
+}
 
         function validarFormulario() {
             let isValid = true;
@@ -778,137 +887,91 @@
             return isValid;
         }
 
-        async function enviarFormulario() {
-            if (!validarFormulario()) return;
+async function enviarFormulario() {
+    if (!validarFormulario()) return;
 
-            const formData = new FormData(document.getElementById('usuarioForm'));
-            const url = isEditMode 
-                ? `/usuarios/editar/${currentDocumento}/` 
-                : `/usuarios/crear/`;
+    const formData = new FormData(document.getElementById('usuarioForm'));
+    const url = isEditMode 
+        ? `/usuarios/editar/${currentDocumento}/` 
+        : `/usuarios/crear/`;
 
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    body: formData,
-                    headers: {
-                        'X-CSRFToken': '{{ csrf_token }}',
-                    },
-                });
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+        });
 
-                const data = await response.json();
-                
-                if (!response.ok) {
-                    throw new Error(data.message || `Error ${response.status}`);
-                }
-
-                if (data.success) {
-                    Swal.fire({
-                        title: '¡Éxito!',
-                        text: isEditMode ? 'Usuario actualizado correctamente' : 'Usuario creado correctamente',
-                        icon: 'success'
-                    }).then(() => {
-                        cerrarModal();
-                        window.location.reload();
-                    });
-                } else if (data.errors) {
-                    // Mostrar errores de validación del servidor
-                    Object.entries(data.errors).forEach(([field, message]) => {
-                        const errorElement = document.getElementById(`${field}Error`);
-                        if (errorElement) {
-                            errorElement.textContent = message;
-                        }
-                    });
-                }
-            } catch (error) {
-                console.error('Error al enviar formulario:', error);
-                Swal.fire({
-                    title: 'Error',
-                    text: error.message || 'Ocurrió un error al procesar la solicitud',
-                    icon: 'error'
-                });
-            }
+        const data = await response.json();
+        
+        if (!response.ok) {
+            throw new Error(data.message || `Error ${response.status}`);
         }
 
-        async function toggleEstadoUsuario(documento) {
-            try {
-                const usuarioActual = "{{ request.user.documento }}";
-                const esUsuarioActual = (documento === usuarioActual);
-                const accion = document.querySelector(`.toggle-estado[data-documento="${documento}"]`).textContent.trim();
-                
-                // Mensaje personalizado para auto-desactivación
-                let mensajeConfirmacion = `¿Deseas ${accion.toLowerCase()} este usuario?`;
-                
-                if (esUsuarioActual && accion.includes("Desactivar")) {
-                    mensajeConfirmacion = "Si desactivas tu cuenta, se cerrará la sesión automáticamente y no podrás volver a ingresar. ¿Deseas continuar?";
+        if (data.success) {
+            Swal.fire({
+                title: '¡Éxito!',
+                text: isEditMode ? 'Usuario actualizado correctamente' : 'Usuario creado correctamente',
+                icon: 'success'
+            }).then(() => {
+                cerrarModal();
+                if (isEditMode) {
+                    // Actualizar solo la fila modificada
+                    const fila = document.querySelector(`.btn-editar[data-documento="${currentDocumento}"]`).closest('tr');
+                    fila.innerHTML = `
+                        <td class="px-4 py-6 text-lg border-b border-gray-100">${data.administrador.documento}</td>
+                        <td class="px-4 py-6 text-lg border-b border-gray-100">${data.administrador.nombre_completo}</td>
+                        <td class="px-4 py-6 text-lg border-b border-gray-100">${data.administrador.correo_electronico}</td>
+                        <td class="px-4 py-6 text-lg border-b border-gray-100">${data.administrador.telefono}</td>
+                        <td class="px-4 py-6 border-b border-gray-100">
+                            ${data.administrador.is_active ? 
+                                '<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Activo</span>' : 
+                                '<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Inactivo</span>'}
+                        </td>
+                        <td class="px-4 py-6 border-b border-gray-100">
+                            <div class="flex flex-wrap justify-center gap-2">
+                                <button class="btn-editar bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md transition-colors inline-flex items-center gap-1 text-sm" data-documento="${data.administrador.documento}">
+                                    <i class="fas fa-edit"></i> 
+                                    <span class="hidden sm:inline">Editar</span>
+                                </button>
+                                <button class="btn-eliminar bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md transition-colors inline-flex items-center gap-1 text-sm" data-documento="${data.administrador.documento}">
+                                    <i class="fas fa-trash-alt"></i> 
+                                    <span class="hidden sm:inline">Eliminar</span>
+                                </button>
+                                <button class="toggle-estado bg-${data.administrador.is_active ? 'yellow' : 'green'}-500 hover:bg-${data.administrador.is_active ? 'yellow' : 'green'}-600 text-white px-3 py-1 rounded-md transition-colors inline-flex items-center gap-1 text-sm" data-documento="${data.administrador.documento}">
+                                    <i class="fas fa-${data.administrador.is_active ? 'ban' : 'check'}"></i> 
+                                    <span class="hidden sm:inline">${data.administrador.is_active ? 'Desactivar' : 'Activar'}</span>
+                                </button>
+                            </div>
+                        </td>
+                    `;
+                } else {
+                    // Si es creación, recargar la página
+                    window.location.reload();
                 }
-
-                const result = await Swal.fire({
-                    title: 'Confirmación',
-                    html: mensajeConfirmacion,
-                    icon: 'warning',
-                    showCancelButton: true,
-                    confirmButtonColor: '#3085d6',
-                    cancelButtonColor: '#d33',
-                    confirmButtonText: 'Continuar',
-                    cancelButtonText: 'Cancelar'
-                });
-
-                if (result.isConfirmed) {
-                    const response = await fetch(`/usuarios/toggle-estado/${documento}/`, {
-                        method: 'POST',
-                        headers: {
-                            'X-CSRFToken': '{{ csrf_token }}',
-                            'Content-Type': 'application/json',
-                        },
-                    });
-                    
-                    if (!response.ok) {
-                        throw new Error(`Error ${response.status}`);
-                    }
-                    
-                    const data = await response.json();
-                    
-                    if (data.success) {
-                        // Actualizar el estado en la tabla
-                        const fila = document.querySelector(`.toggle-estado[data-documento="${documento}"]`).closest('tr');
-                        const estadoCelda = fila.querySelector('td:nth-child(5)');
-                        
-                        if (data.is_active) {
-                            estadoCelda.innerHTML = '<span class="text-green-600">Activo</span>';
-                            fila.querySelector('.toggle-estado').innerHTML = '<i class="fas fa-ban"></i> Desactivar';
-                            fila.querySelector('.toggle-estado').className = 'toggle-estado bg-yellow-500 text-white px-3 py-1 rounded hover:bg-yellow-600';
-                        } else {
-                            estadoCelda.innerHTML = '<span class="text-red-600">Inactivo</span>';
-                            fila.querySelector('.toggle-estado').innerHTML = '<i class="fas fa-check"></i> Activar';
-                            fila.querySelector('.toggle-estado').className = 'toggle-estado bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600';
-                        }
-                        
-                        // Mostrar mensaje de éxito
-                        await Swal.fire({
-                            icon: 'success',
-                            title: '¡Éxito!',
-                            text: data.message,
-                            confirmButtonText: 'Aceptar'
-                        });
-                        
-                        // Si se desactivó a sí mismo, redirigir al login
-                        if (esUsuarioActual && !data.is_active) {
-                            window.location.href = "{% url 'logout' %}";
-                        }
-                    } else {
-                        throw new Error(data.message || 'Error al cambiar el estado');
-                    }
+            });
+        } else if (data.errors) {
+            // Mostrar errores de validación del servidor
+            Object.entries(data.errors).forEach(([field, message]) => {
+                const errorElement = document.getElementById(`${field}Error`);
+                if (errorElement) {
+                    errorElement.textContent = message;
                 }
-            } catch (error) {
-                console.error('Error al cambiar estado:', error);
-                Swal.fire({
-                    icon: 'error',
-                    title: 'Error',
-                    text: error.message || 'No se pudo cambiar el estado del usuario',
-                    confirmButtonText: 'Entendido'
-                });
-            }
+            });
         }
+    } catch (error) {
+        console.error('Error al enviar formulario:', error);
+        Swal.fire({
+            title: 'Error',
+            text: error.message || 'Ocurrió un error al procesar la solicitud',
+            icon: 'error'
+        });
+    }
+}
+
 
         // Event Listeners
         document.addEventListener('DOMContentLoaded', function() {
