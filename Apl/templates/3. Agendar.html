@@ -30,7 +30,7 @@
         <nav class="opciones" id="menu">
             <button class="cerrar" id="cerrar-menu">✕</button>
             <a href={% url "index"%}>INICIO</a>
-            <a href="#conocenos">CONÓCENOS</a>
+            <a href="{% url 'index' %}#conocenos">CONÓCENOS</a>
             <a href={% url "servicios" %}>SERVICIOS</a>
             <a href={% url "agendar" %}>AGENDAR CITA</a>
             <a href={% url "login"%}><img class="perfil" src={% static "Images/perfil.png" %} alt="logo DR.PUL"></a>
@@ -244,10 +244,17 @@
                 </div>
                 <div class="error-message" id="services-error"></div>
             </div>
-            <button type="submit" class="agendar">Enviar</button>
             <div id="form-error" class="alert alert-danger" style="display: none;"></div>
-            <a href="{% url 'CancelarCita' %}" class="agendar" style="margin-top: 10px; display: inline-block;">Cancelar una cita</a>
-            <a class="dispo" href="#inicio"><h3>⬆️ Disponibilidad ⬆️</h3></a>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 18px; gap: 10px;">
+                <a href="{% url 'CancelarCita' %}" class="agendar" style="background:#e3342f; color:#fff; min-width: 160px; text-align:center;">
+                    Cancelar cita online
+                </a>
+                <!-- Botón de enviar (modifica el botón para que sea type="button" y tenga id="btn-abrir-terminos") -->
+                <button type="button" class="agendar" id="btn-abrir-terminos" style="min-width: 120px;">Enviar</button>
+                <a href="{% url 'Agenadarllamada' %}" class="agendar" style="background:#1E2D93; color:#fff; min-width: 220px; text-align:center;">
+                    <span style="color:#ff3c00;">📞</span> Agendar cita por llamada
+                </a>
+            </div>
         </form>
     </div>
 </section>
@@ -256,10 +263,23 @@
     {% if messages %}
     <div class="mensaje-exito-container">
         {% for message in messages %}
-        <div class="mensaje-exito">
-            <span class="mensaje-texto">{{ message }}</span>
-            <button onclick="this.parentElement.style.display='none'" class="cerrar-mensaje">&times;</button>
-        </div>
+            {% if "invalid date format" in message|stringformat:"s" or "Error" in message|stringformat:"s" %}
+                <div class="mensaje-exito mensaje-error">
+                    <span class="mensaje-texto">
+                        {% if "invalid date format" in message|stringformat:"s" %}
+                            Error: No se ha registrado el formulario o hay campos sin completar.
+                        {% else %}
+                            {{ message }}
+                        {% endif %}
+                    </span>
+                    <button onclick="this.parentElement.style.display='none'" class="cerrar-mensaje">&times;</button>
+                </div>
+            {% else %}
+                <div class="mensaje-exito">
+                    <span class="mensaje-texto">{{ message }}</span>
+                    <button onclick="this.parentElement.style.display='none'" class="cerrar-mensaje">&times;</button>
+                </div>
+            {% endif %}
         {% endfor %}
     </div>
     {% endif %}
@@ -318,6 +338,14 @@
         from { opacity: 0; transform: translateY(-30px);}
         to { opacity: 1; transform: translateY(0);}
     }
+    .mensaje-error {
+    background: #ffeaea !important;
+    color: #c0392b !important;
+    border: 1.5px solid #e3342f !important;
+}
+.mensaje-error .cerrar-mensaje {
+    color: #c0392b !important;
+}
 </style>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -782,22 +810,6 @@
             border-radius: 5px;
             margin-bottom: 25px; /* Más espacio para el mensaje de error */
         }
-        .input-error {
-            border: 2px solid #ff4444 !important;
-        }
-
-        .error-message {
-            color: #ff4444;
-            font-size: 0.8em;
-            margin-top: 5px;
-            display: none;
-        }
-
-        .checkbox-group.input-error {
-            border: 2px solid #ff4444;
-            padding: 10px;
-            border-radius: 5px;
-        }
         div.form-group > div.date-container {
             margin-bottom: 0px;
         }
@@ -805,6 +817,44 @@
         div.form-group > div.date-container + .form-group {
             margin-top: 0px;
         }
+        @media (max-width: 700px) {
+    .formulario .container > form > div[style*="display: flex"] {
+        flex-direction: column !important;
+        gap: 14px !important;
+        align-items: stretch !important;
+        margin-top: 10px !important;
+    }
+    .formulario .container > form .agendar,
+    .formulario .container > form button.agendar {
+        min-width: unset !important;
+        width: 100% !important;
+        margin: 0 !important;
+        text-align: center;
+        font-size: 1.08em;
+        padding: 13px 0 !important;
+        border-radius: 7px !important;
+        box-shadow: 0 2px 8px rgba(58,110,173,0.08);
+        transition: background 0.2s, color 0.2s;
+    }
+    .formulario .container > form .agendar:not(:last-child) {
+        margin-bottom: 8px !important;
+    }
+}
+/* Mejora visual para todos los tamaños */
+.formulario .container > form .agendar,
+.formulario .container > form button.agendar {
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    border: none;
+    outline: none;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.formulario .container > form .agendar:hover,
+.formulario .container > form button.agendar:hover {
+    filter: brightness(0.93);
+    box-shadow: 0 4px 16px rgba(58,110,173,0.13);
+}
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -970,5 +1020,103 @@ document.addEventListener('DOMContentLoaded', function () {
 
 <script src={% static "JavaScript/From.js" %}></script>
 <!-- filepath: c:\Users\luisa\OneDrive\Escritorio\DjangoVeterinaria\Apl\templates\3. Agendar.html -->
+<!-- Modal de Términos y Condiciones -->
+<div id="modal-terminos" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.35); z-index:9999; align-items:center; justify-content:center;">
+  <div style="background:#fff; max-width:400px; margin:auto; padding:24px 18px 18px 18px; border-radius:10px; box-shadow:0 4px 24px rgba(0,0,0,0.13); position:relative;">
+    <h3 style="margin-bottom:12px; color:#3a6ead;">Términos y Condiciones</h3>
+    <div style="max-height:220px; overflow-y:auto; font-size:1.08em; margin-bottom:16px; line-height:1.7;">
+      <strong>🐾 TÉRMINOS Y CONDICIONES DE USO DEL SERVICIO DE CITAS EN LÍNEA – Veterinaria DR.PUL</strong>
+      <br><br>
+      <strong>1. Objeto del servicio</strong>
+      <p>Permite solicitar citas veterinarias llenando un formulario en línea, sin registro.</p>
+      <strong>2. Uso adecuado</strong>
+      <ul>
+        <li>Proporcione información veraz y completa.</li>
+        <li>No envíe solicitudes falsas o repetitivas.</li>
+        <li>No interfiera en el funcionamiento del sistema.</li>
+      </ul>
+      <strong>2.1. Uso por menores de edad</strong>
+      <p>Pueden usar el servicio con autorización de padres o responsables.</p>
+      <strong>3. Protección de datos personales</strong>
+      <ul>
+        <li>Sus datos solo se usan para gestionar la cita y contacto.</li>
+        <li>No se comparten con terceros ni se usan con fines comerciales.</li>
+      </ul>
+      <strong>4. Confirmación de la cita</strong>
+      <p>La cita no es automática. Se confirmará por contacto directo.</p>
+      <strong>5. Modificaciones y cancelaciones</strong>
+      <p>Comuníquese con la veterinaria para cambios o cancelaciones.</p>
+      <strong>6. Limitación de responsabilidad</strong>
+      <ul>
+        <li>No somos responsables por errores de datos o fallos técnicos.</li>
+      </ul>
+      <strong>7. Propiedad intelectual</strong>
+      <p>El contenido del sitio es propiedad de la veterinaria.</p>
+      <strong>8. Modificaciones</strong>
+      <p>Estos términos pueden cambiar y serán publicados aquí.</p>
+      <strong>9. Contacto</strong>
+      <p>Correo: veterinariadr.pul@gmail.com<br>
+      Teléfono: +57 310 6890146<br>
+      Dirección: Cl. 16 #915, Sogamoso, Boyacá</p>
+    </div>
+    <div style="display:flex; gap:10px; justify-content:flex-end;">
+      <button id="btn-cancelar-terminos" style="background:#eee; color:#333; border:none; padding:8px 16px; border-radius:5px; cursor:pointer;">Cancelar</button>
+      <button id="btn-aceptar-terminos" style="background:#3a6ead; color:#fff; border:none; padding:8px 16px; border-radius:5px; cursor:pointer;">Acepto</button>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btnAbrirTerminos = document.getElementById('btn-abrir-terminos');
+    const modalTerminos = document.getElementById('modal-terminos');
+    const btnAceptarTerminos = document.getElementById('btn-aceptar-terminos');
+    const btnCancelarTerminos = document.getElementById('btn-cancelar-terminos');
+    const form = document.getElementById('appointment-form');
+
+    btnAbrirTerminos.addEventListener('click', function(e) {
+        // Antes de mostrar el modal, valida el formulario (opcional)
+        // Si quieres que solo se muestre el modal si el formulario es válido, puedes validar aquí.
+        modalTerminos.style.display = 'flex';
+    });
+
+    btnCancelarTerminos.addEventListener('click', function() {
+        modalTerminos.style.display = 'none';
+    });
+
+    btnAceptarTerminos.addEventListener('click', function() {
+        modalTerminos.style.display = 'none';
+        // Envía el formulario
+        form.submit();
+    });
+
+    // Opcional: cerrar modal al hacer click fuera del cuadro
+    modalTerminos.addEventListener('click', function(e) {
+        if (e.target === modalTerminos) {
+            modalTerminos.style.display = 'none';
+        }
+    });
+});
+</script>
+<style>
+/* Puedes ponerlo en tu <style> o en línea en el modal */
+#modal-terminos div[style*="max-height"] {
+    font-size: 1.08em;
+    line-height: 1.7;
+}
+#modal-terminos strong {
+    display: block;
+    margin-top: 12px;
+    color: #3a6ead;
+    font-size: 1.08em;
+}
+#modal-terminos ul {
+    margin: 8px 0 8px 18px;
+    padding-left: 18px;
+}
+#modal-terminos li {
+    margin-bottom: 4px;
+}
+</style>
 </body>
 </html>

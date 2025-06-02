@@ -13,6 +13,8 @@ from django.views.decorators.http import require_POST
 from django.contrib import messages
 from .models import ImagenGaleria
 from .forms import ImagenGaleriaForm
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfgen import canvas
 
 from django.http import HttpResponseForbidden
 from .models import Servicio, Cita, Mascota
@@ -33,6 +35,8 @@ from django.utils import timezone
 
 
 # Create your views here.
+def llamadacita(request):
+    return render(request, "llamadaCitas.html")  
 
 def index(request): 
     imagenes_galeria = ImagenGaleria.objects.filter(activa=True).order_by('orden')[:9]
@@ -136,6 +140,69 @@ def RegistroC(request):
         'citas_normales': citas_normales,  # <-- Y esto
         'form': form,
 })
+def reporte_citas_pdf(request):
+    from reportlab.lib.pagesizes import letter, landscape
+    from reportlab.pdfgen import canvas
+
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename="reporte_citas.pdf"'
+
+    # Usa orientación horizontal para más espacio
+    p = canvas.Canvas(response, pagesize=landscape(letter))
+    width, height = landscape(letter)
+
+    # Anchos de columna personalizados
+    col_widths = [70, 90, 70, 50, 80, 65, 50, 90, 60, 90]
+    encabezados = ["Documento", "Cliente", "Mascota", "Edad", "Raza", "Fecha", "Hora", "Servicio", "Estado", "Obs."]
+
+    x_start = 40
+    y = height - 50
+
+    # Título
+    p.setFont("Helvetica-Bold", 16)
+    p.drawString(x_start, y, "Reporte de Citas (CitaRapida)")
+    y -= 30
+
+    # Encabezados
+    p.setFont("Helvetica-Bold", 10)
+    x = x_start
+    for i, encabezado in enumerate(encabezados):
+        p.drawString(x, y, encabezado)
+        x += col_widths[i]
+    y -= 18
+
+    # Datos
+    p.setFont("Helvetica", 9)
+    citas = CitaRapida.objects.all().order_by('-fecha')
+    for cita in citas:
+        datos = [
+            cita.numero_documento,
+            cita.nombre_cliente,
+            cita.nombre_mascota,
+            cita.edad_mascota,
+            cita.raza_mascota,
+            cita.fecha.strftime('%Y-%m-%d'),
+            cita.hora.strftime('%H:%M'),
+            cita.servicio,
+            cita.estado,
+            (cita.observaciones or "")[:30],  # recorta observaciones
+        ]
+        x = x_start
+        for i, dato in enumerate(datos):
+            # Recorta texto si es muy largo para la columna
+            texto = str(dato)
+            max_chars = int(col_widths[i] // 5.5)
+            if len(texto) > max_chars:
+                texto = texto[:max_chars-3] + "..."
+            p.drawString(x, y, texto)
+            x += col_widths[i]
+        y -= 15
+        if y < 40:
+            p.showPage()
+            y = height - 40
+            p.setFont("Helvetica", 9)
+    p.save()
+    return response
 
 # views.py
 from django.contrib.auth import authenticate, login as auth_login, logout as auth_logout

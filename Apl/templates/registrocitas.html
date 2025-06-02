@@ -101,7 +101,13 @@
       </ol>
     </nav>
     <div class="max-w-7xl mx-auto bg-white rounded-2xl shadow-lg p-6 md:ml-8 ml-4">
-      <h2 class="text-3xl font-bold mb-6 text-blue-800">📅 Registro de Citas</h2>
+      <div class="flex items-center justify-between mb-6">
+        <h2 class="text-3xl font-bold text-blue-800">📅 Registro de Citas</h2>
+        <a href="{% url 'reporte_citas_pdf' %}" target="_blank"
+           class="bg-red-600 text-white px-4 py-2 rounded shadow hover:bg-red-700 transition font-semibold ml-4">
+           Descargar PDF de Citas
+        </a>
+      </div>
 
       <!-- Mensaje de éxito -->
       <div id="mensaje-exito" class="hidden mb-4 p-3 rounded-md bg-green-100 text-green-800 text-sm font-medium transition duration-300">
