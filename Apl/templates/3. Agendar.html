@@ -202,7 +202,7 @@
             <div class="form-group">
                 <label for="hora">Hora de la Cita</label>
                 <div style="display: flex; align-items: center; gap: 10px;">
-                    <input type="time" id="hora" name="hora" required>
+                    <input type="time" id="hora" name="hora" required min="08:00" max="17:00" step="1200" oninvalid="return false;">
                     <button type="button" id="mostrar-horarios" style="padding: 8px 12px; background: #3a6ead; color: #fff; border: none; border-radius: 4px; cursor: pointer;">
                         Ver horarios disponibles
                     </button>
@@ -365,7 +365,25 @@
 
         // Guardar las opciones originales
         const opcionesOriginales = Array.from(razaMascotaSelect.options);
-
+        horaInput.addEventListener('input', function() {
+            if (!this.value) {
+                clearError(this);
+                return;
+            }
+            const [h, m] = this.value.split(':').map(Number);
+            const minutosTotales = h * 60 + m;
+            const inicio = 8 * 60;
+            const fin = 17 * 60;
+            if (
+                minutosTotales < inicio ||
+                minutosTotales > fin ||
+                m % 20 !== 0
+            ) {
+                showError(this, 'Error digite los horarios disponibles de la veterinaria (08:00 a 17:00, cada 20 minutos)');
+            } else {
+                clearError(this);
+            }
+        });
         claseMascotaSelect.addEventListener('change', function() {
             const especie = this.value;
             // Limpiar opciones actuales
@@ -680,13 +698,13 @@
                     minutosTotales > fin ||
                     m % 20 !== 0
                 ) {
-                    showError(horaInput, 'La hora debe estar entre 08:00 y 5:00 en intervalos de 20 minutos');
+                    showError(horaInput, 'Error digite los horarios disponibles de la veterinaria (08:00 a 17:00, cada 20 minutos)');
+                    horaInput.value = '';
                     isValid = false;
                 } else {
                     clearError(horaInput);
                 }
             }
-
             // Validación de servicios
             if (!mainService.value) {
                 showError(mainService, 'Seleccione el servicio principal');
@@ -817,43 +835,96 @@
         div.form-group > div.date-container + .form-group {
             margin-top: 0px;
         }
-        @media (max-width: 700px) {
-    .formulario .container > form > div[style*="display: flex"] {
+        /* Responsive mejorado para el formulario de agendar */
+@media (max-width: 700px) {
+    .container, .formulario .container {
+        padding: 0 6px !important;
+        max-width: 100vw !important;
+    }
+    .calendario-section h2 {
+        font-size: 1.1em !important;
+        text-align: center;
+    }
+    .calendario-section {
+        padding: 0 !important;
+    }
+    #calendario {
+        min-width: 0 !important;
+        width: 100% !important;
+        overflow-x: auto !important;
+    }
+    .formulario .container > h2 {
+        font-size: 1.3em;
+        text-align: center;
+    }
+    .formulario .container > p {
+        font-size: 1em;
+        text-align: center;
+    }
+    .formulario .container form {
+        padding: 10px 0 !important;
+    }
+    .form-group {
+        margin-bottom: 16px !important;
+    }
+    .services-container {
         flex-direction: column !important;
-        gap: 14px !important;
-        align-items: stretch !important;
-        margin-top: 10px !important;
+        gap: 10px !important;
+    }
+    .service-col {
+        width: 100% !important;
+    }
+    .edad-container {
+        flex-direction: row !important;
+        gap: 8px !important;
     }
     .formulario .container > form .agendar,
     .formulario .container > form button.agendar {
-        min-width: unset !important;
         width: 100% !important;
+        min-width: unset !important;
         margin: 0 !important;
-        text-align: center;
+        margin-bottom: 10px !important;
         font-size: 1.08em;
         padding: 13px 0 !important;
         border-radius: 7px !important;
-        box-shadow: 0 2px 8px rgba(58,110,173,0.08);
-        transition: background 0.2s, color 0.2s;
+        text-align: center;
     }
-    .formulario .container > form .agendar:not(:last-child) {
-        margin-bottom: 8px !important;
+    .formulario .container > form > div[style*="display: flex"] {
+        flex-direction: column !important;
+        gap: 10px !important;
+        align-items: stretch !important;
+        margin-top: 10px !important;
+    }
+    #lista-horarios {
+        position: static !important;
+        max-width: 100% !important;
+        width: 100% !important;
+    }
+    .footer-container {
+        flex-direction: column !important;
+        gap: 18px !important;
+        padding: 10px 0 !important;
+    }
+    .footer-section {
+        width: 100% !important;
+        text-align: center !important;
+    }
+    .copyright {
+        font-size: 0.9em !important;
+        text-align: center !important;
     }
 }
-/* Mejora visual para todos los tamaños */
-.formulario .container > form .agendar,
-.formulario .container > form button.agendar {
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    border: none;
-    outline: none;
-    cursor: pointer;
-    transition: background 0.2s, color 0.2s, box-shadow 0.2s;
-}
-.formulario .container > form .agendar:hover,
-.formulario .container > form button.agendar:hover {
-    filter: brightness(0.93);
-    box-shadow: 0 4px 16px rgba(58,110,173,0.13);
+@media (max-width: 480px) {
+    .Logotipo img {
+        height: 36px !important;
+        max-width: 100px !important;
+    }
+    .formulario .container > h2 {
+        font-size: 1.1em;
+    }
+    .formulario .container > p {
+        font-size: 0.97em;
+    }
 }
     </style>
     <script>
@@ -1074,10 +1145,25 @@ document.addEventListener('DOMContentLoaded', function() {
     const btnCancelarTerminos = document.getElementById('btn-cancelar-terminos');
     const form = document.getElementById('appointment-form');
 
+    // Encuentra la función de validación ya existente
+    function validarFormulario() {
+        // Dispara el evento submit para activar la validación JS existente
+        let evento = new Event('submit', {cancelable: true});
+        let resultado = form.dispatchEvent(evento);
+        // Si la validación JS previene el envío, resultado será false
+        return resultado;
+    }
+
     btnAbrirTerminos.addEventListener('click', function(e) {
-        // Antes de mostrar el modal, valida el formulario (opcional)
-        // Si quieres que solo se muestre el modal si el formulario es válido, puedes validar aquí.
-        modalTerminos.style.display = 'flex';
+        // Valida el formulario antes de mostrar el modal
+        // Si tienes validación personalizada, llama aquí a tu función de validación
+        // Si usas solo HTML5, puedes usar form.checkValidity()
+        if (form.checkValidity()) {
+            modalTerminos.style.display = 'flex';
+        } else {
+            // Dispara la validación nativa para mostrar mensajes
+            form.reportValidity();
+        }
     });
 
     btnCancelarTerminos.addEventListener('click', function() {
@@ -1085,9 +1171,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     btnAceptarTerminos.addEventListener('click', function() {
-        modalTerminos.style.display = 'none';
-        // Envía el formulario
-        form.submit();
+        // Envía el formulario solo si es válido
+        if (form.checkValidity()) {
+            form.submit();
+        } else {
+            modalTerminos.style.display = 'none';
+            form.reportValidity();
+        }
     });
 
     // Opcional: cerrar modal al hacer click fuera del cuadro
@@ -1118,5 +1208,36 @@ document.addEventListener('DOMContentLoaded', function() {
     margin-bottom: 4px;
 }
 </style>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const mainService = document.getElementById('main-service');
+    const extraService = document.getElementById('extra-service');
+
+    function actualizarOpcionesExtra() {
+        const principal = mainService.value;
+        Array.from(extraService.options).forEach(opt => {
+            // No ocultar la opción vacía ni "ninguno"
+            if (opt.value && opt.value !== "ninguno") {
+                opt.disabled = (opt.value === principal);
+            }
+        });
+        // Si el usuario tenía seleccionado el mismo, lo limpia
+        if (extraService.value === principal) {
+            extraService.value = "ninguno";
+        }
+    }
+
+    mainService.addEventListener('change', actualizarOpcionesExtra);
+    // Por si el usuario cambia primero el extra y luego el principal
+    extraService.addEventListener('change', function() {
+        if (extraService.value === mainService.value && extraService.value !== "" && extraService.value !== "ninguno") {
+            extraService.value = "ninguno";
+        }
+    });
+
+    // Inicializa al cargar
+    actualizarOpcionesExtra();
+});
+</script>
 </body>
 </html>

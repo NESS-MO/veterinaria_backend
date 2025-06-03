@@ -31,7 +31,6 @@ from django.conf import settings
 from django.contrib.auth.hashers import make_password
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
-
 from django.utils import timezone
 
 
@@ -374,12 +373,45 @@ def cambia_con(request, token):
     return render(request, 'cambia_contraseña.html')
 
 
-
-
 def modificar(request):
     return gestion_galeria(request)
 
 def backup(request):
+    import os
+    import tempfile
+    import shutil
+    from django.conf import settings
+    from django.http import FileResponse
+    from django.contrib import messages
+
+    db = settings.DATABASES['default']
+
+    # Descargar backup
+    if request.method == 'POST' and not request.POST.get('action'):
+        if db['ENGINE'] == 'django.db.backends.sqlite3':
+            temp = tempfile.NamedTemporaryFile(delete=False, suffix='.sqlite3')
+            temp.close()
+            shutil.copy(db['NAME'], temp.name)
+            
+            # Mensaje de éxito
+            messages.success(request, "Copia de seguridad descargada correctamente")
+            
+            response = FileResponse(open(temp.name, 'rb'), as_attachment=True, filename='backup.sqlite3')
+            return response
+        else:
+            messages.error(request, "Solo se soportan backups de SQLite en esta versión")
+
+    # Restaurar backup
+    if request.method == 'POST' and request.POST.get('action') == 'restore':
+        backup_file = request.FILES.get('backup_file')
+        if backup_file and db['ENGINE'] == 'django.db.backends.sqlite3':
+            with open(db['NAME'], 'wb+') as destino:
+                for chunk in backup_file.chunks():
+                    destino.write(chunk)
+            messages.success(request, "Base de datos restaurada correctamente")
+        else:
+            messages.error(request, "No se pudo restaurar la base de datos. Verifica el archivo.")
+
     return render(request, "6. backup.html")
 
 def Tip(request):
@@ -626,7 +658,7 @@ def aceptar_cita(request, cita_id):
         estado='Pendiente',
         observaciones=observaciones
     )
-    enviar_correo_cita(cita.cliente, "aceptada")
+    enviar_correo_cita(cita.cliente, "aceptada", cita)
     cita.delete()
     messages.success(request, "Cita aceptada y registrada en el historial.")
     return redirect('gestioncitas')
@@ -696,14 +728,27 @@ def editar_estado_observacion_normal(request, cita_id):
     messages.success(request, "Cita actualizada correctamente.")
     return redirect('registroc')
 
-def enviar_correo_cita(cliente, estado):
+def enviar_correo_cita(cliente, estado, cita=None):
     asunto = "Estado de tu cita en la Veterinaria"
     if estado == "aceptada":
-        mensaje = f"Hola {cliente.primer_nombre}, tu cita ha sido ACEPTADA. ¡Te esperamos!"
+        template = 'correo_cita_aceptada.html'
+        context = {
+            'nombre_cliente': cliente.primer_nombre,
+            'fecha': cita.fecha.strftime('%d/%m/%Y') if cita else '',
+            'hora': cita.horario.strftime('%H:%M') if cita else '',
+            'mascota': cita.mascota.nombre_mascota if cita and cita.mascota else '',
+            'servicio': cita.extra if cita else '',
+        }
+        html_content = render_to_string(template, context)
+        text_content = f"Hola {cliente.primer_nombre}, tu cita ha sido ACEPTADA. ¡Te esperamos!"
     else:
-        mensaje = f"Hola {cliente.primer_nombre}, lamentamos informarte que tu cita fue RECHAZADA."
+        html_content = f"<p>Hola {cliente.primer_nombre}, lamentamos informarte que tu cita fue RECHAZADA.</p>"
+        text_content = f"Hola {cliente.primer_nombre}, lamentamos informarte que tu cita fue RECHAZADA."
+
     destinatario = [cliente.correo_electronico]
-    send_mail(asunto, mensaje, None, destinatario)
+    email = EmailMultiAlternatives(asunto, text_content, None, destinatario)
+    email.attach_alternative(html_content, "text/html")
+    email.send()
 
 def index(request):
     imagenes_galeria = ImagenGaleria.objects.filter(activa=True).order_by('orden')[:9]
@@ -998,26 +1043,6 @@ def eliminar_usuario(request, documento):
             'success': True, 
             'message': 'Usuario eliminado correctamente',
             'logout_required': False
-        })
-    return JsonResponse({'error': 'Método no permitido'}, status=405)
-    if request.method == 'POST':
-        admin = get_object_or_404(Administrador, documento=documento)
-        es_usuario_actual = (request.user.documento == documento)
-        
-        admin.is_active = not admin.is_active
-        admin.save()
-        
-        mensaje = f'Usuario {"activado" if admin.is_active else "desactivado"} correctamente'
-        
-        # Si el usuario se desactivó a sí mismo
-        if es_usuario_actual and not admin.is_active:
-            auth_logout(request)
-            mensaje += '. Sesión cerrada automáticamente.'
-        
-        return JsonResponse({
-            'success': True,
-            'message': mensaje,
-            'is_active': admin.is_active
         })
     return JsonResponse({'error': 'Método no permitido'}, status=405)
 

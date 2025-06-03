@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Cita Aceptada - Dr. PUL</title>
+</head>
+<body style="font-family: Arial, sans-serif; background: #f6f8fa; margin:0; padding:0;">
+  <div style="max-width: 500px; margin: 30px auto; background: #fff; border-radius: 10px; box-shadow: 0 2px 8px #e0e0e0; overflow: hidden;">
+    <div style="background: linear-gradient(90deg, #33C0F1 0%, #1E2D93 100%); padding: 24px 0; text-align: center;">
+      <img src="Images/logo2.png" alt="Dr. PUL" style="height: 60px; margin-bottom: 10px;">
+      <h2 style="color: #fff; margin: 0;">¡Tu cita ha sido aceptada!</h2>
+    </div>
+    <div style="padding: 24px;">
+      <p style="font-size: 16px; color: #333;">Hola <b>{{ nombre_cliente }}</b>,</p>
+      <p style="font-size: 15px; color: #333;">
+        Nos alegra informarte que tu cita ha sido <b style="color: #1E2D93;">ACEPTADA</b>.
+      </p>
+      <table style="width:100%; margin: 18px 0; font-size: 15px;">
+        <tr>
+          <td><b>Fecha:</b></td>
+          <td>{{ fecha }}</td>
+        </tr>
+        <tr>
+          <td><b>Hora:</b></td>
+          <td>{{ hora }}</td>
+        </tr>
+        <tr>
+          <td><b>Mascota:</b></td>
+          <td>{{ mascota }}</td>
+        </tr>
+        <tr>
+          <td><b>Servicio:</b></td>
+          <td>{{ servicio }}</td>
+        </tr>
+      </table>
+      <p style="font-size: 15px; color: #333;">¡Te esperamos en Dr. PUL!<br>
+      <span style="color: #33C0F1;">Comprometidos con la salud animal</span></p>
+      <hr style="margin: 24px 0;">
+      <p style="font-size: 13px; color: #888; text-align: center;">
+        <b>Veterinaria Dr. PUL</b><br>
+        Calle 123, Ciudad<br>
+        Tel: 123 456 7890
+      </p>
+    </div>
+  </div>
+</body>
+</html>
