@@ -82,33 +82,43 @@
     </nav>
     <div class="container mx-auto max-w-4xl">
       <h1 class="text-3xl font-bold text-[#1E2D93] mb-6">Copia de Seguridad</h1>
-
       <div class="card bg-white rounded-xl shadow-lg p-6 mb-8">
-        <p class="text-lg text-gray-700 mb-4">Gestiona y descarga las copias de seguridad de la base de datos de la clínica.</p>
-
-        <div class="buttons flex flex-wrap gap-4 mb-6">
-          <button class="generate bg-blue-600 hover:bg-blue-800 text-white px-5 py-3 rounded-lg font-semibold">Generar Backup</button>
-          <button class="download bg-green-600 hover:bg-green-800 text-white px-5 py-3 rounded-lg font-semibold">Descargar Último Backup</button>
-        </div>
-
-        <h2 class="text-xl font-semibold mb-4">Historial de Copias</h2>
-        <div class="history grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          <div class="backup-card bg-slate-100 rounded-lg p-4 hover:shadow-md transition-shadow">
-            <div class="name font-bold mb-1">backup-2025-05-01.sql</div>
-            <div class="meta text-sm text-gray-600">1.2 MB · 01/05/2025</div>
-            <a href="#" class="text-blue-600 hover:underline text-sm mt-2 inline-block">Descargar</a>
-          </div>
-          <div class="backup-card bg-slate-100 rounded-lg p-4 hover:shadow-md transition-shadow">
-            <div class="name font-bold mb-1">backup-2025-04-20.sql</div>
-            <div class="meta text-sm text-gray-600">1.1 MB · 20/04/2025</div>
-            <a href="#" class="text-blue-600 hover:underline text-sm mt-2 inline-block">Descargar</a>
-          </div>
-          <div class="backup-card bg-slate-100 rounded-lg p-4 hover:shadow-md transition-shadow">
-            <div class="name font-bold mb-1">backup-2025-04-05.sql</div>
-            <div class="meta text-sm text-gray-600">1.0 MB · 05/04/2025</div>
-            <a href="#" class="text-blue-600 hover:underline text-sm mt-2 inline-block">Descargar</a>
-          </div>
-        </div>
+        <p class="text-lg text-gray-700 mb-4">
+          Gestiona y descarga la copia de seguridad de la base de datos de la clínica.
+        </p>
+        <!-- Botón para generar y descargar backup -->
+        <form method="post" class="mb-6">
+          {% csrf_token %}
+          <button type="submit" class="bg-blue-600 hover:bg-blue-800 text-white px-5 py-3 rounded-lg font-semibold w-full md:w-auto">
+            Generar y Descargar Copia de Seguridad
+          </button>
+        </form>
+        <p class="mb-6 text-gray-600 text-sm">
+          Al hacer clic, se descargará una copia de la base de datos directamente en tu ordenador.
+        </p>
+        <!-- Restaurar backup -->
+        <form method="post" enctype="multipart/form-data" class="flex flex-col md:flex-row items-center gap-2">
+          {% csrf_token %}
+          <input type="hidden" name="action" value="restore">
+          <button type="submit" class="bg-yellow-600 hover:bg-yellow-800 text-white px-5 py-3 rounded-lg font-semibold order-1">
+            Cargar Copia de Seguridad
+          </button>
+          <label class="cursor-pointer bg-gray-200 hover:bg-gray-300 text-gray-800 px-5 py-3 rounded-lg font-semibold transition-colors flex items-center gap-2 order-2">
+            <i class="fa-solid fa-upload text-blue-500"></i>
+            Seleccionar archivo
+            <input type="file" name="backup_file" accept=".sql,.sqlite3" required class="hidden"
+              onchange="
+                const fileName = this.files[0]?.name || 'Ningún archivo seleccionado';
+                const pill = document.getElementById('file-pill');
+                pill.innerHTML = fileName !== 'Ningún archivo seleccionado'
+                  ? `<span class='inline-flex items-center bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full border border-blue-300 animate-fade-in'>
+                        <i class='fa-solid fa-file-arrow-up mr-2'></i> ${fileName}
+                     </span>`
+                  : `<span class='text-gray-600 text-sm'>Ningún archivo seleccionado</span>`;
+              ">
+          </label>
+          <span id="file-pill" class="text-gray-600 text-sm ml-2 order-3">Ningún archivo seleccionado</span>
+        </form>
       </div>
     </div>
   </section>
@@ -150,3 +160,7 @@
   </script>
 </body>
 </html>
+<style>
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+.animate-fade-in { animation: fade-in 0.3s; }
+</style>

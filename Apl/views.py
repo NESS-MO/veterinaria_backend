@@ -29,7 +29,8 @@ from django.utils.html import strip_tags
 from django.core.mail import EmailMultiAlternatives, send_mail
 from django.conf import settings
 from django.contrib.auth.hashers import make_password
-
+from django.core.validators import validate_email
+from django.core.exceptions import ValidationError
 from django.utils import timezone
 
 
@@ -214,6 +215,9 @@ from .forms import LoginForm
 from django.http import JsonResponse
 
 def login(request):
+    # Verificar si viene de un cambio de contraseña exitoso
+    password_changed = request.GET.get('password_changed') == '1'
+    
     if request.method == 'POST':
         form = LoginForm(request, data=request.POST)
         if form.is_valid():
@@ -223,7 +227,6 @@ def login(request):
             
             if user is not None:
                 auth_login(request, user)
-                # Para solicitudes AJAX (spinner)
                 if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
                     return JsonResponse({
                         'success': True,
@@ -233,7 +236,6 @@ def login(request):
             else:
                 form.add_error(None, "Documento o contraseña incorrectos")
         
-        # Manejo de errores para AJAX
         if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
             errors = form.errors.as_json()
             return JsonResponse({
@@ -244,118 +246,130 @@ def login(request):
     else:
         form = LoginForm()
     
-    # Respuesta normal para GET
-    return render(request, "4. login.html", {'form': form})
+    context = {
+        'form': form,
+        'password_changed': password_changed  # Pasar este contexto a la plantilla
+    }
+    return render(request, "4. login.html", context)
 
 def logout(request):
     auth_logout(request)
     return redirect('index')
 
 def RContrasena(request):
-    # Verifica si el metodo HTTP de la peticion es POST
     if request.method == 'POST':
-        # Obtiene el email enviado desde el formulario de recuperacion
         email = request.POST.get('correo_electronico')
+        print(f"Intentando recuperar contraseña para el correo: {email}")
         
         try:
-            # Intenta obtener el usuario cuyo email coincide con el ingresado
-            user = administrador.objects.get(email=email)
-        except administrador.DoesNotExist:
-            # Si no se encuentra ningun usuario con ese email muestra un mensaje de error
-            messages.error(request, "El correo ingresado no está registrado.")
-            # Vuelve a renderizar el formulario de recuperacion de contraseña
-            return render(request, '4.1 RecuperarContrasena.html')
-        
-        # Guarda el email del usuario (se utiliza para enviar el correo de recuperacion)
-        correo_electronico = user.email
-
-        # Se crea una instancia de TimestampSigner para generar un token con marca de tiempo
-        signer = TimestampSigner()
-        # Se firma el id del usuario (convertido a string) para generar un token único
-        token = signer.sign(str(user.pk))
-        
-        # Se construye la URL absoluta para que el usuario cambie su contraseña
-        # utilizando 'reverse' para obtener la URL definida con el name 'cambia_con'
-        reset_url = request.build_absolute_uri(reverse('cambia_con', args=[token]))
-        
-        # Se renderiza la plantilla del mensaje de correo con los datos necesarios
-        html_message = render_to_string('accounts/msg_correo.html', {
-            'username': user.nombre_completo,  # Se pasa el nombre de usuario, útil para personalizar el mensaje
-            'reset_url': reset_url,       # Se pasa la URL de recuperación para que el usuario la utilice
-            'site_name': 'Veterinaria',  # Nombre del sitio para contextualizar el correo
-        })
-        
-        # Define el asunto del correo de recuperación
-        subject = "Recuperación de contraseña"
-        # Convierte el mensaje HTML a texto plano, útil para clientes de correo que no muestran HTML
-        text_message = strip_tags(html_message)
-        
-        try:
-            # Se prepara el correo usando EmailMultiAlternatives para enviar texto y HTML
-            email = EmailMultiAlternatives(
-                subject=subject,                       # Asunto del correo
-                body=text_message,                     # Versión en texto plano del mensaje
-                from_email=settings.DEFAULT_FROM_EMAIL, # Email remitente definido en las settings
-                to=[correo_electronico]                     # Lista de destinatarios (el email del usuario)
-            )
-            # Establece la codificación del correo a 'utf-8'
-            email.encoding = 'utf-8'
-            # Envía el correo
-            email.send()
-            # Muestra un mensaje de éxito informando que se ha enviado el enlace de recuperación
-            messages.success(request, "Se ha enviado un enlace a tu correo de recuperación para cambiar la contraseña.")
-            # Redirige al usuario a la página de login tras el envío correcto del correo
-            return redirect("login")
+            # Validar formato de correo
+            validate_email(email)
+            
+            # Buscar usuario
+            try:
+                user = Administrador.objects.get(correo_electronico=email)
+            except Administrador.DoesNotExist:
+                print("Correo no encontrado en la base de datos")
+                return JsonResponse({
+                    'success': False,
+                    'message': 'El correo no está registrado en el sistema'
+                }, status=404)
+            
+            # Generar token
+            signer = TimestampSigner()
+            token = signer.sign(str(user.pk))
+            
+            # Construir URL de reset
+            try:
+                reset_url = request.build_absolute_uri(reverse('cambia_con', args=[token]))
+                print(f"URL de reset: {reset_url}")
+            except Exception as e:
+                print(f"Error construyendo URL: {str(e)}")
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Error interno al generar el enlace'
+                }, status=500)
+            
+            # Preparar correo
+            try:
+                html_message = render_to_string('accounts/msg_correo.html', {
+                    'username': user.nombre_completo,
+                    'reset_url': reset_url,
+                    'site_name': 'Veterinaria',
+                })
+                subject = "Recuperación de contraseña"
+                text_message = strip_tags(html_message)
+                
+                # Configurar y enviar correo
+                email_message = EmailMultiAlternatives(
+                    subject=subject,
+                    body=text_message,
+                    from_email=settings.DEFAULT_FROM_EMAIL,
+                    to=[email]
+                )
+                email_message.attach_alternative(html_message, "text/html")
+                
+                # Intento de envío
+                try:
+                    email_message.send()
+                    print("Correo enviado exitosamente")
+                    return JsonResponse({
+                        'success': True,
+                        'redirect_url': reverse('RContrasenaenviado')
+                    })
+                except Exception as e:
+                    print(f"Error al enviar correo: {str(e)}")
+                    return JsonResponse({
+                        'success': False,
+                        'message': f'Error al enviar el correo: {str(e)}'
+                    }, status=500)
+                    
+            except Exception as e:
+                print(f"Error preparando correo: {str(e)}")
+                return JsonResponse({
+                    'success': False,
+                    'message': 'Error interno al preparar el correo'
+                }, status=500)
+                
+        except ValidationError:
+            print("Formato de correo inválido")
+            return JsonResponse({
+                'success': False,
+                'message': 'El formato del correo electrónico no es válido'
+            }, status=400)
+            
         except Exception as e:
-            # Si ocurre alguna excepción al enviar el correo, se muestra un mensaje de error con la descripción
-            messages.error(request, f"Error al enviar el correo: {str(e)}")
-            # Vuelve a renderizar el formulario de recuperación en caso de error
-            return render(request, 'RecuperarContrasena.html')
-        
-    return render(request, "4.1 RecuperarContrasena.html")
-
+            print(f"Error inesperado: {str(e)}")
+            return JsonResponse({
+                'success': False,
+                'message': 'Error interno del servidor'
+            }, status=500)
+    
+    return render(request, '4.1 RecuperarContrasena.html')
 
 def cambia_con(request, token):
-    # Se crea una instancia de TimestampSigner para poder verificar el token
     signer = TimestampSigner()
     try:
-        # Se intenta "desfirmar" el token para extraer el id del usuario,
-        # estableciendo una validez máxima de 3600 segundos (1 hora)
         user_id = signer.unsign(token, max_age=3600)
-        # Se obtiene el usuario correspondiente al id; si no existe, se retorna un error 404
-        usuario = get_object_or_404(administrador, pk=user_id)
+        usuario = get_object_or_404(Administrador, pk=user_id)
     except (BadSignature, SignatureExpired):
-        # Si el token es inválido o ha expirado, se muestra un mensaje de error
         messages.error(request, "El enlace de recuperación es inválido o ha expirado.")
-        # Se redirige al usuario a la página de recuperación de contraseña para volver a solicitar un nuevo enlace
-        return redirect("4.1 RecuperarContrasena.html")
+        return redirect("recuperar_contrasena")
     
-    # Verifica si el método HTTP es POST, lo que indica que se envió el formulario para cambiar la contraseña
     if request.method == 'POST':
-        # Obtiene la nueva contraseña ingresada en el formulario
         new_password = request.POST.get('new_password')
-        # Obtiene la confirmación de la nueva contraseña ingresada en el formulario
         confirm_password = request.POST.get('confirm_password')
         
-        # Comprueba que ambos campos de contraseña coincidan
         if new_password != confirm_password:
-            # Si no coinciden, muestra un mensaje de error
             messages.error(request, "Las contraseñas no coinciden.")
-            # Vuelve a renderizar el formulario para cambiar la contraseña
             return render(request, 'cambia_contraseña.html')
         
-        # Si las contraseñas coinciden, se actualiza la contraseña del usuario,
-        # utilizando make_password para encriptarla adecuadamente
         usuario.password = make_password(new_password)
-        # Se guarda el usuario en la base de datos con la nueva contraseña
         usuario.save()
         
-        # Muestra un mensaje de éxito indicando que la contraseña se ha cambiado correctamente
-        messages.success(request, "La contraseña se ha cambiado correctamente.")
-        # Redirige al usuario a la página de login para que pueda iniciar sesión nuevamente
-        return redirect("login")
+        # Redirigir a login con parámetro de éxito
+        return redirect(reverse('login') + '?password_changed=1')
     
-    # Si el método es GET, se renderiza el formulario para el cambio de contraseña
     return render(request, 'cambia_contraseña.html')
 
 
@@ -365,6 +379,36 @@ def modificar(request):
     return gestion_galeria(request)
 
 def backup(request):
+    import os
+    import tempfile
+    import shutil
+    from django.conf import settings
+    from django.http import FileResponse
+    from django.contrib import messages
+
+    db = settings.DATABASES['default']
+
+    # Descargar backup
+    if request.method == 'POST' and not request.POST.get('action'):
+        if db['ENGINE'] == 'django.db.backends.sqlite3':
+            temp = tempfile.NamedTemporaryFile(delete=False, suffix='.sqlite3')
+            temp.close()
+            shutil.copy(db['NAME'], temp.name)
+            response = FileResponse(open(temp.name, 'rb'), as_attachment=True, filename='backup.sqlite3')
+            return response
+        # Si usas otro motor, avísame
+
+    # Restaurar backup
+    if request.method == 'POST' and request.POST.get('action') == 'restore':
+        backup_file = request.FILES.get('backup_file')
+        if backup_file and db['ENGINE'] == 'django.db.backends.sqlite3':
+            with open(db['NAME'], 'wb+') as destino:
+                for chunk in backup_file.chunks():
+                    destino.write(chunk)
+            messages.success(request, "Base de datos restaurada correctamente.")
+        else:
+            messages.error(request, "No se pudo restaurar la base de datos. Verifica el archivo.")
+
     return render(request, "6. backup.html")
 
 def Tip(request):
@@ -611,7 +655,7 @@ def aceptar_cita(request, cita_id):
         estado='Pendiente',
         observaciones=observaciones
     )
-    enviar_correo_cita(cita.cliente, "aceptada")
+    enviar_correo_cita(cita.cliente, "aceptada", cita)
     cita.delete()
     messages.success(request, "Cita aceptada y registrada en el historial.")
     return redirect('gestioncitas')
@@ -681,14 +725,27 @@ def editar_estado_observacion_normal(request, cita_id):
     messages.success(request, "Cita actualizada correctamente.")
     return redirect('registroc')
 
-def enviar_correo_cita(cliente, estado):
+def enviar_correo_cita(cliente, estado, cita=None):
     asunto = "Estado de tu cita en la Veterinaria"
     if estado == "aceptada":
-        mensaje = f"Hola {cliente.primer_nombre}, tu cita ha sido ACEPTADA. ¡Te esperamos!"
+        template = 'correo_cita_aceptada.html'
+        context = {
+            'nombre_cliente': cliente.primer_nombre,
+            'fecha': cita.fecha.strftime('%d/%m/%Y') if cita else '',
+            'hora': cita.horario.strftime('%H:%M') if cita else '',
+            'mascota': cita.mascota.nombre_mascota if cita and cita.mascota else '',
+            'servicio': cita.extra if cita else '',
+        }
+        html_content = render_to_string(template, context)
+        text_content = f"Hola {cliente.primer_nombre}, tu cita ha sido ACEPTADA. ¡Te esperamos!"
     else:
-        mensaje = f"Hola {cliente.primer_nombre}, lamentamos informarte que tu cita fue RECHAZADA."
+        html_content = f"<p>Hola {cliente.primer_nombre}, lamentamos informarte que tu cita fue RECHAZADA.</p>"
+        text_content = f"Hola {cliente.primer_nombre}, lamentamos informarte que tu cita fue RECHAZADA."
+
     destinatario = [cliente.correo_electronico]
-    send_mail(asunto, mensaje, None, destinatario)
+    email = EmailMultiAlternatives(asunto, text_content, None, destinatario)
+    email.attach_alternative(html_content, "text/html")
+    email.send()
 
 def index(request):
     imagenes_galeria = ImagenGaleria.objects.filter(activa=True).order_by('orden')[:9]
@@ -1082,3 +1139,9 @@ def crear_usuario(request):
         'success': False,
         'message': 'Método no permitido'
     }, status=405)
+
+def recuperar_contrasena_enviado(request):
+    return render(request, 'recuperarcontrasenaenviado.html')
+
+def recuperar_contrasena_enviado(request):
+    return render(request, 'recuperarcontrasenaenviado.html')
