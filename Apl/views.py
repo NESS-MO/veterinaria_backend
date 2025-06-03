@@ -143,39 +143,64 @@ def RegistroC(request):
         'form': form,
 })
 
-from reportlab.lib.pagesizes import letter, landscape
-from reportlab.pdfgen import canvas
-
 def reporte_citas_pdf(request):
+    from reportlab.lib.pagesizes import letter, landscape
+    from reportlab.pdfgen import canvas
+    from reportlab.pdfbase.pdfmetrics import stringWidth
+
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename="reporte_citas.pdf"'
 
-    # Usa orientación horizontal para más espacio
     p = canvas.Canvas(response, pagesize=landscape(letter))
     width, height = landscape(letter)
 
-    # Anchos de columna personalizados
-    col_widths = [70, 90, 70, 50, 80, 65, 50, 90, 60, 90]
+    # Margen uniforme
+    margin = 40
+    usable_width = width - 2 * margin
+
+    # Ajusta los anchos de columna para que sumen <= usable_width
+    col_widths = [60, 80, 60, 35, 70, 65, 45, 95, 55, 160]  # Reducido un poco más cada columna
+    total_col_width = sum(col_widths)
+    if total_col_width > usable_width:
+        # Escala proporcionalmente si se pasa del ancho útil
+        scale = usable_width / total_col_width
+        col_widths = [int(w * scale) for w in col_widths]
+
     encabezados = ["Documento", "Cliente", "Mascota", "Edad", "Raza", "Fecha", "Hora", "Servicio", "Estado", "Obs."]
 
-    x_start = 40
-    y = height - 50
+    x_start = margin
+    y = height - margin
 
-    # Título
     p.setFont("Helvetica-Bold", 16)
     p.drawString(x_start, y, "Reporte de Citas (CitaRapida)")
     y -= 30
 
-    # Encabezados
     p.setFont("Helvetica-Bold", 10)
     x = x_start
     for i, encabezado in enumerate(encabezados):
-        p.drawString(x, y, encabezado)
+        p.drawString(x + 2, y, encabezado)  # +2 para un pequeño margen izquierdo
         x += col_widths[i]
-    y -= 18
+    y -= 22  # Más espacio después de los encabezados
 
-    # Datos
+    def split_text(text, width, fontname="Helvetica", fontsize=9):
+        lines = []
+        for raw_line in str(text).split('\n'):
+            words = raw_line.split()
+            line = ""
+            for word in words:
+                test_line = f"{line} {word}".strip()
+                if stringWidth(test_line, fontname, fontsize) <= width - 4:  # margen
+                    line = test_line
+                else:
+                    if line:
+                        lines.append(line)
+                    line = word
+            if line or not words:
+                lines.append(line)
+        return lines
+
     p.setFont("Helvetica", 9)
+    row_height = 17  # Un poco más de espacio entre filas
     citas = CitaRapida.objects.all().order_by('-fecha')
     for cita in citas:
         datos = [
@@ -186,23 +211,35 @@ def reporte_citas_pdf(request):
             cita.raza_mascota,
             cita.fecha.strftime('%Y-%m-%d'),
             cita.hora.strftime('%H:%M'),
-            cita.servicio,
+            cita.servicio or "",
             cita.estado,
-            (cita.observaciones or "")[:30],  # recorta observaciones
+            cita.observaciones or "",
         ]
-        x = x_start
+        # Prepara líneas para cada columna
+        lines_per_col = []
         for i, dato in enumerate(datos):
-            # Recorta texto si es muy largo para la columna
-            texto = str(dato)
-            max_chars = int(col_widths[i] // 5.5)
-            if len(texto) > max_chars:
-                texto = texto[:max_chars-3] + "..."
-            p.drawString(x, y, texto)
-            x += col_widths[i]
-        y -= 15
-        if y < 40:
+            lines = split_text(dato, col_widths[i])
+            lines_per_col.append(lines)
+        max_lines = max(len(lines) for lines in lines_per_col)
+
+        # Imprime la fila línea por línea, alineando columnas
+        for line_idx in range(max_lines):
+            x = x_start
+            for i, lines in enumerate(lines_per_col):
+                text = lines[line_idx] if line_idx < len(lines) else ""
+                p.drawString(x + 2, y - (line_idx * row_height), text)
+                x += col_widths[i]
+        y -= max_lines * row_height  # Solo después de imprimir toda la fila
+
+        if y < margin + row_height:
             p.showPage()
-            y = height - 40
+            y = height - margin
+            p.setFont("Helvetica-Bold", 10)
+            x = x_start
+            for i, encabezado in enumerate(encabezados):
+                p.drawString(x + 2, y, encabezado)
+                x += col_widths[i]
+            y -= 22
             p.setFont("Helvetica", 9)
     p.save()
     return response
@@ -742,7 +779,15 @@ def enviar_correo_cita(cliente, estado, cita=None):
         html_content = render_to_string(template, context)
         text_content = f"Hola {cliente.primer_nombre}, tu cita ha sido ACEPTADA. ¡Te esperamos!"
     else:
-        html_content = f"<p>Hola {cliente.primer_nombre}, lamentamos informarte que tu cita fue RECHAZADA.</p>"
+        template = 'correo_cita_rechazada.html'
+        context = {
+            'nombre_cliente': cliente.primer_nombre,
+            'fecha': cita.fecha.strftime('%d/%m/%Y') if cita else '',
+            'hora': cita.horario.strftime('%H:%M') if cita else '',
+            'mascota': cita.mascota.nombre_mascota if cita and cita.mascota else '',
+            'servicio': cita.extra if cita else '',
+        }
+        html_content = render_to_string(template, context)
         text_content = f"Hola {cliente.primer_nombre}, lamentamos informarte que tu cita fue RECHAZADA."
 
     destinatario = [cliente.correo_electronico]
