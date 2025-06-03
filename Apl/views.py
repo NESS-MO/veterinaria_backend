@@ -107,8 +107,10 @@ def Agendar(request):
     )
     citas_por_fecha = [{'fecha': item['fecha'], 'total': item['total']} for item in citas_rapidas]
 
+    servicios = Servicio.objects.filter(activo=True).order_by('orden')
     return render(request, '3. Agendar.html', {
         'citas_por_fecha': citas_por_fecha,
+        'servicios': servicios,  # <-- agrega esto
     })
 
 def RegistroC(request):
@@ -135,12 +137,14 @@ def RegistroC(request):
     citas_normales = Cita.objects.all()  # <-- Agrega esto
     rango_edades = range(1, 21)
     rango_meses = range(0, 12)
+    servicios = Servicio.objects.filter(activo=True).order_by('orden')
     return render(request, 'registrocitas.html', {
         'rango_edades': rango_edades,
         'rango_meses': rango_meses,
         'citas_rapidas': citas_rapidas,
         'citas_normales': citas_normales,  # <-- Y esto
         'form': form,
+        'servicios': servicios,
 })
 
 def reporte_citas_pdf(request):

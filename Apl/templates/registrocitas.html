@@ -218,14 +218,9 @@
             <select name="servicio" id="servicio" required
               class="border p-2 rounded-md focus:ring-2 focus:ring-blue-400 text-sm transition-all">
               <option value="" disabled selected>Seleccione un servicio</option>
-              <option value="Consulta">Consulta</option>
-              <option value="Esterilización Canina y Felina">Esterilización Canina y Felina</option>
-              <option value="Guardería">Guardería</option>
-              <option value="Vacunación">Vacunación</option>
-              <option value="Profilaxis">Profilaxis</option>
-              <option value="Hospitalización">Hospitalización</option>
-              <option value="Cirugías">Cirugías</option>
-              <option value="Asistencia Médica">Asistencia Médica</option>
+              {% for servicio in servicios %}
+                <option value="{{ servicio.nombre }}">{{ servicio.nombre }}</option>
+              {% endfor %}
             </select>
             <span id="error-servicio" class="text-xs text-red-500 mt-1 hidden">Debe seleccionar un servicio</span>
           </div>
