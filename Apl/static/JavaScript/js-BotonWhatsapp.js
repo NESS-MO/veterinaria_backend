@@ -11,6 +11,7 @@ function createWhatsAppButton() {
         display: flex;
         align-items: center;
         text-decoration: none;
+        cursor: pointer;
       }
   
       .whatsapp-logo img {
@@ -24,13 +25,14 @@ function createWhatsAppButton() {
   
       .whatsapp-logo:hover img {
         transform: scale(1.1);
+        filter: drop-shadow(0 0 8px rgba(37, 211, 102, 0.4));
       }
   
       .whatsapp-logo .tooltip-text {
         visibility: hidden;
         width: 0;
         opacity: 0;
-        background: linear-gradient(135deg, #2563eb, #0891b2);
+        background: linear-gradient(135deg, #25D366, #128C7E);
         color: #fff;
         text-align: center;
         border-radius: 6px;
@@ -40,6 +42,7 @@ function createWhatsAppButton() {
         transition: all 0.3s ease;
         order: 1;
         overflow: hidden;
+        font-weight: 600;
       }
   
       .whatsapp-logo:hover .tooltip-text {
@@ -51,11 +54,11 @@ function createWhatsAppButton() {
     `;
     document.head.appendChild(style);
 
-
     // Crear el botón de WhatsApp
     const whatsappLink = document.createElement('a');
-    whatsappLink.href = 'https://www.whatsapp.com/?lang=es_LA';
+    whatsappLink.href = 'https://wa.me/573106890146';
     whatsappLink.className = 'whatsapp-logo';
+    whatsappLink.target = '_blank';
     whatsappLink.innerHTML = `
       <img src="${STATIC_URL}Images/WhatsApp.jpg" alt="WhatsApp">
       <span class="tooltip-text">¡Chatea con nosotros!</span>
@@ -63,7 +66,7 @@ function createWhatsAppButton() {
   
     // Agregar al body
     document.body.appendChild(whatsappLink);
-  }
+}
   
-  // Llamar la función cuando el DOM esté listo
-  document.addEventListener('DOMContentLoaded', createWhatsAppButton);
+// Llamar la función cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', createWhatsAppButton);

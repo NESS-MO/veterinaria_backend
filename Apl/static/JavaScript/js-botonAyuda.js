@@ -232,7 +232,7 @@ function createAyudaElements() {
       <!-- Contenido principal -->
       <div class="cuerpo-ayuda">
         <div class="opciones-ayuda">
-          <a href="https://accounts.google.com/v3/signin/identifier?continue=https%3A%2F%2Fmail.google.com%2Fmail%2Fu%2F0%2F&emr=1&followup=https%3A%2F%2Fmail.google.com%2Fmail%2Fu%2F0%2F&ifkv=AXH0vVuznh3tW70rj_lnPjuR9wZVXFVPr73Bl8MRTIdgMXU1Q56F1nk_kjEXg1K6Hl146BrlLPaRSw&osid=1&passive=1209600&service=mail&flowName=GlifWebSignIn&flowEntry=ServiceLogin&dsh=S-1828459910%3A1742386782972927" class="opcion-ayuda">
+          <a href="https://mail.google.com/mail/?view=cm&fs=1&to=veterinariadr.pul@gmail.com&su=Consulta%20desde%20el%20sitio%20web&body=Estimado%20equipo%20de%20Veterinaria%20Dr.%20Pul,%0D%0A%0D%0AMe%20pongo%20en%20contacto%20con%20ustedes%20para..." class="opcion-ayuda" target="_blank">
             <img src="${STATIC_URL}Images/gmail.jpg" alt="Email">
             <div class="texto-opcion">
               <h3>Contactar por correo</h3>
@@ -245,6 +245,14 @@ function createAyudaElements() {
             <div class="texto-opcion">
               <h3>Llamar por teléfono</h3>
               <p>+57 310 6890146</p>
+            </div>
+          </a>
+          
+          <a href="${STATIC_URL}Documents/Manual_de_Usuario_Veterinaria_Dr._Pul.pdf" class="opcion-ayuda" download="Manual_Usuario_DRPUL.pdf">
+            <img src="${STATIC_URL}Images/pdf.png" alt="Manual de Usuario">
+            <div class="texto-opcion">
+              <h3>Manual de Usuario</h3>
+              <p>Descarga nuestra guía de uso</p>
             </div>
           </a>
         </div>
