@@ -1,0 +1,30 @@
+<!-- filepath: Apl/templates/correo_cita_rechazada.html -->
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Cita Rechazada</title>
+</head>
+<body style="font-family: Arial, sans-serif; background: #f4f4f4; margin: 0; padding: 0;">
+  <div style="max-width: 480px; margin: 0 auto; background: #fff; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 8px #0001;">
+    <div style="background: linear-gradient(90deg, #1E2D93 0%, #33C0F1 100%); color: #fff; padding: 24px 0; text-align: center;">
+      <img src="https://cdn-icons-png.flaticon.com/512/463/463612.png" alt="Rechazada" width="48" style="margin-bottom: 8px;">
+      <h2 style="margin: 0; font-size: 1.5em;">Tu cita ha sido rechazada</h2>
+    </div>
+    <div style="padding: 32px 24px;">
+      <p>Hola <b>{{ nombre_cliente }}</b>,</p>
+      <p>Lamentamos informarte que tu cita ha sido <b style="color: #e53e3e;">RECHAZADA</b>.</p>
+      <p style="color: #888; font-size: 0.95em;">
+        Si tienes dudas o deseas reagendar, contáctanos.<br>
+        ¡Gracias por confiar en nosotros!
+      </p>
+      <hr style="margin: 24px 0;">
+      <div style="text-align: center; color: #888; font-size: 0.9em;">
+        <b>Veterinaria Dr. PUL</b><br>
+        Calle 123, Ciudad<br>
+        Tel: 123 456 7890
+      </div>
+    </div>
+  </div>
+</body>
+</html>

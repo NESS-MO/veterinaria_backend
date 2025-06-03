@@ -176,8 +176,8 @@
                               Sin mascota
                           {% endif %}
                       </td>
-                      <td>{{ cita.fecha }}</td>
-                      <td>{{ cita.horario }}</td>
+                      <td>{{ cita.fecha|date:"Y-m-d" }}</td>
+                      <td>{{ cita.horario|time:"h:i A" }}</td>
                       <td>{{ cita.extra }}</td>
                       <td>
                           <form action="{% url 'aceptar_cita' cita.id %}" method="post" style="display:inline;">
