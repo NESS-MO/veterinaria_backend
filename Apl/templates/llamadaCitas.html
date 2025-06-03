@@ -25,14 +25,16 @@
             <h3 class="eslogan">COMPROMETIDOS CON LA SALUD ANIMAL</h3>
         </div>
         <button class="abrir" id="abrir-menu">☰</button>
-        <nav class="opciones" id="menu">
-            <button class="cerrar" id="cerrar-menu">✕</button>
-            <a href={% url "index"%}>INICIO</a>
-            <a href="#conocenos">CONÓCENOS</a>
-            <a href={% url "servicios" %}>SERVICIOS</a>
-            <a href={% url "agendar" %}>AGENDAR CITA</a>
-            <a href={% url "login"%}><img class="perfil" src={% static "Images/perfil.png" %} alt="logo DR.PUL"></a>
-        </nav>
+    <nav class="opciones" id="menu">
+        <button class="cerrar" id="cerrar-menu">✕</button>
+        <a href="{% url 'index' %}">INICIO</a>
+        <a href="{% url 'index' %}#conocenos">CONÓCENOS</a>
+        <a href="{% url 'servicios' %}">SERVICIOS</a>
+        <a href="{% url 'agendar' %}">AGENDAR CITA</a>
+        <a href="{% url 'login' %}" title="Inicio de sesión">
+            <img class="perfil" src="{% static 'Images/perfil.png' %}" alt="Perfil">
+        </a>
+    </nav>
     </header>
 
     <!-- Solo este bloque queda visible -->

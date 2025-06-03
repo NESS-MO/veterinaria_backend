@@ -35,7 +35,9 @@
         <a href="{% url 'index' %}#conocenos">CONÓCENOS</a>
         <a href="{% url 'servicios' %}">SERVICIOS</a>
         <a href="{% url 'agendar' %}">AGENDAR CITA</a>
-        <a href="{% url 'login' %}"><img class="perfil" src="{% static 'Images/perfil.png' %}" alt="Perfil"></a>
+        <a href="{% url 'login' %}" title="Inicio de sesión">
+            <img class="perfil" src="{% static 'Images/perfil.png' %}" alt="Perfil">
+        </a>
     </nav>
 </header>
 
