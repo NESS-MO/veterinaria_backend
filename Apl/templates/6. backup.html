@@ -22,9 +22,8 @@
       }
     }
   </script> 
-<body class="font-sans bg-gradient-to-tr from-[#e0f7ff] to-white text-[#333] min-h-screen">
+<body class="font-sans bg-gray-50 from-[#e0f7ff] to-white text-[#333] min-h-screen">
     <!-- Breadcrumb -->
-
 
   <!-- Mobile menu button -->
   <button class="md:hidden fixed top-4 left-4 z-30 bg-primary text-white p-2 rounded-lg shadow-lg" id="mobileMenuBtn">
@@ -59,45 +58,66 @@
 
   <!-- Contenido principal -->
   <section class="md:ml-72 p-6">
-      <nav class="flex ml-8 mb-9 w-full justify-start">
-        <ol class="inline-flex items-center space-x-1 md:space-x-2">
-            <li class="inline-flex items-center">
-                <a href="{% url 'gestioncitas' %}" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors">
-                    <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M14.707 7.793a1 1 0 0 0-1.414 0L11 10.086V1.5a1 1 0 0 0-2 0v8.586L6.707 7.793a1 1 0 1 0-1.414 1.414l4 4a1 1 0 0 0 1.416 0l4-4a1 1 0 0 0-.002-1.414Z"/>
-                        <path d="M18 12h-2.55l-2.975 2.975a3.5 3.5 0 0 1-4.95 0L4.55 12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/>
-                    </svg>
-                    Administrador
-                </a>
-            </li>
-            <li>
-                <div class="flex items-center">
-                    <svg class="w-5 h-5 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
-                    </svg>
-                    <span class="ml-1 text-sm font-medium text-gray-700 md:ml-2">Copias de seguridad</span>
-                </div>
-            </li>
-        </ol>
+    <!-- Mensajes con SweetAlert2 -->
+    {% if messages %}
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+        {% for message in messages %}
+          Swal.fire({
+            title: '{{ message.tags|title }}',
+            text: '{{ message }}',
+            icon: '{{ message.tags }}',
+            confirmButtonColor: '#1E2D93',
+            confirmButtonText: 'Aceptar'
+          });
+        {% endfor %}
+      });
+    </script>
+    {% endif %}
+    
+    <nav class="flex ml-8 mb-9 w-full justify-start">
+      <ol class="inline-flex items-center space-x-1 md:space-x-2">
+        <li class="inline-flex items-center">
+          <a href="{% url 'gestioncitas' %}" class="inline-flex items-center text-sm font-medium text-gray-500 hover:text-blue-600 transition-colors">
+            <svg class="w-4 h-4 mr-2" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M14.707 7.793a1 1 0 0 0-1.414 0L11 10.086V1.5a1 1 0 0 0-2 0v8.586L6.707 7.793a1 1 0 1 0-1.414 1.414l4 4a1 1 0 0 0 1.416 0l4-4a1 1 0 0 0-.002-1.414Z"/>
+              <path d="M18 12h-2.55l-2.975 2.975a3.5 3.5 0 0 1-4.95 0L4.55 12H2a2 2 0 0 0-2 2v4a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-4a2 2 0 0 0-2-2Zm-3 5a1 1 0 1 1 0-2 1 1 0 0 1 0 2Z"/>
+            </svg>
+            Administrador
+          </a>
+        </li>
+        <li>
+          <div class="flex items-center">
+            <svg class="w-5 h-5 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+              <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+            </svg>
+            <span class="ml-1 text-sm font-medium text-gray-700 md:ml-2">Copias de seguridad</span>
+          </div>
+        </li>
+      </ol>
     </nav>
+    
     <div class="container mx-auto max-w-4xl">
       <h1 class="text-3xl font-bold text-[#1E2D93] mb-6">Copia de Seguridad</h1>
       <div class="card bg-white rounded-xl shadow-lg p-6 mb-8">
         <p class="text-lg text-gray-700 mb-4">
           Gestiona y descarga la copia de seguridad de la base de datos de la clínica.
         </p>
+        
         <!-- Botón para generar y descargar backup -->
-        <form method="post" class="mb-6">
+        <form method="post" class="mb-6" id="downloadForm">
           {% csrf_token %}
           <button type="submit" class="bg-blue-600 hover:bg-blue-800 text-white px-5 py-3 rounded-lg font-semibold w-full md:w-auto">
             Generar y Descargar Copia de Seguridad
           </button>
         </form>
+        
         <p class="mb-6 text-gray-600 text-sm">
           Al hacer clic, se descargará una copia de la base de datos directamente en tu ordenador.
         </p>
+        
         <!-- Restaurar backup -->
-        <form method="post" enctype="multipart/form-data" class="flex flex-col md:flex-row items-center gap-2">
+        <form method="post" enctype="multipart/form-data" class="flex flex-col md:flex-row items-center gap-2" id="restoreForm">
           {% csrf_token %}
           <input type="hidden" name="action" value="restore">
           <button type="submit" class="bg-yellow-600 hover:bg-yellow-800 text-white px-5 py-3 rounded-lg font-semibold order-1">
@@ -123,8 +143,8 @@
     </div>
   </section>
 
-    <script src={% static "JavaScript/sienna.js" %}></script>
-    <script src={% static "JavaScript/custom.js" %}></script>
+  <script src={% static "JavaScript/sienna.js" %}></script>
+  <script src={% static "JavaScript/custom.js" %}></script>
 
   <!-- Script para el menú móvil -->
   <script>
@@ -156,6 +176,20 @@
           overlay.classList.add('pointer-events-none');
         }
       });
+    });
+
+    // Manejar el envío del formulario de restauración
+    document.getElementById('restoreForm').addEventListener('submit', function(e) {
+      const fileInput = this.querySelector('input[type="file"]');
+      if (!fileInput.files.length) {
+        e.preventDefault();
+        Swal.fire({
+          title: 'Error',
+          text: 'Por favor selecciona un archivo de copia de seguridad',
+          icon: 'error',
+          confirmButtonColor: '#1E2D93'
+        });
+      }
     });
   </script>
 </body>

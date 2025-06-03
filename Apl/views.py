@@ -107,8 +107,10 @@ def Agendar(request):
     )
     citas_por_fecha = [{'fecha': item['fecha'], 'total': item['total']} for item in citas_rapidas]
 
+    servicios = Servicio.objects.filter(activo=True).order_by('orden')
     return render(request, '3. Agendar.html', {
         'citas_por_fecha': citas_por_fecha,
+        'servicios': servicios,  # <-- agrega esto
     })
 
 def RegistroC(request):
@@ -410,8 +412,6 @@ def cambia_con(request, token):
     return render(request, 'cambia_contraseña.html')
 
 
-
-
 def modificar(request):
     return gestion_galeria(request)
 
@@ -431,9 +431,14 @@ def backup(request):
             temp = tempfile.NamedTemporaryFile(delete=False, suffix='.sqlite3')
             temp.close()
             shutil.copy(db['NAME'], temp.name)
+            
+            # Mensaje de éxito
+            messages.success(request, "Copia de seguridad descargada correctamente")
+            
             response = FileResponse(open(temp.name, 'rb'), as_attachment=True, filename='backup.sqlite3')
             return response
-        # Si usas otro motor, avísame
+        else:
+            messages.error(request, "Solo se soportan backups de SQLite en esta versión")
 
     # Restaurar backup
     if request.method == 'POST' and request.POST.get('action') == 'restore':
@@ -442,7 +447,7 @@ def backup(request):
             with open(db['NAME'], 'wb+') as destino:
                 for chunk in backup_file.chunks():
                     destino.write(chunk)
-            messages.success(request, "Base de datos restaurada correctamente.")
+            messages.success(request, "Base de datos restaurada correctamente")
         else:
             messages.error(request, "No se pudo restaurar la base de datos. Verifica el archivo.")
 
@@ -1085,26 +1090,6 @@ def eliminar_usuario(request, documento):
             'success': True, 
             'message': 'Usuario eliminado correctamente',
             'logout_required': False
-        })
-    return JsonResponse({'error': 'Método no permitido'}, status=405)
-    if request.method == 'POST':
-        admin = get_object_or_404(Administrador, documento=documento)
-        es_usuario_actual = (request.user.documento == documento)
-        
-        admin.is_active = not admin.is_active
-        admin.save()
-        
-        mensaje = f'Usuario {"activado" if admin.is_active else "desactivado"} correctamente'
-        
-        # Si el usuario se desactivó a sí mismo
-        if es_usuario_actual and not admin.is_active:
-            auth_logout(request)
-            mensaje += '. Sesión cerrada automáticamente.'
-        
-        return JsonResponse({
-            'success': True,
-            'message': mensaje,
-            'is_active': admin.is_active
         })
     return JsonResponse({'error': 'Método no permitido'}, status=405)
 

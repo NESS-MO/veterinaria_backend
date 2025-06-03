@@ -215,30 +215,20 @@
             <div class="form-group">
                 <label>Motivo de la Cita:</label>
                 <div class="services-container">
-                    <!-- Servicio Principal -->
                     <div class="service-col">
-                        <select id="main-service" name="main_service" required class="service-select">
+                        <select id="main-service" name="main_service" class="service-select" required>
                             <option value="">Seleccione principal*</option>
-                            <option value="consulta">Consulta</option>
-                            <option value="esterilizacion">Esterilización</option>
-                            <option value="guarderia">Guardería</option>
-                            <option value="vacunacion">Vacunación</option>
-                            <option value="profilaxis">Profilaxis</option>
-                            <option value="cirugias">Cirugías</option>
+                            {% for servicio in servicios %}
+                                <option value="{{ servicio.nombre }}">{{ servicio.nombre }}</option>
+                            {% endfor %}
                         </select>
                     </div>
-                    
-                    <!-- Servicio Extra -->
                     <div class="service-col">
                         <select id="extra-service" name="extra_service" class="service-select">
-                            <option value="">Servicio extra (opcional)</option>
-                            <option value="consulta">Consulta</option>
-                            <option value="esterilizacion">Esterilización</option>
-                            <option value="guarderia">Guardería</option>
-                            <option value="vacunacion">Vacunación</option>
-                            <option value="profilaxis">Profilaxis</option>
-                            <option value="cirugias">Cirugías</option>
                             <option value="ninguno">Ninguno</option>
+                            {% for servicio in servicios %}
+                                <option value="{{ servicio.nombre }}">{{ servicio.nombre }}</option>
+                            {% endfor %}
                         </select>
                     </div>
                 </div>
