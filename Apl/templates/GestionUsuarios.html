@@ -250,12 +250,26 @@
                             <label for="inputPassword" class="block text-sm font-medium text-gray-700 mb-2">Contraseña *</label>
                             <div class="relative">
                                 <input type="password" name="password" id="inputPassword" required
-                                    class="w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
+                                    class="w-full border border-gray-300 rounded-md shadow-sm py-3 px-4 pr-12 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                    minlength="12">
                                 <button type="button" class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700" onclick="togglePassword('inputPassword')">
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
                             <div id="passwordError" class="text-red-500 text-sm mt-1"></div>
+                            <div class="text-xs text-gray-500 mt-1">
+                                La contraseña debe tener mínimo 12 caracteres, incluyendo al menos:<br>
+                                - 1 letra mayúscula (A-Z)<br>
+                                - 1 carácter especial (@!|./&)
+                            </div>
+                            <div class="password-strength mt-2">
+                                <div class="flex items-center gap-2">
+                                    <div class="h-1 flex-1 bg-gray-200 rounded-full overflow-hidden">
+                                        <div id="passwordStrengthBar" class="h-full bg-gray-400 w-0"></div>
+                                    </div>
+                                    <span id="passwordStrengthText" class="text-xs text-gray-500">Seguridad</span>
+                                </div>
+                            </div>
                         </div>
                         
                         <div class="form-group relative">
@@ -344,10 +358,15 @@
             
             // Limpiar errores
             clearErrors();
+            
+            // Resetear indicador de fortaleza
+            document.getElementById('passwordStrengthBar').style.width = '0%';
+            document.getElementById('passwordStrengthBar').className = 'h-full bg-gray-400';
+            document.getElementById('passwordStrengthText').textContent = 'Seguridad';
         }
 
         function clearErrors() {
-            document.querySelectorAll('.error-message').forEach(el => {
+            document.querySelectorAll('[id$="Error"]').forEach(el => {
                 el.textContent = '';
             });
         }
@@ -370,6 +389,49 @@
         document.getElementById('inputNombre').addEventListener('input', function(e) {
             // Permitir solo letras y espacios
             this.value = this.value.replace(/[^A-Za-záéíóúÁÉÍÓÚñÑ\s]/g, '');
+        });
+
+        // Validación de contraseña en tiempo real
+        document.getElementById('inputPassword').addEventListener('input', function() {
+            const password = this.value;
+            const strengthBar = document.getElementById('passwordStrengthBar');
+            const strengthText = document.getElementById('passwordStrengthText');
+            
+            // Calcular fortaleza
+            let strength = 0;
+            
+            // Longitud mínima
+            if (password.length >= 12) strength += 1;
+            
+            // Contiene mayúscula
+            if (/[A-Z]/.test(password)) strength += 1;
+            
+            // Contiene carácter especial
+            if (/[@!|./&]/.test(password)) strength += 1;
+            
+            // Contiene número
+            if (/[0-9]/.test(password)) strength += 1;
+            
+            // Actualizar barra y texto
+            const width = strength * 25;
+            strengthBar.style.width = `${width}%`;
+            
+            if (strength === 0) {
+                strengthBar.className = 'h-full bg-gray-400';
+                strengthText.textContent = 'Muy débil';
+            } else if (strength === 1) {
+                strengthBar.className = 'h-full bg-red-500';
+                strengthText.textContent = 'Débil';
+            } else if (strength === 2) {
+                strengthBar.className = 'h-full bg-yellow-500';
+                strengthText.textContent = 'Moderada';
+            } else if (strength === 3) {
+                strengthBar.className = 'h-full bg-blue-500';
+                strengthText.textContent = 'Fuerte';
+            } else {
+                strengthBar.className = 'h-full bg-green-500';
+                strengthText.textContent = 'Muy fuerte';
+            }
         });
 
         // Funciones para mostrar/ocultar filtros
