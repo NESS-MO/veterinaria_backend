@@ -126,32 +126,32 @@
 </section>  
 
 
-    <!-- Galería Nuestro Trabajo -->
-    <section class="seccion-trabajo">
-        <div class="encabezado-trabajo">
-            <h2 class="titulo-trabajo">Nuestro Trabajo</h2>
-            <p class="descripcion-trabajo">Aquí puedes ver algunas imágenes de nuestro día a día y los servicios que ofrecemos en la clínica.</p>
-        </div>
-        
-        <div class="galeria-trabajo">
-            {% for imagen in imagenes_galeria %}
-            <div class="item-trabajo">
-                <img src="{{ imagen.imagen.url }}" 
-                    alt="{{ imagen.titulo|default:'Nuestro trabajo en DR.PUL' }}"
-                    class="imagen-trabajo">
-                {% if imagen.titulo %}
-                <div class="titulo-imagen">
-                    <p>{{ imagen.titulo }}</p>
-                </div>
-                {% endif %}
+<!-- Galería Nuestro Trabajo -->
+<section class="seccion-trabajo">
+    <div class="encabezado-trabajo">
+        <h2 class="titulo-trabajo">Nuestro Trabajo</h2>
+        <p class="descripcion-trabajo">Aquí puedes ver algunas imágenes de nuestro día a día y los servicios que ofrecemos en la clínica.</p>
+    </div>
+    
+    <div class="galeria-trabajo">
+        {% for imagen in imagenes_galeria %}
+        <div class="item-trabajo">
+            <img src="{{ imagen.imagen.url }}" 
+                alt="{{ imagen.titulo|default:'Nuestro trabajo en DR.PUL' }}"
+                class="imagen-trabajo">
+            {% if imagen.titulo %}
+            <div class="titulo-imagen">
+                <p>{{ imagen.titulo }}</p>
             </div>
-            {% empty %}
-            <div class="mensaje-vacio">
-                <p>No hay imágenes disponibles en la galería.</p>
-            </div>
-            {% endfor %}
+            {% endif %}
         </div>
-    </section>
+        {% empty %}
+        <div class="mensaje-vacio">
+            <p>No hay imágenes disponibles en la galería.</p>
+        </div>
+        {% endfor %}
+    </div>
+</section>
 
 
     <!--Mapa-->

@@ -88,7 +88,7 @@
             <div class="mb-8 text-center">
                 <h1 class="text-3xl font-bold text-[#1E2D93] mb-2">Galería "Nuestro Trabajo"</h1>
                 <p class="text-gray-600">Administra las imágenes que se muestran en la página principal.</p>
-                <p class="text-sm text-gray-500 mt-2">Imágenes en galería: {{ total_imagenes }}/9</p>
+                <p class="text-sm text-gray-500 mt-2">Imágenes en galería: {{ total_imagenes }}/12</p>
             </div>
             
             <!-- Formulario para agregar/editar imagen -->
@@ -236,7 +236,6 @@ document.getElementById('id_imagen').addEventListener('change', function(e) {
     }
 });
 
-// Modifica la función editarImagen para mostrar la imagen existente
 function editarImagen(id) {
     // Mostrar mensaje de carga
     const Toast = Swal.mixin({
@@ -293,6 +292,9 @@ function editarImagen(id) {
             
             document.querySelector('button[type="submit"]').innerHTML = '<i class="material-icons align-middle">save</i> Guardar Cambios';
             
+            // Actualizar estado del botón después de configurar todo
+            actualizarEstadoBoton();
+            
             // Resaltar el formulario brevemente
             const formSection = document.querySelector('.bg-gray-50.rounded-lg.border.border-gray-200');
             formSection.style.transition = 'box-shadow 0.3s';
@@ -341,64 +343,85 @@ function editarImagen(id) {
                 confirmButtonText: 'Entendido',
                 confirmButtonColor: '#33C0F1'
             });
+            actualizarEstadoBoton();
         }
 
-        // Manejar envío del formulario con AJAX
-        document.getElementById('galeriaForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const formData = new FormData(this);
-            const imagenId = formData.get('imagen_id');
-            
-            Swal.fire({
-                title: 'Procesando',
-                html: imagenId ? 'Actualizando imagen...' : 'Subiendo nueva imagen...',
-                allowOutsideClick: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                }
-            });
-
-            const url = imagenId ? `/api/galeria/${imagenId}/` : '/api/galeria/';
-            const method = 'POST';
-            
-            fetch(url, {
-                method: method,
-                body: formData,
-                headers: {
-                    'X-CSRFToken': formData.get('csrfmiddlewaretoken')
-                }
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(err => { throw new Error(err.error || 'Error en la respuesta del servidor'); });
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success || data.id) {
-                    Swal.fire({
-                        title: '¡Éxito!',
-                        text: imagenId ? 'Imagen actualizada correctamente' : 'Imagen subida correctamente',
-                        icon: 'success',
-                        confirmButtonText: 'Aceptar'
-                    }).then(() => {
-                        location.reload();
-                    });
-                } else {
-                    throw new Error(data.error || 'Error al guardar la imagen');
-                }
-            })
-            .catch(error => {
-                Swal.fire({
-                    title: 'Error',
-                    text: error.message || 'Error al guardar la imagen',
-                    icon: 'error',
-                    confirmButtonText: 'Entendido'
-                });
-                console.error('Error:', error);
-            });
+document.getElementById('galeriaForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const imagenId = formData.get('imagen_id');
+    const totalImagenes = parseInt("{{ total_imagenes }}");
+    
+    // Validar límite de imágenes solo para nuevas (no ediciones)
+    if (!imagenId && totalImagenes >= 12) {
+        Swal.fire({
+            title: 'Límite alcanzado',
+            text: 'No se pueden agregar más imágenes. El límite es de 12.',
+            icon: 'error',
+            confirmButtonText: 'Entendido'
         });
+        return;
+    }
+    
+    Swal.fire({
+        title: 'Procesando',
+        html: imagenId ? 'Actualizando imagen...' : 'Subiendo nueva imagen...',
+        allowOutsideClick: false,
+        didOpen: () => {
+            Swal.showLoading();
+        }
+    });
+
+    const url = imagenId ? `/api/galeria/${imagenId}/` : '/api/galeria/';
+    const method = 'POST';
+    
+    fetch(url, {
+        method: method,
+        body: formData,
+        headers: {
+            'X-CSRFToken': formData.get('csrfmiddlewaretoken')
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(err => { throw new Error(err.error || 'Error en la respuesta del servidor'); });
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success || data.id) {
+            Swal.fire({
+                title: '¡Éxito!',
+                text: imagenId ? 'Imagen actualizada correctamente' : 'Imagen subida correctamente',
+                icon: 'success',
+                confirmButtonText: 'Aceptar'
+            }).then(() => {
+                location.reload();
+            });
+        } else {
+            throw new Error(data.error || 'Error al guardar la imagen');
+        }
+    })
+    .catch(error => {
+        Swal.fire({
+            title: 'Error',
+            text: error.message || 'Error al guardar la imagen',
+            icon: 'error',
+            confirmButtonText: 'Entendido'
+        });
+        console.error('Error:', error);
+    });
+    // En la función editarImagen(id), ya estás agregando este campo dinámicamente:
+    let idField = document.querySelector('input[name="imagen_id"]');
+    if (!idField) {
+        idField = document.createElement('input');
+        idField.type = 'hidden';
+        idField.name = 'imagen_id';
+        document.getElementById('galeriaForm').appendChild(idField);
+    }
+    idField.value = data.id;
+});
 
         // Mostrar nombre del archivo seleccionado
         document.querySelector('input[type="file"]').addEventListener('change', function() {
@@ -511,7 +534,61 @@ function confirmarToggle(id, estaActiva) {
         }
     });
 }
-    </script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    const totalImagenes = parseInt("{{ total_imagenes }}");
+    const submitButton = document.querySelector('#galeriaForm button[type="submit"]');
+    const imagenIdField = document.querySelector('input[name="imagen_id"]');
+    
+    // Cambiar esta validación de 9 a 12
+    if (totalImagenes >= 12 && !imagenIdField) {
+        submitButton.disabled = true;
+        submitButton.classList.add('opacity-50', 'cursor-not-allowed');
+        submitButton.title = 'No se pueden agregar más imágenes. El límite es de 12.';
+        
+        // Mostrar mensaje informativo
+        const formSection = document.querySelector('.bg-gray-50.rounded-lg.border.border-gray-200');
+        const infoDiv = document.createElement('div');
+        infoDiv.className = 'mt-4 p-3 bg-yellow-100 text-yellow-800 rounded text-sm';
+        infoDiv.innerHTML = '<i class="fas fa-info-circle mr-2"></i> No se pueden agregar más imágenes. El límite es de 12. Elimina o edita imágenes existentes.';
+        formSection.appendChild(infoDiv);
+    }
+});
+
+function actualizarEstadoBoton() {
+    const totalImagenes = parseInt("{{ total_imagenes }}");
+    const submitButton = document.querySelector('#galeriaForm button[type="submit"]');
+    const imagenIdField = document.querySelector('input[name="imagen_id"]');
+    
+    // Cambiar esta validación de 9 a 12
+    if (totalImagenes >= 12 && !imagenIdField) {
+        submitButton.disabled = true;
+        submitButton.classList.add('opacity-50', 'cursor-not-allowed');
+        submitButton.title = 'No se pueden agregar más imágenes. El límite es de 12.';
+        
+        // Mostrar mensaje informativo si no existe
+        const formSection = document.querySelector('.bg-gray-50.rounded-lg.border.border-gray-200');
+        if (!document.getElementById('limite-mensaje')) {
+            const infoDiv = document.createElement('div');
+            infoDiv.id = 'limite-mensaje';
+            infoDiv.className = 'mt-4 p-3 bg-yellow-100 text-yellow-800 rounded text-sm';
+            infoDiv.innerHTML = '<i class="fas fa-info-circle mr-2"></i> No se pueden agregar más imágenes. El límite es de 12. Elimina o edita imágenes existentes.';
+            formSection.appendChild(infoDiv);
+        }
+    } else {
+        submitButton.disabled = false;
+        submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
+        submitButton.title = '';
+        
+        // Eliminar mensaje informativo si existe
+        const mensaje = document.getElementById('limite-mensaje');
+        if (mensaje) {
+            mensaje.remove();
+        }
+    }
+}
+
+</script>
 </body>
 </html>
 {% endif %}

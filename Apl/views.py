@@ -62,7 +62,7 @@ def llamadacita(request):
     return render(request, "llamadaCitas.html")  
 
 def index(request): 
-    imagenes_galeria = ImagenGaleria.objects.filter(activa=True).order_by('orden')[:9]
+    imagenes_galeria = ImagenGaleria.objects.filter(activa=True).order_by('orden')[:12]
     return render(request, "1. Index.html", {'imagenes_galeria': imagenes_galeria})
 
 def servicios(request):
@@ -621,47 +621,44 @@ def obtener_tip_actual(request):
             'imagen': ''
         })
 
-# --- Galería ---
     
-
-
 def gestion_galeria(request):
     imagenes = ImagenGaleria.objects.all().order_by('orden')
+    total_imagenes = ImagenGaleria.objects.count()
     
     if request.method == 'POST':
-        # Manejar toggle activa/inactiva
-        if 'toggle_activa' in request.POST:
-            imagen_id = request.POST['toggle_activa']
-            imagen = get_object_or_404(ImagenGaleria, id=imagen_id)
-            imagen.activa = not imagen.activa
-            imagen.save()
-            messages.success(request, f'Imagen {"mostrada" if imagen.activa else "ocultada"} correctamente')
+        imagen_id = request.POST.get('imagen_id')
+        
+        # Validar límite solo para nuevas imágenes (no ediciones)
+        if 'imagen' in request.FILES and not imagen_id and total_imagenes >= 12:
+            messages.error(request, "No se pueden agregar más imágenes. El límite es de 9.")
             return redirect('Galeria')
             
-        # Resto del código para manejar edición/creación...
-        imagen_id = request.POST.get('imagen_id')
         if imagen_id:
-            # Manejar edición de imagen existente
+            # Edición de imagen existente
             imagen = get_object_or_404(ImagenGaleria, id=imagen_id)
             form = ImagenGaleriaForm(request.POST, request.FILES, instance=imagen)
         else:
-            # Manejar creación de nueva imagen
+            # Creación de nueva imagen
             form = ImagenGaleriaForm(request.POST, request.FILES)
         
         if form.is_valid():
-            form.save()
+            imagen = form.save()
             action = 'actualizada' if imagen_id else 'agregada'
             messages.success(request, f'Imagen {action} correctamente')
             return redirect('Galeria')
         else:
-            messages.error(request, 'Por favor corrige los errores del formulario')
+            # Mostrar errores específicos del formulario
+            for field, errors in form.errors.items():
+                for error in errors:
+                    messages.error(request, f"{field}: {error}")
     else:
         form = ImagenGaleriaForm()
         
     return render(request, '5. modificar-galeria.html', {
         'imagenes': imagenes,
         'form': form,
-        'total_imagenes': ImagenGaleria.objects.count()
+        'total_imagenes': total_imagenes
     })
 
 @csrf_exempt
@@ -872,12 +869,6 @@ def enviar_correo_cita(cliente, estado, cita=None):
     email = EmailMultiAlternatives(asunto, text_content, None, destinatario)
     email.attach_alternative(html_content, "text/html")
     email.send()
-
-def index(request):
-    imagenes_galeria = ImagenGaleria.objects.filter(activa=True).order_by('orden')[:9]
-    return render(request, "1. Index.html", {'imagenes_galeria': imagenes_galeria})
-
-
 
 def servicios(request):
     servicios = Servicio.objects.filter(activo=True).order_by('orden')

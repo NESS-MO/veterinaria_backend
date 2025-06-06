@@ -20,7 +20,7 @@ class ImagenGaleriaForm(forms.ModelForm):
         self.fields['imagen'].required = False  # Esta línea es clave
         self.fields['orden'].widget.attrs.update({
             'min': '1',
-            'max': '9',
+            'max': '12',
             'class': 'border rounded px-2 py-1 w-full'  # Manteniendo el estilo original
         })
         self.fields['imagen'].widget.attrs.update({

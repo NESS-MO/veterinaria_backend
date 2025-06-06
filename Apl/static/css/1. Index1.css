@@ -1,3 +1,4 @@
+/* Estilos generales para la sección de bienvenida */
 .bienvenida {
     position: relative;
     background-image: linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.5)), url(../Images/fondo.jpg);
@@ -11,10 +12,8 @@
     position: absolute;
     bottom: 40px;
     left: 50%;
-    transform: translateX(-50%); /* Centra horizontalmente */
+    transform: translateX(-50%);
 }
-
-
 
 .bienvenida h1 {
     font-size: 32px;
@@ -26,6 +25,7 @@
     margin-bottom: 30px;
 }
 
+/* Estilos para botones */
 .agendar {
     background-color: #1e40af;
     color: #fff;
@@ -46,10 +46,8 @@
     color: #1e40af;
 }
 
-
-
 .agendar-submit {
-    background-color:   #1e40af;
+    background-color: #1e40af;
     color: white;
     padding: 10px 20px;
     font-size: 16px;
@@ -63,7 +61,7 @@
     background-color: #1e40af;
 }
 
-
+/* Estilos para la sección Conócenos */
 .conocenos {
     padding: 60px 20px;
     background-color: #ffffff;
@@ -101,7 +99,7 @@
 .c1 {
     flex: 1;
     min-width: 300px;
-    max-width: 800px; /* Aumentado para acomodar la imagen */
+    max-width: 800px;
     text-align: left;
     padding: 0;
     border-radius: 15px;
@@ -164,6 +162,7 @@
     display: block;
 }
 
+/* Estilos para la sección Nuestro Equipo */
 .equipo-nuevo {
     padding: 60px 20px;
     background-color: #f9f9f9;
@@ -238,23 +237,29 @@
     color: #555;
     line-height: 1.5;
 }
-    
 
-.nuestro-trabajo {
+/* Estilos para la sección Nuestro Trabajo */
+.seccion-trabajo {
     padding: 60px 20px;
     background-color: #ffffff;
-    text-align: center;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
-.nuestro-trabajo h2 {
+.encabezado-trabajo {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.titulo-trabajo {
     font-size: 36px;
-    margin-bottom: 20px;
-    color: #1e40af;
+    color: #1E2D93;
+    margin-bottom: 15px;
     position: relative;
     display: inline-block;
 }
 
-.nuestro-trabajo h2::after {
+.titulo-trabajo::after {
     content: '';
     position: absolute;
     bottom: -10px;
@@ -262,38 +267,7 @@
     transform: translateX(-50%);
     width: 80px;
     height: 3px;
-    background-color: #22d3ee;
-}
-
-.nuestro-trabajo p {
-    font-size: 16px;
-    color: #555;
-    max-width: 700px;
-    margin: 0 auto 30px;
-    line-height: 1.6;
-}
-
-.galeria {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-    gap: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-.imagen {
-    position: relative;
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-    aspect-ratio: 1/1;
-}
-
-.imagen:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    background-color: #33C0F1;
 }
 
 .descripcion-trabajo {
@@ -304,7 +278,6 @@
     line-height: 1.6;
 }
 
-/* Galería */
 .galeria-trabajo {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -318,7 +291,7 @@
     aspect-ratio: 1/1;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.3s ease;
-    background-color: white; /* Fondo blanco para los items */
+    background-color: white;
 }
 
 .item-trabajo:hover {
@@ -331,7 +304,6 @@
     object-fit: cover;
 }
 
-/* Mensaje cuando no hay imágenes */
 .mensaje-vacio {
     grid-column: 1 / -1;
     text-align: center;
@@ -339,7 +311,6 @@
     color: #666;
 }
 
-/* Estilos para los títulos de las imágenes */
 .titulo-imagen {
     position: absolute;
     bottom: 0;
@@ -360,37 +331,7 @@
     text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
 }
 
-/* Ajustes para el contenedor de cada imagen */
-.item-trabajo {
-    position: relative; /* Añade esto si no está presente */
-    overflow: hidden;
-    border-radius: 8px;
-    aspect-ratio: 1/1;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-}
-
-/* Responsive */
-@media (max-width: 900px) {
-    .galeria-trabajo {
-        grid-template-columns: repeat(2, 1fr);
-    }
-}
-
-@media (max-width: 600px) {
-    .galeria-trabajo {
-        grid-template-columns: 1fr;
-    }
-    
-    .titulo-trabajo {
-        font-size: 28px;
-    }
-    
-    .descripcion-trabajo {
-        font-size: 15px;
-    }
-}
-
+/* Estilos para el mapa */
 .f-mapa {
     padding: 40px 20px;
     background-color: #f3f3f3;
@@ -411,6 +352,7 @@
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
+/* Estilos para el footer */
 footer {
     background: linear-gradient(135deg, #22d3ee, #1e40af);
     color: #fff;
@@ -500,34 +442,9 @@ footer {
     color: rgba(255, 255, 255, 0.7);
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .footer-container {
-        grid-template-columns: 1fr;
-        gap: 30px;
-    }
-    
-    .footer-section {
-        text-align: center;
-    }
-    
-    .footer-section h3::after {
-        left: 50%;
-        transform: translateX(-50%);
-    }
-    
-    .contact-item {
-        justify-content: center;
-    }
-    
-    .quick-links {
-        align-items: center;
-    }
-}
-
-/* Estilos para el botón de abrir y cerrar */
+/* Estilos para el menú hamburguesa */
 .abrir, .cerrar {
-    display: none; /* Ocultar por defecto */
+    display: none;
     background: none;
     border: none;
     font-size: 24px;
@@ -535,16 +452,16 @@ footer {
     cursor: pointer;
 }
 
-/* Estilos para el menú en dispositivos móviles */
+/* Media queries */
 @media screen and (max-width: 768px) {
     .abrir, .cerrar {
-        display: block; /* Mostrar en dispositivos móviles */
+        display: block;
     }
 
     .opciones {
         position: fixed;
         top: 0;
-        right: -100%; /* Ocultar el menú fuera de la pantalla */
+        right: -100%;
         width: 70%;
         height: 100vh;
         background: linear-gradient(135deg, #2563eb, #0891b2);
@@ -556,7 +473,7 @@ footer {
     }
 
     .opciones.activo {
-        right: 0; /* Mostrar el menú */
+        right: 0;
     }
 
     .opciones a {
@@ -570,189 +487,24 @@ footer {
     }
 }
 
-@media (max-width: 768px) {
-    .bienvenida {
-        padding: 180px 20px; /* Reducir el padding para dispositivos pequeños */
-    }
-
-    .miembro {
-        width: 100%;
-        max-width: 100%;
-    }
-
-    .mapa {
-        height: 300px;
-    }
-}
-
-
-@media (min-width: 1200px) {
-    .formulario .container {
-        max-width: 1000px; 
-    }
-
-    .miembro {
-        max-width: 350px; 
-}
-
-@media (max-width: 768px) {
-    .galeria {
-        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); 
-}
-}
-@media (min-width: 1200px) {
-    .galeria {
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); 
-    }
-}
-}
-
-@media (max-width: 1024px) {
-    .logo1, .logo2 {
-        height: 40%; 
-    }
-    .logo3 {
-        height: 23%;
-        bottom: 50px;
-    }
-}
-
-@media (max-width: 768px) {
-    .logo1, .logo2 {
-        height: 150px;
-    }
-    .logo3 {
-        height: 100px;
-        bottom: 40px;
-    }
-}
-
-@media (max-width: 480px) {
-    .logo1, .logo2 {
-        height: 120px;
-    }
-    .logo3 {
-        height: 65px;
-        bottom: 50px;
-    }
-}
-
-/* Galería */
-.galeria-trabajo {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-}
-
-.item-trabajo {
-    position: relative;
-    overflow: hidden;
-    border-radius: 8px;
-    aspect-ratio: 1/1;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-    background-color: white; /* Fondo blanco para los items */
-}
-
-.item-trabajo:hover {
-    transform: translateY(-5px);
-}
-
-.imagen-trabajo {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-}
-
-/* Mensaje cuando no hay imágenes */
-.mensaje-vacio {
-    grid-column: 1 / -1;
-    text-align: center;
-    padding: 40px 0;
-    color: #666;
-}
-
-/* Estilos para los títulos de las imágenes */
-.titulo-imagen {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
-    color: white;
-    padding: 15px 10px 10px;
-    text-align: center;
-    opacity: 1;
-    transition: all 0.3s ease;
-}
-
-.titulo-imagen p {
-    margin: 0;
-    font-size: 16px;
-    font-weight: 600;
-    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-}
-
-/* Ajustes para el contenedor de cada imagen */
-.item-trabajo {
-    position: relative; /* Añade esto si no está presente */
-    overflow: hidden;
-    border-radius: 8px;
-    aspect-ratio: 1/1;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease;
-}
-
-/* Sección Nuestro Trabajo */
-.seccion-trabajo {
-    padding: 60px 20px;
-    background-color: #ffffff; /* Mismo color que la sección Conócenos */
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.encabezado-trabajo {
-    text-align: center;
-    margin-bottom: 40px;
-}
-
-.titulo-trabajo {
-    font-size: 36px;
-    color: #1E2D93;
-    margin-bottom: 15px;
-    position: relative;
-    display: inline-block;
-}
-
-.titulo-trabajo::after {
-    content: '';
-    position: absolute;
-    bottom: -10px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80px;
-    height: 3px;
-    background-color: #33C0F1;
-}
-
-.descripcion-trabajo {
-    font-size: 16px;
-    color: #555;
-    max-width: 700px;
-    margin: 0 auto;
-    line-height: 1.6;
-}
-
-
-
 @media (max-width: 1024px) {
     .bienvenida {
         padding: 25% 20px;
     }
     
-    .logo1{
+    .logo1 {
         height: 30%;
         bottom: 10px;
+    }
+    
+    .mapa {
+        height: 500px;
+    }
+}
+
+@media (max-width: 900px) {
+    .galeria-trabajo {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 
@@ -766,34 +518,10 @@ footer {
         padding: 30% 20px;
     }
     
-    .logo1{
+    .logo1 {
         height: 25%;
     }
-}
-
-@media (max-width: 480px) {
-    header {
-        padding: 8px 10px;
-    }
-
-    .bienvenida {
-        padding: 55% 20px;
-    }
     
-    .logo1{
-        height: 30%;
-    }
-}
-
-/* ------------------------- */
-/* Mejoras a las Secciones de Contenido (Sin cambios) */
-/* ------------------------- */
-@media (max-width: 768px) {
-    header {
-        flex-direction: row;
-        padding: 10px 15px;
-    }
-
     .conocenos {
         padding: 40px 15px;
     }
@@ -820,59 +548,12 @@ footer {
         width: 100%;
         max-width: 350px;
     }
-}
-
-/* ------------------------- */
-/* Mejoras a la Galería (Sin cambios) */
-/* ------------------------- */
-@media (max-width: 900px) {
-    .galeria-trabajo {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 15px;
-    }
-}
-
-@media (max-width: 600px) {
-    .galeria-trabajo {
-        grid-template-columns: 1fr;
-        gap: 15px;
-    }
     
-    .item-trabajo {
-        aspect-ratio: 4/3;
-    }
-}
-
-/* ------------------------- */
-/* Mejoras al Mapa (Sin cambios) */
-/* ------------------------- */
-@media (max-width: 1024px) {
-    .mapa {
-        height: 500px;
-    }
-}
-
-@media (max-width: 768px) {
     .mapa {
         width: 95%;
         height: 400px;
     }
-}
-
-@media (max-width: 480px) {
-    .mapa {
-        height: 300px;
-    }
     
-    .f-mapa h2 {
-        font-size: 24px;
-    }
-}
-
-/* ------------------------- */
-/* Mejoras al Footer (Sin cambios) */
-/* ------------------------- */
-@media (max-width: 768px) {
     .footer-container {
         grid-template-columns: 1fr;
         text-align: center;
@@ -890,12 +571,7 @@ footer {
         left: 50%;
         transform: translateX(-50%);
     }
-}
-
-/* ------------------------- */
-/* Mejoras Generales de Tipografía (Sin cambios) */
-/* ------------------------- */
-@media (max-width: 768px) {
+    
     .conocenos h1, .equipo-nuevo h2, .titulo-trabajo {
         font-size: 28px;
     }
@@ -909,7 +585,45 @@ footer {
     }
 }
 
+@media (max-width: 600px) {
+    .galeria-trabajo {
+        grid-template-columns: 1fr;
+    }
+    
+    .titulo-trabajo {
+        font-size: 28px;
+    }
+    
+    .descripcion-trabajo {
+        font-size: 15px;
+    }
+    
+    .item-trabajo {
+        aspect-ratio: 4/3;
+    }
+}
+
 @media (max-width: 480px) {
+    header {
+        padding: 8px 10px;
+    }
+
+    .bienvenida {
+        padding: 55% 20px;
+    }
+    
+    .logo1 {
+        height: 30%;
+    }
+    
+    .mapa {
+        height: 300px;
+    }
+    
+    .f-mapa h2 {
+        font-size: 24px;
+    }
+    
     .conocenos h1, .equipo-nuevo h2, .titulo-trabajo {
         font-size: 24px;
     }
@@ -918,4 +632,3 @@ footer {
         font-size: 20px;
     }
 }
-
