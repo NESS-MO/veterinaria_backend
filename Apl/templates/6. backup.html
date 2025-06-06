@@ -1,4 +1,10 @@
 {% load static %}
+{% if not request.user.is_authenticated %}
+  <script>
+    window.location.href = "{% url 'login' %}";
+  </script>
+{% else %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -194,6 +200,7 @@
   </script>
 </body>
 </html>
+{% endif %}
 <style>
 @keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
 .animate-fade-in { animation: fade-in 0.3s; }

@@ -1,4 +1,9 @@
 {% load static %}
+{% if not request.user.is_authenticated %}
+  <script>
+    window.location.href = "{% url 'login' %}";
+  </script>
+{% else %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -710,3 +715,4 @@ document.querySelectorAll('.observacion-auto').forEach(function(textarea) {
 </script>
 </body>
 </html>
+{% endif %}

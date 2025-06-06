@@ -1,4 +1,10 @@
 {% load static %}
+{% if not request.user.is_authenticated %}
+  <script>
+    window.location.href = "{% url 'login' %}";
+  </script>
+{% else %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -59,7 +65,8 @@
 
     
     <!-- Contenido principal -->
-    <div class="md:ml-72 p-6 lg:p-8 min-h-screen">
+    <!-- Contenido principal -->
+<div class="md:ml-72 px-6 lg:px-8 py-6 min-h-screen">
     <nav class="flex ml-8 mb-9 w-full justify-start">
         <ol class="inline-flex items-center space-x-1 md:space-x-2">
             <li class="inline-flex items-center">
@@ -86,107 +93,74 @@
     
     <div class="mb-6">
         <!-- Contenedor para centrar el botón de filtrar -->
-    <div class="flex justify-center mb-6">
-        <button id="btnMostrarFiltros" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md transition-colors inline-flex items-center gap-2">
-            <i class="fas fa-filter"></i> 
-            <span>Filtrar</span>
-        </button>
-    </div>
+        <div class="flex justify-center mb-6">
+            <button id="btnMostrarFiltros" class="bg-blue-500 hover:bg-blue-600 text-white px-6 py-3 rounded-lg shadow-md transition-colors inline-flex items-center gap-2">
+                <i class="fas fa-filter"></i> 
+                <span>Filtrar</span>
+            </button>
+        </div>
         
-        <div id="filtrosContainer" class="hidden bg-white p-4 lg:p-6 rounded-lg shadow-md mb-4 transition-all duration-300 ease-in-out">
+        <div id="filtrosContainer" class="hidden bg-white p-4 lg:p-6 rounded-lg shadow-md mb-4 mx-auto w-full max-w-6xl transition-all duration-300 ease-in-out">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Documento</label>
-                    <input type="text" id="filtroDocumento" placeholder="Buscar por documento..."
-                        class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
-                    <input type="text" id="filtroNombre" placeholder="Buscar por nombre..."
-                        class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Correo</label>
-                    <input type="text" id="filtroCorreo" placeholder="Buscar por correo..."
-                        class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
-                    <input type="text" id="filtroTelefono" placeholder="Buscar por teléfono..."
-                        class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
-                    <select id="filtroEstado" class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all">
-                        <option value="">Todos</option>
-                        <option value="true">Activo</option>
-                        <option value="false">Inactivo</option>
-                    </select>
-                </div>
-                <div class="flex items-end">
-                    <button id="btnLimpiarFiltros" class="bg-gray-300 hover:bg-gray-400 text-gray-700 px-4 py-2 rounded-lg transition-colors inline-flex items-center gap-2">
-                        <i class="fas fa-times"></i> 
-                        <span>Limpiar</span>
-                    </button>
-                </div>
+                <!-- Campos de filtro... -->
             </div>
         </div>
     </div>
     
-    <div class="bg-white rounded-lg shadow-lg overflow-hidden mx-auto max-w-6xl mt-6">
-    <div class="overflow-x-auto">
-        <table class="w-full border-collapse text-center">
-            <thead>
-                <tr class="bg-gray-50">
-                    <th class="px-4 py-6 text-sm font-bold text-gray-900 border-b border-gray-200">Documento</th>
-                    <th class="px-4 py-6 text-sm font-bold text-gray-900 border-b border-gray-200">Nombre Completo</th>
-                    <th class="px-4 py-6 text-sm font-bold text-gray-900 border-b border-gray-200">Correo Electrónico</th>
-                    <th class="px-4 py-6 text-sm font-bold text-gray-900 border-b border-gray-200">Teléfono</th>
-                    <th class="px-4 py-6 text-sm font-bold text-gray-900 border-b border-gray-200">Estado</th>
-                    <th class="px-4 py-6 text-sm font-bold text-gray-900 border-b border-gray-200">Acciones</th>
-                </tr>
-            </thead>
-            <tbody id="tablaCuerpo">
-                {% for admin in administradores %}
-                <tr class="hover:bg-gray-50 transition-colors">
-                    <td class="px-4 py-6 text-lg border-b border-gray-100">{{ admin.documento }}</td>
-                    <td class="px-4 py-6 text-lg border-b border-gray-100">{{ admin.nombre_completo }}</td>
-                    <td class="px-4 py-6 text-lg border-b border-gray-100">{{ admin.correo_electronico }}</td>
-                    <td class="px-4 py-6 text-lg border-b border-gray-100">{{ admin.telefono }}</td>
-                    <td class="px-4 py-6 border-b border-gray-100">
-                        {% if admin.is_active %}
-                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Activo</span>
-                        {% else %}
-                            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Inactivo</span>
-                        {% endif %}
-                    </td>
-                    <td class="border-b border-gray-100">
-                        <div class="flex flex-wrap justify-center gap-2">
-                            <button class="btn-editar bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md transition-colors inline-flex items-center gap-1 text-sm" data-documento="{{ admin.documento }}">
-                                <i class="fas fa-edit"></i> 
-                                <span class="hidden sm:inline">Editar</span>
-                            </button>
-                            <button class="btn-eliminar bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md transition-colors inline-flex items-center gap-1 text-sm" data-documento="{{ admin.documento }}">
-                                <i class="fas fa-trash-alt"></i> 
-                                <span class="hidden sm:inline">Eliminar</span>
-                            </button>
-                            <button class="toggle-estado bg-{{ admin.is_active|yesno:'yellow,green' }}-500 hover:bg-{{ admin.is_active|yesno:'yellow,green' }}-600 text-white px-3 py-1 rounded-md transition-colors inline-flex items-center gap-1 text-sm" data-documento="{{ admin.documento }}">
-                                <i class="fas fa-{{ admin.is_active|yesno:'ban,check' }}"></i> 
-                                <span class="hidden sm:inline">{{ admin.is_active|yesno:'Desactivar,Activar' }}</span>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-                {% empty %}
-                <tr>
-                    <td colspan="6" class="px-4 py-8 text-center text-gray-500">No hay usuarios registrados</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+    <!-- Contenedor de la tabla - Modificado -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden mx-auto w-full max-w-6xl mt-6">
+        <div class="overflow-x-auto">
+            <table class="w-full border-collapse text-center">
+                <thead>
+                    <tr class="bg-gray-50">
+                        <th class="px-4 py-6 text-sm font-bold text-gray-900 border-b border-gray-200">Documento</th>
+                        <th class="px-4 py-6 text-sm font-bold text-gray-900 border-b border-gray-200">Nombre Completo</th>
+                        <th class="px-4 py-6 text-sm font-bold text-gray-900 border-b border-gray-200">Correo Electrónico</th>
+                        <th class="px-4 py-6 text-sm font-bold text-gray-900 border-b border-gray-200">Teléfono</th>
+                        <th class="px-4 py-6 text-sm font-bold text-gray-900 border-b border-gray-200">Estado</th>
+                        <th class="px-4 py-6 text-sm font-bold text-gray-900 border-b border-gray-200">Acciones</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaCuerpo">
+                    {% for admin in administradores %}
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-4 py-6 text-lg border-b border-gray-100">{{ admin.documento }}</td>
+                        <td class="px-4 py-6 text-lg border-b border-gray-100">{{ admin.nombre_completo }}</td>
+                        <td class="px-4 py-6 text-lg border-b border-gray-100">{{ admin.correo_electronico }}</td>
+                        <td class="px-4 py-6 text-lg border-b border-gray-100">{{ admin.telefono }}</td>
+                        <td class="px-4 py-6 border-b border-gray-100">
+                            {% if admin.is_active %}
+                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Activo</span>
+                            {% else %}
+                                <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800">Inactivo</span>
+                            {% endif %}
+                        </td>
+                        <td class="border-b border-gray-100">
+                            <div class="flex flex-wrap justify-center gap-2">
+                                <button class="btn-editar bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md transition-colors inline-flex items-center gap-1 text-sm" data-documento="{{ admin.documento }}">
+                                    <i class="fas fa-edit"></i> 
+                                    <span class="hidden sm:inline">Editar</span>
+                                </button>
+                                <button class="btn-eliminar bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded-md transition-colors inline-flex items-center gap-1 text-sm" data-documento="{{ admin.documento }}">
+                                    <i class="fas fa-trash-alt"></i> 
+                                    <span class="hidden sm:inline">Eliminar</span>
+                                </button>
+                                <button class="toggle-estado bg-{{ admin.is_active|yesno:'yellow,green' }}-500 hover:bg-{{ admin.is_active|yesno:'yellow,green' }}-600 text-white px-3 py-1 rounded-md transition-colors inline-flex items-center gap-1 text-sm" data-documento="{{ admin.documento }}">
+                                    <i class="fas fa-{{ admin.is_active|yesno:'ban,check' }}"></i> 
+                                    <span class="hidden sm:inline">{{ admin.is_active|yesno:'Desactivar,Activar' }}</span>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="px-4 py-8 text-center text-gray-500">No hay usuarios registrados</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
     </div>
-</div>
-
 
     <div class="mt-6 text-center">
         <button id="btnNuevoUsuario" class="bg-green-500 hover:bg-green-600 text-white px-6 py-3 rounded-lg shadow-md transition-colors inline-flex items-center gap-2">
@@ -1107,3 +1081,4 @@ document.querySelectorAll('#sidebar a').forEach(link => {
     </script>
 </body>
 </html>
+{% endif %}

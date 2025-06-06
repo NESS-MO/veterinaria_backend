@@ -1,4 +1,10 @@
 {% load static %}
+{% if not request.user.is_authenticated %}
+  <script>
+    window.location.href = "{% url 'login' %}";
+  </script>
+{% else %}
+{% load static %}
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -52,7 +58,15 @@
     }
     </style>
 </head>
+
 <body>
+    <!-- Verificación de sesión -->
+    {% if not request.user.is_authenticated %}
+    <script>
+        window.location.href = "{% url 'login' %}?next={% url 'gestioncitas' %}";
+    </script>
+    {% endif %}
+
     <!-- Botón menú móvil -->
     <button class="md:hidden fixed top-4 left-4 z-30 bg-primary text-white p-2 rounded-lg shadow-lg" id="mobileMenuBtn">
       <i class="fas fa-bars"></i>
@@ -72,7 +86,7 @@
         <li><a href="{% url 'Galeria' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Modificar Galería</a></li>
         <li><a href="{% url 'modificarservicio' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Modificar Servicios</a></li>
         <li><a href="{% url 'backup' %}" class="block hover:bg-white/20 p-2 rounded transition-colors">Copia de seguridad</a></li>
-        <li><a href="{% url 'index' %}" class="block hover:bg-red-500/80 p-2 rounded transition-colors">Cerrar sesión</a></li>
+        <li><a href="{% url 'logout' %}" class="block hover:bg-red-500/80 p-2 rounded transition-colors">Cerrar sesión</a></li>
       </ul>
       <div class="absolute bottom-0 left-0 w-full p-4 bg-white/10 border-t border-white/20">
         <div class="text-center">
@@ -210,8 +224,6 @@
         {% endfor %}
       </div>
 
-
-
       <script>
         setTimeout(function() {
           var alerta = document.getElementById('alertas-mensaje');
@@ -221,14 +233,35 @@
     {% endif %}
     <script>
     // Sidebar móvil
-    const toggleBtn = document.getElementById('menu-toggle');
+    const toggleBtn = document.getElementById('mobileMenuBtn');
     const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('overlay');
+    
     if(toggleBtn && sidebar){
       toggleBtn.addEventListener('click', () => {
-        sidebar.classList.toggle('sidebar-open');
         sidebar.classList.toggle('-translate-x-full');
+        overlay.classList.toggle('opacity-0');
+        overlay.classList.toggle('pointer-events-none');
       });
     }
+
+    // Cerrar sidebar al hacer clic en overlay
+    overlay.addEventListener('click', () => {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('opacity-0');
+        overlay.classList.add('pointer-events-none');
+    });
+
+    // Cerrar sidebar al hacer clic en un enlace (solo móvil)
+    document.querySelectorAll('#sidebar a').forEach(link => {
+        link.addEventListener('click', function() {
+            if (window.innerWidth < 768) {
+                sidebar.classList.add('-translate-x-full');
+                overlay.classList.add('opacity-0');
+                overlay.classList.add('pointer-events-none');
+            }
+        });
+    });
 
     document.addEventListener('DOMContentLoaded', function () {
         // Mostrar/ocultar filtros usando la clase 'mostrar'
@@ -288,36 +321,9 @@
         }
     });
     </script>
-    <script>
-document.getElementById('mobileMenuBtn').addEventListener('click', function() {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('overlay');
-    sidebar.classList.toggle('-translate-x-full');
-    overlay.classList.toggle('opacity-0');
-    overlay.classList.toggle('pointer-events-none');
-});
-document.getElementById('overlay').addEventListener('click', function() {
-    const sidebar = document.getElementById('sidebar');
-    const overlay = document.getElementById('overlay');
-    sidebar.classList.add('-translate-x-full');
-    overlay.classList.add('opacity-0');
-    overlay.classList.add('pointer-events-none');
-});
-document.querySelectorAll('#sidebar a').forEach(link => {
-    link.addEventListener('click', function() {
-        if (window.innerWidth < 768) {
-            const sidebar = document.getElementById('sidebar');
-            const overlay = document.getElementById('overlay');
-            sidebar.classList.add('-translate-x-full');
-            overlay.classList.add('opacity-0');
-            overlay.classList.add('pointer-events-none');
-        }
-    });
-});
-
-    </script>
 
     <script src={% static "JavaScript/sienna.js" %}></script>
     <script src={% static "JavaScript/custom.js" %}></script>
 </body>
 </html>
+{% endif %}

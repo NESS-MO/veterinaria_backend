@@ -296,14 +296,18 @@ class CitaRapidaForm(forms.ModelForm):
         }
 # forms.py
 
+from django import forms
+from django.contrib.auth.forms import AuthenticationForm
+
 class LoginForm(AuthenticationForm):
-    username = forms.CharField(label="Documento")
-    password = forms.CharField(label="Contraseña", widget=forms.PasswordInput)
-    
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.fields['username'].widget.attrs.update({'class': 'form-control'})
-        self.fields['password'].widget.attrs.update({'class': 'form-control'})
+    username = forms.CharField(
+        label="Documento",
+        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese su documento'})
+    )
+    password = forms.CharField(
+        label="Contraseña",
+        widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Ingrese su contraseña'})
+    )
 
 
 class AdministradorForm(forms.ModelForm):
