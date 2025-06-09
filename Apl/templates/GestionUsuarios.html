@@ -102,7 +102,46 @@
         
         <div id="filtrosContainer" class="hidden bg-white p-4 lg:p-6 rounded-lg shadow-md mb-4 mx-auto w-full max-w-6xl transition-all duration-300 ease-in-out">
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Campos de filtro... -->
+                <!-- Filtro por documento -->
+                <div class="form-group">
+                    <label for="filtroDocumento" class="block text-sm font-medium text-gray-700 mb-1">Documento</label>
+                    <input type="text" id="filtroDocumento" class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <!-- Filtro por nombre -->
+                <div class="form-group">
+                    <label for="filtroNombre" class="block text-sm font-medium text-gray-700 mb-1">Nombre</label>
+                    <input type="text" id="filtroNombre" class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <!-- Filtro por correo -->
+                <div class="form-group">
+                    <label for="filtroCorreo" class="block text-sm font-medium text-gray-700 mb-1">Correo</label>
+                    <input type="text" id="filtroCorreo" class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <!-- Filtro por teléfono -->
+                <div class="form-group">
+                    <label for="filtroTelefono" class="block text-sm font-medium text-gray-700 mb-1">Teléfono</label>
+                    <input type="text" id="filtroTelefono" class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <!-- Filtro por estado -->
+                <div class="form-group">
+                    <label for="filtroEstado" class="block text-sm font-medium text-gray-700 mb-1">Estado</label>
+                    <select id="filtroEstado" class="w-full border border-gray-300 rounded-md py-2 px-3 focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="">Todos</option>
+                        <option value="true">Activo</option>
+                        <option value="false">Inactivo</option>
+                    </select>
+                </div>
+                
+                <!-- Botón para limpiar filtros -->
+                <div class="form-group flex items-end">
+                    <button id="btnLimpiarFiltros" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md transition-colors">
+                        Limpiar Filtros
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -293,16 +332,41 @@
         const delay = 300; // Retardo en ms para la búsqueda en tiempo real
 
         // Funciones del modal
-        function abrirModal() {
-            document.getElementById('usuarioModal').style.display = 'block';
-            document.body.style.overflow = 'hidden';
+        function abrirModal(esEdicion = false, documento = '') {
+        const modal = document.getElementById('usuarioModal');
+        const tituloModal = document.getElementById('modalTitle');
+        const botonSubmit = document.getElementById('submitButton');
+        
+        if (esEdicion) {
+            tituloModal.textContent = 'Editar Administrador';
+            botonSubmit.textContent = 'Actualizar';
+            document.getElementById('passwordFields').style.display = 'none';
+            document.getElementById('inputPassword').required = false;
+            document.getElementById('inputConfirmPassword').required = false;
+            document.getElementById('inputDocumentoLogin').readOnly = true;
+            
+            // Cargar datos del usuario a editar
+            cargarUsuarioParaEditar(documento);
+        } else {
+            tituloModal.textContent = 'Nuevo Administrador';
+            botonSubmit.textContent = 'Crear';
+            document.getElementById('passwordFields').style.display = 'block';
+            document.getElementById('inputPassword').required = true;
+            document.getElementById('inputConfirmPassword').required = true;
+            document.getElementById('inputDocumentoLogin').readOnly = false;
+            document.getElementById('usuarioForm').reset();
         }
+        
+        modal.style.display = 'block';
+        document.body.style.overflow = 'hidden';
+    }
 
-        function cerrarModal() {
-            document.getElementById('usuarioModal').style.display = 'none';
-            document.body.style.overflow = 'auto';
-            resetForm();
-        }
+    // Función para cerrar el modal
+    function cerrarModal() {
+        document.getElementById('usuarioModal').style.display = 'none';
+        document.body.style.overflow = 'auto';
+        clearErrors();
+    }
 
         function togglePassword(inputId) {
             const input = document.getElementById(inputId);
@@ -366,131 +430,144 @@
         });
 
         // Validación de contraseña en tiempo real
-        document.getElementById('inputPassword').addEventListener('input', function() {
-            const password = this.value;
-            const strengthBar = document.getElementById('passwordStrengthBar');
-            const strengthText = document.getElementById('passwordStrengthText');
-            
-            // Calcular fortaleza
-            let strength = 0;
-            
-            // Longitud mínima
-            if (password.length >= 12) strength += 1;
-            
-            // Contiene mayúscula
-            if (/[A-Z]/.test(password)) strength += 1;
-            
-            // Contiene carácter especial
-            if (/[@!|./&]/.test(password)) strength += 1;
-            
-            // Contiene número
-            if (/[0-9]/.test(password)) strength += 1;
-            
-            // Actualizar barra y texto
-            const width = strength * 25;
-            strengthBar.style.width = `${width}%`;
-            
-            if (strength === 0) {
-                strengthBar.className = 'h-full bg-gray-400';
-                strengthText.textContent = 'Muy débil';
-            } else if (strength === 1) {
-                strengthBar.className = 'h-full bg-red-500';
-                strengthText.textContent = 'Débil';
-            } else if (strength === 2) {
-                strengthBar.className = 'h-full bg-yellow-500';
-                strengthText.textContent = 'Moderada';
-            } else if (strength === 3) {
-                strengthBar.className = 'h-full bg-blue-500';
-                strengthText.textContent = 'Fuerte';
-            } else {
-                strengthBar.className = 'h-full bg-green-500';
-                strengthText.textContent = 'Muy fuerte';
-            }
-        });
+document.getElementById('inputPassword').addEventListener('input', function() {
+    const password = this.value;
+    const strengthBar = document.getElementById('passwordStrengthBar');
+    const strengthText = document.getElementById('passwordStrengthText');
+    
+    // Calcular fortaleza basada en criterios
+    let strength = 0;
+    
+    // Longitud mínima (1 punto si tiene al menos 1 carácter)
+    if (password.length > 0) strength = 1; // Cambio importante aquí
+    
+    // Mayúscula (solo suma si ya tiene algo)
+    if (password.length > 0 && /[A-Z]/.test(password)) strength += 1;
+    
+    // Carácter especial (solo suma si ya tiene algo)
+    if (password.length > 0 && /[@!|./&]/.test(password)) strength += 1;
+    
+    // Número (solo suma si ya tiene algo)
+    if (password.length > 0 && /[0-9]/.test(password)) strength += 1;
+    
+    // Longitud adecuada (12+ caracteres)
+    if (password.length >= 12) strength += 1;
+    
+    // Asegurarnos de que strength no sea 0 si hay algo escrito
+    if (password.length > 0 && strength === 0) strength = 1;
+    
+    // Actualizar barra y texto
+    let widthPercentage = 0;
+    let colorClass = 'bg-gray-400';
+    let text = 'Seguridad';
+    
+    if (password.length === 0) {
+        widthPercentage = 0;
+        colorClass = 'bg-gray-400';
+        text = 'Seguridad';
+    } else if (strength <= 1) {
+        widthPercentage = 25;
+        colorClass = 'bg-red-500';
+        text = 'Muy débil';
+    } else if (strength === 2) {
+        widthPercentage = 50;
+        colorClass = 'bg-yellow-500';
+        text = 'Débil';
+    } else if (strength === 3) {
+        widthPercentage = 75;
+        colorClass = 'bg-blue-500';
+        text = 'Moderada';
+    } else {
+        widthPercentage = 100;
+        colorClass = 'bg-green-500';
+        text = 'Fuerte';
+    }
+    
+    strengthBar.style.width = `${widthPercentage}%`;
+    strengthBar.className = `h-full ${colorClass} transition-all duration-300`;
+    strengthText.textContent = text;
+});
 
         // Funciones para mostrar/ocultar filtros
-        document.getElementById('btnMostrarFiltros').addEventListener('click', function() {
-            const filtros = document.getElementById('filtrosContainer');
-            const icono = this.querySelector('i');
-            
-            // Alternar visibilidad
-            filtros.classList.toggle('hidden');
-            
-            // Cambiar ícono y estilo del botón
-            if (filtros.classList.contains('hidden')) {
-                this.classList.remove('bg-blue-600');
-                this.classList.add('bg-blue-500');
-                icono.classList.remove('fa-times');
-                icono.classList.add('fa-filter');
-            } else {
-                this.classList.remove('bg-blue-500');
-                this.classList.add('bg-blue-600');
-                icono.classList.remove('fa-filter');
-                icono.classList.add('fa-times');
+document.getElementById('btnMostrarFiltros').addEventListener('click', function() {
+    const filtros = document.getElementById('filtrosContainer');
+    const icono = this.querySelector('i');
+    
+    filtros.classList.toggle('hidden');
+    
+    if (filtros.classList.contains('hidden')) {
+        this.classList.remove('bg-blue-600');
+        this.classList.add('bg-blue-500');
+        icono.classList.remove('fa-times');
+        icono.classList.add('fa-filter');
+        
+        // Limpiar los campos de filtro cuando se ocultan
+        document.getElementById('filtroDocumento').value = '';
+        document.getElementById('filtroNombre').value = '';
+        document.getElementById('filtroCorreo').value = '';
+        document.getElementById('filtroTelefono').value = '';
+        document.getElementById('filtroEstado').value = '';
+        
+        // Aplicar filtros (que ahora están vacíos) para mostrar todos los registros
+        aplicarFiltros();
+    } else {
+        this.classList.remove('bg-blue-500');
+        this.classList.add('bg-blue-600');
+        icono.classList.remove('fa-filter');
+        icono.classList.add('fa-times');
+    }
+});
+
+        // Funciones de filtrado
+async function aplicarFiltros() {
+    try {
+        const filtros = {
+            documento: document.getElementById('filtroDocumento').value,
+            nombre: document.getElementById('filtroNombre').value,
+            correo: document.getElementById('filtroCorreo').value,
+            telefono: document.getElementById('filtroTelefono').value,
+            estado: document.getElementById('filtroEstado').value
+        };
+
+        // Mostrar carga
+        const tbody = document.getElementById('tablaCuerpo');
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Cargando usuarios...</td></tr>';
+
+        // Construir URL con parámetros
+        const params = new URLSearchParams();
+        for (const key in filtros) {
+            if (filtros[key]) {
+                params.append(key, filtros[key]);
+            }
+        }
+
+        // Hacer la petición AJAX
+        const response = await fetch(`/usuarios/?${params.toString()}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
             }
         });
 
-        // Funciones de filtrado
-        async function aplicarFiltros() {
-            try {
-                // Obtener valores de los filtros
-                const filtros = {
-                    documento: document.getElementById('filtroDocumento').value,
-                    nombre: document.getElementById('filtroNombre').value,
-                    correo: document.getElementById('filtroCorreo').value,
-                    telefono: document.getElementById('filtroTelefono').value,
-                    estado: document.getElementById('filtroEstado').value
-                };
-
-                // Mostrar carga
-                const tbody = document.getElementById('tablaCuerpo');
-                tbody.innerHTML = '<tr><td colspan="6" class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Buscando usuarios...</td></tr>';
-
-                // Construir URL con parámetros
-                const params = new URLSearchParams();
-                for (const key in filtros) {
-                    if (filtros[key]) {
-                        params.append(key, filtros[key]);
-                    }
-                }
-
-                // Hacer la petición AJAX
-                const response = await fetch(`/usuarios/?${params.toString()}`, {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    }
-                });
-
-                // Verificar si la respuesta es exitosa
-                if (!response.ok) {
-                    const errorData = await response.json().catch(() => null);
-                    throw new Error(errorData?.error || `Error HTTP: ${response.status}`);
-                }
-
-                // Procesar la respuesta
-                const data = await response.json();
-                
-                if (!data.administradores) {
-                    throw new Error('Formato de respuesta inesperado');
-                }
-
-                // Actualizar la tabla
-                actualizarTabla(data.administradores);
-                
-            } catch (error) {
-                console.error('Error en aplicarFiltros:', error);
-                
-                // Mostrar mensaje de error en la tabla
-                document.getElementById('tablaCuerpo').innerHTML = `
-                    <tr>
-                        <td colspan="6" class="text-center py-4 text-red-500">
-                            Error: ${error.message}
-                        </td>
-                    </tr>
-                `;
-            }
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
         }
+
+        const data = await response.json();
+        actualizarTabla(data.administradores);
+        
+    } catch (error) {
+        console.error('Error en aplicarFiltros:', error);
+        document.getElementById('tablaCuerpo').innerHTML = `
+            <tr>
+                <td colspan="6" class="text-center py-4 text-red-500">
+                    Error: ${error.message}
+                </td>
+            </tr>
+        `;
+    }
+}
+
 
 
         function actualizarTabla(administradores) {
@@ -546,44 +623,18 @@
         }
 
         // Limpiar filtros
-        document.getElementById('btnLimpiarFiltros').addEventListener('click', async function() {
-            // Limpiar los campos de filtro
-            document.getElementById('filtroDocumento').value = '';
-            document.getElementById('filtroNombre').value = '';
-            document.getElementById('filtroCorreo').value = '';
-            document.getElementById('filtroTelefono').value = '';
-            document.getElementById('filtroEstado').value = '';
-            
-            // Mostrar carga
-            document.querySelector('tbody').innerHTML = '<tr><td colspan="6" class="text-center py-4"><i class="fas fa-spinner fa-spin"></i> Cargando todos los usuarios...</td></tr>';
-            
-            try {
-                // Hacer una nueva petición sin filtros
-                const response = await fetch('/usuarios/', {
-                    headers: {
-                        'X-Requested-With': 'XMLHttpRequest',
-                        'Accept': 'application/json'
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error('Error al cargar usuarios');
-                }
-                
-                const data = await response.json();
-                actualizarTabla(data.administradores);
-                
-            } catch (error) {
-                console.error('Error al limpiar filtros:', error);
-                document.querySelector('tbody').innerHTML = `
-                    <tr>
-                        <td colspan="6" class="text-center py-4 text-red-500">
-                            Error al cargar usuarios: ${error.message}
-                        </td>
-                    </tr>
-                `;
-            }
-        });
+// Limpiar filtros
+document.getElementById('btnLimpiarFiltros').addEventListener('click', function() {
+    // Limpiar los campos de filtro
+    document.getElementById('filtroDocumento').value = '';
+    document.getElementById('filtroNombre').value = '';
+    document.getElementById('filtroCorreo').value = '';
+    document.getElementById('filtroTelefono').value = '';
+    document.getElementById('filtroEstado').value = '';
+    
+    // Aplicar filtros vacíos
+    aplicarFiltros();
+});
 
         // Event listeners para filtros en tiempo real
         document.getElementById('filtroDocumento').addEventListener('input', function() {
@@ -1014,8 +1065,7 @@ async function enviarFormulario() {
             // Botón nuevo usuario
             document.getElementById('btnNuevoUsuario').addEventListener('click', function(e) {
                 e.preventDefault();
-                resetForm();
-                abrirModal();
+                abrirModal(false);
             });
 
             // Inicializar event listeners
