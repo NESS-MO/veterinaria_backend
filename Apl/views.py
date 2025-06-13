@@ -59,6 +59,20 @@ def Agendar(request):
     if request.method == 'POST':
         try:
             numero_documento = request.POST['numero_documento']
+            fecha = request.POST['fecha']
+            hora = request.POST['hora']
+
+            # Verifica si ya existe una cita con los mismos datos (cliente, fecha y hora)
+            existe = Cita.objects.filter(
+                cliente__numero_documento=numero_documento,
+                fecha=fecha,
+                horario=hora,
+                estado='pendiente'
+            ).exists()
+            if existe:
+                messages.error(request, "Ya existe una cita pendiente para este cliente en la misma fecha y hora.")
+                return redirect('agendar')
+
             cliente, _ = Cliente.objects.get_or_create(
                 numero_documento=numero_documento,
                 defaults={
@@ -69,9 +83,8 @@ def Agendar(request):
                     'correo_electronico': request.POST['correo_electronico'],
                 }
             )
-            nombre_mascota = request.POST['mascota']
             mascota, _ = Mascota.objects.get_or_create(
-                nombre_mascota=nombre_mascota,
+                nombre_mascota=request.POST['mascota'],
                 cliente=cliente,
                 defaults={
                     'especie': request.POST['clase-mascota'],
@@ -84,11 +97,11 @@ def Agendar(request):
                 servicios.append(request.POST['extra_service'])
 
             Cita.objects.create(
-                fecha=request.POST['fecha'],
-                horario=request.POST['hora'],
+                fecha=fecha,
+                horario=hora,
                 extra=", ".join(servicios),
                 cliente=cliente,
-                mascota=mascota,  # <--- Aquí agregas la mascota correcta
+                mascota=mascota,
                 estado='pendiente'
             )
             messages.success(request, "Cita agendada exitosamente")
@@ -96,7 +109,6 @@ def Agendar(request):
         except Exception as e:
             messages.error(request, f"Error al registrar: {str(e)}")
 
-    # SOLO ESTO CAMBIA:
     hoy = timezone.now().date()
     citas_rapidas = (
         CitaRapida.objects
@@ -110,7 +122,7 @@ def Agendar(request):
     servicios = Servicio.objects.filter(activo=True).order_by('orden')
     return render(request, '3. Agendar.html', {
         'citas_por_fecha': citas_por_fecha,
-        'servicios': servicios,  # <-- agrega esto
+        'servicios': servicios,
     })
 
 def RegistroC(request):
@@ -124,6 +136,37 @@ def RegistroC(request):
             edad = ""
         data['edad_mascota'] = edad
 
+        # --- VALIDACIÓN DE DUPLICADOS ---
+        numero_documento = data.get('numero_documento')
+        nombre_mascota = data.get('nombre_mascota')
+        fecha = data.get('fecha')
+        hora = data.get('hora')
+
+        # Verificar si existe una cita con los mismos datos en el registro
+        cita_existente = CitaRapida.objects.filter(
+            numero_documento=numero_documento,
+            nombre_mascota=nombre_mascota,
+            fecha=fecha,
+            hora=hora
+        ).first()
+
+        if cita_existente and cita_existente.estado not in ['Cancelada', 'Completada']:
+            messages.warning(request, "Ya existe una cita pendiente con los mismos datos en el registro.")
+            return redirect('registroc')
+
+        # Verificar si existe una cita en gestión de citas con los mismos datos
+        cita_gestion = Cita.objects.filter(
+            cliente__numero_documento=numero_documento,
+            fecha=fecha,
+            horario=hora,
+            estado='pendiente'
+        ).exists()
+
+        if cita_gestion:
+            messages.warning(request, "Ya existe una cita pendiente en gestión de citas con los mismos datos.")
+            return redirect('registroc')
+        # --- FIN VALIDACIÓN ---
+
         form = CitaRapidaForm(data)
         if form.is_valid():
             form.save()
@@ -133,16 +176,18 @@ def RegistroC(request):
             messages.error(request, "Por favor corrige los errores del formulario.")
     else:
         form = CitaRapidaForm()
+
     citas_rapidas = CitaRapida.objects.all()
-    citas_normales = Cita.objects.all()  # <-- Agrega esto
+    citas_normales = Cita.objects.all()
     rango_edades = range(1, 21)
     rango_meses = range(0, 12)
     servicios = Servicio.objects.filter(activo=True).order_by('orden')
+
     return render(request, 'registrocitas.html', {
         'rango_edades': rango_edades,
         'rango_meses': rango_meses,
         'citas_rapidas': citas_rapidas,
-        'citas_normales': citas_normales,  # <-- Y esto
+        'citas_normales': citas_normales,
         'form': form,
         'servicios': servicios,
 })
@@ -750,7 +795,20 @@ def editar_observacion_cita(request, cita_id):
 @require_POST
 def editar_estado_observacion_rapida(request, cita_id):
     cita = get_object_or_404(CitaRapida, id=cita_id)
-    cita.estado = request.POST.get('estado')
+    nuevo_estado = request.POST.get('estado')
+    # Solo validar si se va a poner en Pendiente
+    if nuevo_estado == 'Pendiente':
+        existe = CitaRapida.objects.filter(
+            numero_documento=cita.numero_documento,
+            nombre_mascota=cita.nombre_mascota,
+            fecha=request.POST.get('fecha'),
+            hora=request.POST.get('hora'),
+            estado='Pendiente'
+        ).exclude(id=cita_id).exists()
+        if existe:
+            messages.warning(request, "Ya existe otra cita pendiente con los mismos datos.")
+            return redirect('registroc')
+    cita.estado = nuevo_estado
     cita.observaciones = request.POST.get('observaciones')
     cita.fecha = request.POST.get('fecha')
     cita.hora = request.POST.get('hora')

@@ -253,7 +253,12 @@
     {% if messages %}
     <div class="mensaje-exito-container">
         {% for message in messages %}
-            {% if "invalid date format" in message|stringformat:"s" or "Error" in message|stringformat:"s" %}
+            {% if "Ya existe una cita pendiente para este cliente, mascota y fecha." in message|stringformat:"s" %}
+                <div class="mensaje-exito mensaje-warning">
+                    <span class="mensaje-texto">{{ message }}</span>
+                    <button onclick="this.parentElement.style.display='none'" class="cerrar-mensaje">&times;</button>
+                </div>
+            {% elif "invalid date format" in message|stringformat:"s" or "Error" in message|stringformat:"s" %}
                 <div class="mensaje-exito mensaje-error">
                     <span class="mensaje-texto">
                         {% if "invalid date format" in message|stringformat:"s" %}
@@ -335,6 +340,14 @@
 }
 .mensaje-error .cerrar-mensaje {
     color: #c0392b !important;
+}
+.mensaje-warning {
+    background: #fff8e1 !important; /* Fondo amarillo claro */
+    color: #856404 !important; /* Texto marrón oscuro */
+    border: 1.5px solid #ffe082 !important; /* Borde amarillo */
+}
+.mensaje-warning .cerrar-mensaje {
+    color: #856404 !important; /* Color del botón de cerrar */
 }
 </style>
 <script>
@@ -1227,6 +1240,134 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Inicializa al cargar
     actualizarOpcionesExtra();
+});
+</script>
+<script>
+// Solo letras y espacios
+function soloLetrasInput(e) {
+    const key = e.key;
+    if (
+        key.length === 1 &&
+        !/[A-Za-záéíóúÁÉÍÓÚñÑ\s]/.test(key) &&
+        !e.ctrlKey && !e.metaKey
+    ) {
+        e.preventDefault();
+    }
+}
+// Solo números
+function soloNumerosInput(e) {
+    const key = e.key;
+    if (
+        key.length === 1 &&
+        !/[0-9]/.test(key) &&
+        !e.ctrlKey && !e.metaKey
+    ) {
+        e.preventDefault();
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const primer_nombreInput = document.getElementById('primer_nombre');
+    const primer_apellidoInput = document.getElementById('primer_apellido');
+    const mascotaInput = document.getElementById('mascota');
+    const otraRazaInput = document.getElementById('otra-raza');
+    const telefonoInput = document.getElementById('telefono');
+    const numero_documentoInput = document.getElementById('numero_documento');
+    const tipoDocumentoSelect = document.getElementById('tipo_documento');
+    const edadNumeroInput = document.getElementById('edad-numero');
+
+    if (primer_nombreInput) primer_nombreInput.addEventListener('keydown', soloLetrasInput);
+    if (primer_apellidoInput) primer_apellidoInput.addEventListener('keydown', soloLetrasInput);
+    if (mascotaInput) mascotaInput.addEventListener('keydown', soloLetrasInput);
+    if (otraRazaInput) otraRazaInput.addEventListener('keydown', soloLetrasInput);
+    if (telefonoInput) telefonoInput.addEventListener('keydown', soloNumerosInput);
+    if (edadNumeroInput) edadNumeroInput.addEventListener('keydown', soloNumerosInput);
+
+    // Documento: depende del tipo
+    if (numero_documentoInput && tipoDocumentoSelect) {
+        numero_documentoInput.addEventListener('keydown', function(e) {
+            const tipo = tipoDocumentoSelect.value;
+            const key = e.key;
+            // Permitir teclas de control
+            if (
+                key === "Backspace" || key === "Delete" || key === "Tab" ||
+                key === "ArrowLeft" || key === "ArrowRight" || key === "Home" || key === "End"
+            ) {
+                return;
+            }
+            if (tipo === 'CC' || tipo === 'TI') {
+                // Solo números, máximo 10 dígitos
+                if (
+                    (key.length === 1 && !/[0-9]/.test(key)) ||
+                    (this.value.length >= 10)
+                ) {
+                    e.preventDefault();
+                }
+            } else if (tipo === 'CE') {
+                // Letras y números, máximo 2 letras al inicio
+                const valor = this.value;
+                if (valor.length < 2) {
+                    if (
+                        key.length === 1 &&
+                        !/[A-Za-z]/.test(key) &&
+                        !e.ctrlKey && !e.metaKey
+                    ) {
+                        e.preventDefault();
+                    }
+                } else {
+                    if (
+                        key.length === 1 &&
+                        !/[0-9]/.test(key) &&
+                        !e.ctrlKey && !e.metaKey
+                    ) {
+                        e.preventDefault();
+                    }
+                }
+            }
+        });
+
+        // Validación en tiempo real para longitud exacta
+        numero_documentoInput.addEventListener('input', function() {
+            const tipo = tipoDocumentoSelect.value;
+            if (tipo === 'CC') {
+                if (this.value.length < 10) {
+                    this.setCustomValidity('La cédula debe tener exactamente 10 números');
+                    document.getElementById('numero_documento-error').textContent = 'La cédula debe tener exactamente 10 números';
+                    document.getElementById('numero_documento-error').style.display = 'block';
+                } else if (this.value.length > 10) {
+                    this.value = this.value.slice(0, 10);
+                    this.setCustomValidity('');
+                    document.getElementById('numero_documento-error').style.display = 'none';
+                } else {
+                    this.setCustomValidity('');
+                    document.getElementById('numero_documento-error').style.display = 'none';
+                }
+            } else if (tipo === 'TI') {
+                if (this.value.length < 9) {
+                    this.setCustomValidity('La tarjeta de identidad debe tener 9 o 10 números');
+                    document.getElementById('numero_documento-error').textContent = 'La tarjeta de identidad debe tener 9 o 10 números';
+                    document.getElementById('numero_documento-error').style.display = 'block';
+                } else if (this.value.length > 10) {
+                    this.value = this.value.slice(0, 10);
+                    this.setCustomValidity('');
+                    document.getElementById('numero_documento-error').style.display = 'none';
+                } else {
+                    this.setCustomValidity('');
+                    document.getElementById('numero_documento-error').style.display = 'none';
+                }
+            } else {
+                this.setCustomValidity('');
+                document.getElementById('numero_documento-error').style.display = 'none';
+            }
+        });
+
+        // Limpiar el campo al cambiar el tipo de documento
+        tipoDocumentoSelect.addEventListener('change', function() {
+            numero_documentoInput.value = '';
+            numero_documentoInput.setCustomValidity('');
+            document.getElementById('numero_documento-error').style.display = 'none';
+        });
+    }
 });
 </script>
 </body>
